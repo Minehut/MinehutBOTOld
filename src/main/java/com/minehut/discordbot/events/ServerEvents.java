@@ -60,7 +60,7 @@ public class ServerEvents {
     public void handle(UserPardonEvent event) {
         Core.getDiscord().changeStatus(Status.game("with " + event.getGuild().getUsers().size() + " users!"));
 
-        Chat.sendDiscordMessage(event.getUser().getName() + " **was unbanned from Discord.**");
+        Chat.sendDiscordMessage(event.getUser().mention() + " **was unbanned from Discord.**");
         Core.log.info(event.getUser().getName() + " was unbanned from Discord.");
     }
 

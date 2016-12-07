@@ -3,6 +3,7 @@ package com.minehut.discordbot;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.minehut.discordbot.events.ChatEvents;
+import com.minehut.discordbot.events.Commands;
 import com.minehut.discordbot.events.ServerEvents;
 import com.minehut.discordbot.util.Chat;
 import org.slf4j.LoggerFactory;
@@ -21,12 +22,12 @@ import java.util.Scanner;
  */
 public class Core {
 
-    private static IDiscordClient discord = null;
     public static boolean enabled = false;
     public static String discordLogChatID = "253063123781550080"; //TODO Config
     public static boolean discordConnection;
     public static Discord4J.Discord4JLogger log = new Discord4J.Discord4JLogger("BOT");
-    private static ClientBuilder clientBuilder = new ClientBuilder(); // Creates the ClientBuilder instance
+    private static IDiscordClient discord = null;
+    private static ClientBuilder clientBuilder = new ClientBuilder();
     private static String token = "MjUzMDY0MjQ0MTU1NjQ1OTU0.Cx9tlQ.kSuH4KOZ0DqE_1KXPloogbKvJQ0"; //TODO Config
 
     private static IDiscordClient getClient(String token) {
@@ -135,6 +136,7 @@ public class Core {
 
             discord.getDispatcher().registerListener(new ServerEvents());
             discord.getDispatcher().registerListener(new ChatEvents());
+            discord.getDispatcher().registerListener(new Commands());
         }
     }
 

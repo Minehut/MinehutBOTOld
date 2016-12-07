@@ -19,13 +19,13 @@ public class Chat {
     public static void sendDiscordMessage(String message) {
         try {
             Core.getDiscord().getChannelByID(Core.discordLogChatID).sendMessage(message);
-        } catch (RateLimitException e) { // RateLimitException thrown. The bot is sending messages too quickly!
+        } catch (RateLimitException e) {
             Core.log.error("Sending messages too quickly!");
             e.printStackTrace();
-        } catch (DiscordException e) { // DiscordException thrown. Many possibilities. Use getErrorMessage() to see what went wrong.
+        } catch (DiscordException e) {
             Core.log.error(e.getErrorMessage());
             e.printStackTrace();
-        } catch (MissingPermissionsException e) { // MissingPermissionsException thrown. The bot doesn't have permission to send the message!
+        } catch (MissingPermissionsException e) {
             Core.log.error("Missing permissions for channel!");
             e.printStackTrace();
         }
@@ -34,13 +34,13 @@ public class Chat {
     public static void sendDiscordMessage(String message, IChannel channel) {
         try {
             Core.getDiscord().getChannelByID(channel.getID()).sendMessage(message);
-        } catch (RateLimitException e) { // RateLimitException thrown. The bot is sending messages too quickly!
+        } catch (RateLimitException e) {
             Core.log.error("Sending messages too quickly!");
             e.printStackTrace();
-        } catch (DiscordException e) { // DiscordException thrown. Many possibilities. Use getErrorMessage() to see what went wrong.
+        } catch (DiscordException e) {
             Core.log.error(e.getErrorMessage());
             e.printStackTrace();
-        } catch (MissingPermissionsException e) { // MissingPermissionsException thrown. The bot doesn't have permission to send the message!
+        } catch (MissingPermissionsException e) {
             Core.log.error("Missing permissions for channel!");
             e.printStackTrace();
         }
@@ -48,7 +48,9 @@ public class Chat {
 
     public static void removeMessage(IMessage message) {
         try {
-            message.delete();
+            if (!message.isDeleted()) {
+                message.delete();
+            }
         } catch (MissingPermissionsException | RateLimitException | DiscordException e) {
             e.printStackTrace();
         }

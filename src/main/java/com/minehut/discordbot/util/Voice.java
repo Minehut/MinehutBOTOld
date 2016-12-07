@@ -12,12 +12,12 @@ import java.io.IOException;
  */
 public class Voice {
 
-    private static void setVolume(float vol, IGuild guild) { //TODO Change to %
+    public static void setVolume(float vol, IGuild guild) { //TODO Change to %
         AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
         player.setVolume(vol);
     }
 
-    private static void pause(IGuild guild) throws IOException, UnsupportedAudioFileException {
+    public static void pause(IGuild guild) throws IOException, UnsupportedAudioFileException {
         AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
         if (!player.isPaused()) {
             player.setPaused(true);
@@ -26,22 +26,22 @@ public class Voice {
 
     //TODO Add toggle pause
 
-    private static void resume(IGuild guild) throws IOException, UnsupportedAudioFileException {
+    public static void resume(IGuild guild) throws IOException, UnsupportedAudioFileException {
         AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
         if (player.isPaused()) {
             player.setPaused(false);
         }
     }
 
-    private static void skip(IGuild guild) throws IOException, UnsupportedAudioFileException {
+    public static void skip(IGuild guild) throws IOException, UnsupportedAudioFileException {
         AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
         player.skip();
     }
 
-    private static void playAudioFile(String s_file, IGuild guild) throws IOException, UnsupportedAudioFileException {
-        File file = new File(s_file);
+    public static void playAudioFile(String file, IGuild guild) throws IOException, UnsupportedAudioFileException {
+        File music = new File("C:/words/" + file + ".mp3");
         AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
-        player.queue(file);
+        player.queue(music);
     }
 
 }
