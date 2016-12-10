@@ -22,7 +22,6 @@ import java.util.ArrayList;
 public class ChatEvents {
 
     public static ArrayList<String> badWords = new ArrayList<>();
-    public static boolean logRemove = true;
 
     @EventSubscriber
     public void handle(MessageReceivedEvent event) throws IOException, RateLimitException, DiscordException {
@@ -73,13 +72,7 @@ public class ChatEvents {
 
                 Chat.sendDiscordMessage(sender.mention() + ", please do not mention staff in this channel as if gets checked regularly. If it's urgent, please use " +
                         event.getMessage().getGuild().getChannelByID("239599059415859200").mention() + " Thanks! ^-^", channel);
-                return;
             }
-        }
-
-        //TODO temp
-        if (!channel.getID().equals("240296608338673664") && sender.getID().equals("176778082789752832") && message.getContent().startsWith("eval")) {
-            Chat.sendDiscordMessage(sender.mention() + ", please use #random for self bot related testing, thanks! ^-^", channel);
         }
     }
 
@@ -90,13 +83,15 @@ public class ChatEvents {
         IUser sender = oldMessage.getAuthor();
         IChannel channel = oldMessage.getChannel();
 
-        if (sender.getName().equals(sender.getDisplayName(oldMessage.getGuild()))) {
-            Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(oldMessage.getGuild()) + " updated message \"" +
-                    Chat.fixDiscordMentions(oldMessage) + "\" -> \"" + Chat.fixDiscordMentions(newMessage) + "\"");
-        } else {
-            Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(oldMessage.getGuild()) + " (" +
-                    sender.getName() + ") updated message \"" +
-                    Chat.fixDiscordMentions(oldMessage) + "\" -> \"" + Chat.fixDiscordMentions(newMessage) + "\"");
+        if (!sender.equals(Core.getDiscord().getOurUser())) {
+            if (sender.getName().equals(sender.getDisplayName(oldMessage.getGuild()))) {
+                Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(oldMessage.getGuild()) + " updated message \"" +
+                        Chat.fixDiscordMentions(oldMessage) + "\" -> \"" + Chat.fixDiscordMentions(newMessage) + "\"");
+            } else {
+                Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(oldMessage.getGuild()) + " (" +
+                        sender.getName() + ") updated message \"" +
+                        Chat.fixDiscordMentions(oldMessage) + "\" -> \"" + Chat.fixDiscordMentions(newMessage) + "\"");
+            }
         }
     }
 
@@ -107,7 +102,9 @@ public class ChatEvents {
         IChannel channel = message.getChannel();
 
         if (!sender.equals(Core.getDiscord().getOurUser())) {
-            if (!logRemove) return;
+            if (message == null) return;
+            if (message.getContent().startsWith("!")) return;
+            if (!Chat.logRemove) return;
 
             if (sender.getName().equals(sender.getDisplayName(message.getGuild()))) {
                 Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(message.getGuild()) + " removed message \"" + Chat.fixDiscordMentions(message) + "\"");

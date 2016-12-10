@@ -30,13 +30,9 @@ public class Core {
     private static ClientBuilder clientBuilder = new ClientBuilder();
     private static String token = "MjUzMDY0MjQ0MTU1NjQ1OTU0.Cx9tlQ.kSuH4KOZ0DqE_1KXPloogbKvJQ0"; //TODO Config
 
-    private static IDiscordClient getClient(String token) {
-        try {
-            return clientBuilder.withToken(token).login();
-        } catch (DiscordException e) {
-            e.printStackTrace();
-            return null;
-        }
+    private static IDiscordClient getClient(String token) throws DiscordException {
+        //clientBuilder.withShards(2);
+        return clientBuilder.withToken(token).login();
     }
 
     public static void main(String[] args) throws Exception {

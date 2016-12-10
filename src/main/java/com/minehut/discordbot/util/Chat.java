@@ -8,6 +8,7 @@ import sx.blah.discord.handle.obj.IUser;
 import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.MissingPermissionsException;
 import sx.blah.discord.util.RateLimitException;
+import sx.blah.discord.util.RequestBuffer;
 
 import java.util.List;
 
@@ -15,6 +16,8 @@ import java.util.List;
  * Created by MatrixTunnel on 11/28/2016.
  */
 public class Chat {
+
+    public static boolean logRemove = true;
 
     public static void sendDiscordMessage(String message) {
         try {
@@ -47,13 +50,17 @@ public class Chat {
     }
 
     public static void removeMessage(IMessage message) {
-        try {
-            if (!message.isDeleted()) {
+        RequestBuffer.request(() -> {
+            try {
                 message.delete();
+            } catch (MissingPermissionsException e) {
+                // Ignore
+            } catch (DiscordException e) {
+                Core.log.error("Could not erase message!", e);
             }
-        } catch (MissingPermissionsException | RateLimitException | DiscordException e) {
-            e.printStackTrace();
-        }
+        });
+
+        logRemove = true;
     }
 
     public static String fixDiscordMentions(IMessage message) {

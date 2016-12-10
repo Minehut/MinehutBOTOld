@@ -38,9 +38,10 @@ public class Voice {
         player.skip();
     }
 
-    public static void playAudioFile(String file, IGuild guild) throws IOException, UnsupportedAudioFileException {
-        File music = new File("C:/words/" + file + ".mp3");
+    public static void playAudioFile(String output, IGuild guild) throws IOException, UnsupportedAudioFileException {
         AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);
+
+        File music = new File("C:/words/" + output + ".mp3");
         player.queue(music);
     }
 
