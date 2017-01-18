@@ -1,5 +1,6 @@
 package com.minehut.discordbot.util;
 
+import com.minehut.discordbot.Core;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.audio.AudioPlayer;
 
@@ -11,6 +12,11 @@ import java.io.IOException;
  * Created by MatrixTunnel on 12/5/2016.
  */
 public class Voice {
+
+    public static void clearPlaylist(IGuild guild) {
+        Core.getMusicManager().getPlayer(guild.getID()).getPlaylist().clear();
+        Core.getMusicManager().getPlayer(guild.getID()).skip();
+    }
 
     public static void setVolume(float vol, IGuild guild) { //TODO Change to %
         AudioPlayer player = AudioPlayer.getAudioPlayerForGuild(guild);

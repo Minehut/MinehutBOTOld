@@ -5,12 +5,12 @@ import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IMessage;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RateLimitException;
-import sx.blah.discord.util.RequestBuffer;
+import sx.blah.discord.util.*;
 
+import java.awt.*;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by MatrixTunnel on 11/28/2016.
@@ -19,34 +19,132 @@ public class Chat {
 
     public static boolean logRemove = true;
 
-    public static void sendDiscordMessage(String message) {
-        try {
-            Core.getDiscord().getChannelByID(Core.discordLogChatID).sendMessage(message);
-        } catch (RateLimitException e) {
-            Core.log.error("Sending messages too quickly!");
-            e.printStackTrace();
-        } catch (DiscordException e) {
-            Core.log.error(e.getErrorMessage());
-            e.printStackTrace();
-        } catch (MissingPermissionsException e) {
-            Core.log.error("Missing permissions for channel!");
-            e.printStackTrace();
-        }
+    public static final Color CUSTOM_BLUE = new Color(66, 173, 244);
+    public static final Color CUSTOM_RED = new Color(244, 78, 66);
+    public static final Color CUSTOM_GREEN = new Color(64, 192, 61);
+
+    public static IMessage sendMessage(EmbedBuilder embed, IChannel channel) {
+        RequestBuffer.RequestFuture<IMessage> future = RequestBuffer.request(() -> {
+            try {
+                return new MessageBuilder(Core.getDiscord()).withEmbed(embed.build())
+                        .withChannel(channel).send();
+            } catch (DiscordException | MissingPermissionsException e) {
+                Core.log.error("Something went wrong!", e);
+            }
+            return null;
+        });
+        return future.get();
     }
 
-    public static void sendDiscordMessage(String message, IChannel channel) {
-        try {
-            Core.getDiscord().getChannelByID(channel.getID()).sendMessage(message);
-        } catch (RateLimitException e) {
-            Core.log.error("Sending messages too quickly!");
-            e.printStackTrace();
-        } catch (DiscordException e) {
-            Core.log.error(e.getErrorMessage());
-            e.printStackTrace();
-        } catch (MissingPermissionsException e) {
-            Core.log.error("Missing permissions for channel!");
-            e.printStackTrace();
-        }
+    public static IMessage sendMessage(EmbedBuilder embed, IChannel channel, int removeTime) {
+        RequestBuffer.RequestFuture<IMessage> future = RequestBuffer.request(() -> {
+            try {
+                return setAutoDelete(new MessageBuilder(Core.getDiscord()).withEmbed(embed.build())
+                        .withChannel(channel).send(), removeTime);
+            } catch (DiscordException | MissingPermissionsException e) {
+                Core.log.error("Something went wrong!", e);
+            }
+            return null;
+        });
+        return future.get();
+    }
+
+    public static String getFullName(IUser user) {
+        return user.getName() + '#' + user.getDiscriminator();
+    }
+
+    public static EmbedBuilder getEmbed() {
+        return new EmbedBuilder().withColor(CUSTOM_BLUE).ignoreNullEmptyFields(); //Default blue
+    }
+
+    public static IMessage sendMessage(CharSequence message, IChannel channel) {
+        RequestBuffer.RequestFuture<IMessage> future = RequestBuffer.request(() -> {
+            try {
+                return channel.sendMessage(message.toString().substring(0, Math.min(message.length(), 1999)));
+            } catch (DiscordException | MissingPermissionsException e) {
+                Core.log.error("Something went wrong!", e);
+            }
+            return null;
+        });
+        return future.get();
+    }
+
+    public static IMessage sendMessage(CharSequence message, IChannel channel, int removeTime) {
+        RequestBuffer.RequestFuture<IMessage> future = RequestBuffer.request(() -> {
+            try {
+                return setAutoDelete(channel.sendMessage(message.toString().substring(0, Math.min(message.length(), 1999))), removeTime);
+            } catch (DiscordException | MissingPermissionsException e) {
+                Core.log.error("Something went wrong!", e);
+            }
+            return null;
+        });
+        return future.get();
+    }
+
+    public static void editMessage(String s, EmbedBuilder embed, IMessage message, int removeTime) {
+        RequestBuffer.request(() -> {
+            try {
+                setAutoDelete(message.edit(s, embed.build()), removeTime);
+            } catch (MissingPermissionsException | DiscordException e) {
+                Core.log.error("Could not edit own message + embed!", e);
+            }
+        });
+
+    }
+
+    public static void editMessage(String s, EmbedBuilder embed, IMessage message) {
+        RequestBuffer.request(() -> {
+            try {
+                message.edit(s, embed.build());
+            } catch (MissingPermissionsException | DiscordException e) {
+                Core.log.error("Could not edit own message + embed!", e);
+            }
+        });
+
+    }
+
+    public static void editMessage(EmbedBuilder embed, IMessage message) {
+        RequestBuffer.request(() -> {
+            try {
+                message.edit(message.getContent(), embed.build());
+            } catch (MissingPermissionsException | DiscordException e) {
+                Core.log.error("Could not edit own message + embed!", e);
+            }
+        });
+
+    }
+
+    public static void editMessage(EmbedBuilder embed, IMessage message, int removeTime) {
+        RequestBuffer.request(() -> {
+            try {
+                setAutoDelete(message.edit(message.getContent(), embed.build()), removeTime);
+            } catch (MissingPermissionsException | DiscordException e) {
+                Core.log.error("Could not edit own message + embed!", e);
+            }
+        });
+
+    }
+
+    public static void editMessage(IMessage message, String content) {
+        RequestBuffer.request(() -> {
+            try {
+                return message.edit(content);
+            } catch (MissingPermissionsException | DiscordException e) {
+                Core.log.error("Could not edit own message!", e);
+            }
+            return message;
+        }).get();
+    }
+
+    public static void editMessage(IMessage message, String content, int removeTime) {
+        RequestBuffer.request(() -> {
+            try {
+                return setAutoDelete(message.edit(content), removeTime);
+            } catch (MissingPermissionsException | DiscordException e) {
+                Core.log.error("Could not edit own message!", e);
+            }
+            return message;
+        }).get();
     }
 
     public static void removeMessage(IMessage message) {
@@ -61,6 +159,16 @@ public class Chat {
         });
 
         logRemove = true;
+    }
+
+    public static IMessage setAutoDelete(IMessage message, int time) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                removeMessage(message);
+            }
+        }, time * 1000);
+        return message;
     }
 
     public static String fixDiscordMentions(IMessage message) {
