@@ -28,7 +28,6 @@ import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.audio.AudioPlayer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -245,7 +244,4 @@ public class Core {
         commands.add(command);
     }
 
-    //public static PlayerManager getMusicManager() {
-        //return musicManager;
-    //}
 }
