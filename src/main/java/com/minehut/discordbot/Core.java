@@ -116,26 +116,23 @@ public class Core {
     public static void shutdown(boolean restart) {
         try {
             //broadcast("Turning myself off...");
-            for (IGuild guild : Core.getDiscord().getGuilds()) {
-                Core.getMusicManager().getPlayer(guild.getID()).getPlaylist().clear();
-                Core.getMusicManager().getPlayer(guild.getID()).skip();
-
-                AudioPlayer.getAudioPlayerForGuild(guild).getPlaylist().clear();
-                AudioPlayer.getAudioPlayerForGuild(guild).skip();
+            if (discord.getConnectedVoiceChannels().size() > 0) {
+                for (IGuild guild : Core.getDiscord().getGuilds()) {
+                    musicManager.getPlayer(guild.getID()).getPlaylist().clear();
+                    musicManager.getPlayer(guild.getID()).skip();
+                }
+                //if (Core.getDiscord().getOurUser().getConnectedVoiceChannels().size() > 0) {
+                //    Core.getDiscord().getOurUser().getConnectedVoiceChannels().stream().filter(channel -> channel != null).forEach(channel -> {
+                //        Core.getDiscord().getVoiceChannelByID(channel.getID()).leave();
+                //    });
+                //}
             }
-            //if (Core.getDiscord().getOurUser().getConnectedVoiceChannels().size() > 0) {
-            //    Core.getDiscord().getOurUser().getConnectedVoiceChannels().stream().filter(channel -> channel != null).forEach(channel -> {
-            //        Core.getDiscord().getVoiceChannelByID(channel.getID()).leave();
-            //    });
-            //}
 
             SkipCommand.votes.clear();
             VoiceEvents.playing.forEach(Chat::removeMessage);
             //TODO Remove all messages that are waiting on task timers
 
-            if (discord != null) {
-                discord.logout();
-            }
+            discord.logout();
             discordConnection = false;
             enabled = false;
             log.info("Disconnected from Discord");
