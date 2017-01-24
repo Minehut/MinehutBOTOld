@@ -32,6 +32,11 @@ public class QueueCommand implements Command {
     }
 
     @Override
+    public String[] getAliases() {
+        return new String[]{"songs", "playlist", "songlist"};
+    }
+
+    @Override
     public void onCommand(IShard shard, IGuild guild, IChannel channel, IUser sender, IMessage message, String[] args) throws DiscordException {
         Chat.setAutoDelete(message, 5);
 
