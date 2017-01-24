@@ -128,7 +128,7 @@ public class ChatEvents {
                                 }
 
                                 if (cmd.getType() == CommandType.MUSIC && !Bot.getMusicTextChannels().contains(channel.getID())) {
-                                    return; //TODO Use the #music channel (add "add and remove" music channels)
+                                    return; //TODO Use the #music channel (add "add and remove" music channels command)
                                 }
 
                                 try {
@@ -152,7 +152,7 @@ public class ChatEvents {
 
     @EventSubscriber
     public void handle(MessageUpdateEvent event) {
-        if (event.getOldMessage().getGuild() != Bot.getMainGuild()) return;
+        if (event.getOldMessage().getGuild() == null || event.getOldMessage().getGuild() != Bot.getMainGuild()) return;
         IMessage oldMessage = event.getOldMessage();
         IMessage newMessage = event.getNewMessage();
         IUser sender = oldMessage.getAuthor();
