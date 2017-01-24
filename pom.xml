@@ -125,18 +125,13 @@
         <dependency>
             <groupId>com.github.austinv11</groupId>
             <artifactId>Discord4j</artifactId>
-            <version>55627ae</version>
+            <version>51064b5</version>
             <classifier>shaded</classifier>
         </dependency>
         <dependency>
             <groupId>com.arsenarsen.lavaplayer-bridge</groupId>
-            <artifactId>core</artifactId>
-            <version>1.8-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.arsenarsen.lavaplayer-bridge</groupId>
             <artifactId>discord4j-impl</artifactId>
-            <version>1.8-SNAPSHOT</version>
+            <version>1.9-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
