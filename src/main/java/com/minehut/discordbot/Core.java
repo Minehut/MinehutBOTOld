@@ -42,14 +42,13 @@ import java.util.stream.Collectors;
 public class Core {
 
     public static boolean enabled = false;
-    public static String discordLogChatID = "253063123781550080"; //TODO Config
+    public static String discordLogChatID = "253063123781550080";
     public static boolean discordConnection;
     public static Logger log = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
     private static IDiscordClient discord;
-    private static String token = "MjUzMDY0MjQ0MTU1NjQ1OTU0.C0bfrg.CI1hZtwlhPNMgEDqq-SIB89dl8w"; //TODO Config
-    private static String youTubeKey = "AIzaSyASdfSoMieeRyhoN4DZI8_k7rsDzMcQBfw"; //TODO Config
-    private static String soundCloudKey = ""; //TODO Config
+    private static String token = Secret.getDiscordToken();
+    private static String youTubeKey = Secret.getYouTubeAPIKey();
     private static List<Command> commands;
     private static PlayerManager musicManager;
 
@@ -182,10 +181,6 @@ public class Core {
 
     public static List<Command> getCommands() {
         return commands;
-    }
-
-    public static String getSoundCloudKey() {
-        return soundCloudKey;
     }
 
     public static PlayerManager getMusicManager() {
