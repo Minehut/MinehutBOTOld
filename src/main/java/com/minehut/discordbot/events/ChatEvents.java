@@ -152,13 +152,20 @@ public class ChatEvents {
 
     @EventSubscriber
     public void handle(MessageUpdateEvent event) {
-        if (event.getOldMessage().getGuild() == null || event.getOldMessage().getGuild() != Bot.getMainGuild()) return;
+        if (event.getOldMessage().getGuild() != Bot.getMainGuild()) return;
         IMessage oldMessage = event.getOldMessage();
         IMessage newMessage = event.getNewMessage();
         IUser sender = oldMessage.getAuthor();
         IChannel channel = oldMessage.getChannel();
 
         if (!sender.equals(Core.getDiscord().getOurUser())) {
+            if (newMessage.getContent() == null || newMessage.getContent().equals("")) {
+                return;
+            }
+
+            if (newMessage.getContent().startsWith(Command.getPrefix())) return;
+            if (!Chat.logRemove) return;
+
             if (sender.getName().equals(sender.getDisplayName(oldMessage.getGuild()))) {
                 Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(oldMessage.getGuild()) + " updated message \"" +
                         Chat.fixDiscordMentions(oldMessage) + "\" -> \"" + Chat.fixDiscordMentions(newMessage) + "\"");
