@@ -24,6 +24,7 @@ import sx.blah.discord.api.ClientBuilder;
 import sx.blah.discord.api.IDiscordClient;
 import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.DiscordException;
 
 import java.io.*;
@@ -116,11 +117,11 @@ public class Core {
                     musicManager.getPlayer(guild.getID()).getPlaylist().clear();
                     musicManager.getPlayer(guild.getID()).skip();
                 }
-                //if (Core.getDiscord().getOurUser().getConnectedVoiceChannels().size() > 0) {
-                //    Core.getDiscord().getOurUser().getConnectedVoiceChannels().stream().filter(channel -> channel != null).forEach(channel -> {
-                //        Core.getDiscord().getVoiceChannelByID(channel.getID()).leave();
-                //    });
-                //}
+
+                for (IVoiceChannel channel : Core.getDiscord().getConnectedVoiceChannels()) {
+                    Core.log.info("[Guild: " + channel.getGuild().getName() + " left channel: \"" + channel.getName() + "\" (" + channel.getID() + ")]");
+                    channel.leave();
+                }
             }
 
             SkipCommand.votes.clear();
@@ -213,7 +214,7 @@ public class Core {
 
     private void init() throws UnknownBindingException {
         try {
-            discord = new ClientBuilder().withToken(token).login();
+            discord = new ClientBuilder().setMaxReconnectAttempts(Integer.MAX_VALUE).withToken(token).login();
             registerEvents();
             commands = new ArrayList<>();
             musicManager = PlayerManager.getPlayerManager(LibraryFactory.getLibrary(discord));
@@ -222,7 +223,7 @@ public class Core {
             Discord4J.disableChannelWarnings();
             ChatEvents.badWords = loadBadWords();
         } catch (DiscordException e) {
-            log.error("Could not log in!", e);
+            log.error("Could not login to Discord!", e);
             shutdown(false);
         }
 
