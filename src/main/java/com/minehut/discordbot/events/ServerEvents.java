@@ -14,10 +14,7 @@ import sx.blah.discord.handle.impl.events.guild.member.*;
 import sx.blah.discord.handle.impl.events.shard.DisconnectedEvent;
 import sx.blah.discord.handle.impl.events.shard.ReconnectSuccessEvent;
 import sx.blah.discord.handle.obj.*;
-import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.EmbedBuilder;
-import sx.blah.discord.util.MissingPermissionsException;
-import sx.blah.discord.util.RateLimitException;
 
 import java.awt.*;
 import java.util.Date;
@@ -30,10 +27,14 @@ public class ServerEvents {
     private static String disconnectReason = "UNKNOWN";
 
     @EventSubscriber
-    public void handle(ReadyEvent event) throws MissingPermissionsException {
+    public void handle(ReadyEvent event) {
 
         Core.discordConnection = true;
         Bot.updateUsers();
+
+        for (IRole role : Bot.getMainGuild().getRoles()) {
+            Core.log.info("Name: \"" + role.getName() + "\" ID: \"" + role.getID() + "\" - " + role.getPermissions());
+        }
 
         Core.getMusicManager().getPlayerCreateHooks().register(player -> player.addEventListener(new AudioEventAdapter() {
             @Override
@@ -42,11 +43,12 @@ public class ServerEvents {
                     IChannel channel = Core.getDiscord().getChannelByID(id);
                     AudioPlayer song = Core.getMusicManager().getPlayer(channel.getGuild().getID()).getPlayer();
 
-                    if (channel != null && song.getPlayingTrack() == track) {
+                    if (song == player || song.getPlayingTrack() == track) {
                         IMessage msg = Chat.sendMessage("Now Playing: **" + track.getInfo().title + "**", channel);
 
                         SkipCommand.votes.clear();
                         VoiceEvents.playing.add(msg);
+                        break;
                     }
                 }
             }
@@ -55,11 +57,12 @@ public class ServerEvents {
             public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
                 //Chat.removeMessage(msg);
                 SkipCommand.votes.clear();
-                if (VoiceEvents.playing == null) return;
 
-                for (IMessage msg : VoiceEvents.playing) { //Has thrown a npe a few times. I think I fixed it with the break
-                    String content = msg.getContent().toLowerCase();
-                    if (content.contains(track.getInfo().title.toLowerCase())) {
+                for (IMessage msg : VoiceEvents.playing) {
+
+                    AudioPlayer guild = Core.getMusicManager().getPlayer(msg.getGuild().getID()).getPlayer();
+
+                    if (player == guild) {
                         Chat.removeMessage(msg);
                         VoiceEvents.playing.remove(msg);
                         break;
@@ -69,6 +72,7 @@ public class ServerEvents {
         }));
 
         Core.registerCommands();
+
         for (IGuild guild : Core.getDiscord().getGuilds()) {
             Core.getMusicManager().getPlayer(guild.getID()).setVolume(25);
         }
@@ -85,7 +89,7 @@ public class ServerEvents {
     }
 
     @EventSubscriber
-    public void handle(UserJoinEvent event) throws RateLimitException, DiscordException, MissingPermissionsException {
+    public void handle(UserJoinEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
         IUser user = event.getUser();
         IGuild guild = event.getGuild();
@@ -125,7 +129,7 @@ public class ServerEvents {
     }
 
     @EventSubscriber
-    public void handle(UserLeaveEvent event) throws RateLimitException, DiscordException, MissingPermissionsException {
+    public void handle(UserLeaveEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
         IUser user = event.getUser();
 
@@ -148,7 +152,7 @@ public class ServerEvents {
     }
 
     @EventSubscriber
-    public void handle(UserBanEvent event) throws RateLimitException, DiscordException, MissingPermissionsException {
+    public void handle(UserBanEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
         IUser user = event.getUser();
         IGuild guild = event.getGuild();
@@ -169,7 +173,7 @@ public class ServerEvents {
     }
 
     @EventSubscriber
-    public void handle(UserPardonEvent event) throws RateLimitException, DiscordException, MissingPermissionsException {
+    public void handle(UserPardonEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
         IUser user = event.getUser();
         IGuild guild = event.getGuild();
@@ -190,7 +194,7 @@ public class ServerEvents {
     }
 
     @EventSubscriber
-    public void handle(NickNameChangeEvent event) throws RateLimitException, DiscordException, MissingPermissionsException {
+    public void handle(NicknameChangedEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
         IUser user = event.getUser();
 
@@ -215,7 +219,7 @@ public class ServerEvents {
     }
 
     @EventSubscriber
-    public void handle(DisconnectedEvent event) throws DiscordException {
+    public void handle(DisconnectedEvent event) {
         if (event.getReason() != DisconnectedEvent.Reason.LOGGED_OUT) {
             if (event.getReason() != DisconnectedEvent.Reason.RECONNECT_OP) {
                 disconnectReason = event.getReason().name();
