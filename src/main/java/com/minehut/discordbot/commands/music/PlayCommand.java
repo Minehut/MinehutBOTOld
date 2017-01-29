@@ -26,7 +26,7 @@ public class PlayCommand implements Command {
         Chat.setAutoDelete(message, 5);
 
         if (args.length == 0) {
-            Chat.sendMessage(sender.mention() + " Usage: ```" + Command.getPrefix() + "play <term>```", channel, 15);
+            Chat.sendMessage(sender.mention() + " Usage: `" + Command.getPrefix() + getCommand() + getArgs() + "`", channel, 15);
         } else if (args.length >= 1) {
             if (!sender.getConnectedVoiceChannels().contains(guild.getConnectedVoiceChannel())) {
                 Chat.sendMessage(sender.mention() + " you must be in the music channel in order to play songs!", channel, 10);
@@ -48,8 +48,8 @@ public class PlayCommand implements Command {
     }
 
     @Override
-    public String getDescription() {
-        return null;
+    public String getArgs() {
+        return " <term>";
     }
 
     @Override

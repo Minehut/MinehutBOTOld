@@ -42,8 +42,8 @@ public class ReconnectVoiceCommand implements Command {
     }
 
     @Override
-    public String getDescription() {
-        return null;
+    public String getArgs() {
+        return "";
     }
 
     @Override

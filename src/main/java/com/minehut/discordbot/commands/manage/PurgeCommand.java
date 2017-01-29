@@ -29,6 +29,11 @@ public class PurgeCommand implements Command {
     }
 
     @Override
+    public String[] getAliases() {
+        return new String[]{"cut"};
+    }
+
+    @Override
     public void onCommand(IShard shard, IGuild guild, IChannel channel, IUser sender, IMessage message, String[] args) throws DiscordException {
         if (args.length == 1 && args[0].matches("\\d+")) {
             int count = Integer.parseInt(args[0]) + 1;
@@ -64,8 +69,14 @@ public class PurgeCommand implements Command {
                 Chat.logRemove = true;
             });
         } else {
-            Chat.sendMessage(Chat.getEmbed().withDesc("Bad arguments!\n" + getDescription()), channel, 5); //TODO Make reaction
+            Chat.sendMessage(Chat.getEmbed().withDesc("Usage: `" + Command.getPrefix() + getCommand() + getArgs() + "`").withColor(Chat.CUSTOM_GREEN), channel, 5);
+            //Chat.sendMessage(Chat.getEmbed().withDesc("Bad arguments!\n" + getDescription()), channel, 5); //TODO Make reaction
         }
+    }
+
+    @Override
+    public String getArgs() {
+        return " <messages to remove>";
     }
 
     private void bulk(List<IMessage> toDelete, IChannel channel) {
@@ -81,11 +92,6 @@ public class PurgeCommand implements Command {
                             .withDesc("I do not have the `Manage Messages` permission!"), channel, 10);
             }
         });
-    }
-
-    @Override
-    public String getDescription() {
-        return null;
     }
 
     @Override

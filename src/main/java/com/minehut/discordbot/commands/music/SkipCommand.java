@@ -78,8 +78,8 @@ public class SkipCommand implements Command {
     }
 
     @Override
-    public String getDescription() {
-        return null;
+    public String getArgs() {
+        return "";
     }
 
     @Override

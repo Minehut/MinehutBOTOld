@@ -20,7 +20,7 @@ public class HelpCommand implements Command {
 
     @Override
     public String[] getAliases() {
-        return new String[]{"commands"};
+        return new String[]{"commands", "howdoido"};
     }
 
     @Override
@@ -29,8 +29,8 @@ public class HelpCommand implements Command {
     }
 
     @Override
-    public String getDescription() {
-        return null;
+    public String getArgs() {
+        return "";
     }
 
     @Override

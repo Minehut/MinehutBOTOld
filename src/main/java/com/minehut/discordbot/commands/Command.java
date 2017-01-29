@@ -17,7 +17,7 @@ public interface Command {
 
     void onCommand(IShard shard, IGuild guild, IChannel channel, IUser sender, IMessage message, String[] args) throws DiscordException;
 
-    String getDescription();
+    String getArgs();
 
     CommandType getType();
 

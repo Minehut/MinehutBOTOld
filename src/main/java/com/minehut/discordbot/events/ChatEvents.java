@@ -68,85 +68,85 @@ public class ChatEvents {
         }
         */
 
-            if (message.toString().contains("discord.gg")) {
+            if (message.toString().contains("discord.gg") && !Bot.isTrusted(sender)) {
                 Chat.removeMessage(message);
 
                 Chat.sendMessage(sender.mention() + ", please do not advertise Discord servers. Thanks! ^-^", channel);
                 return;
             }
 
-            // #suggestions, #bug-report and
-            if (channel.getID().equals("240917433731383298") || channel.getID().equals("240274864462626818") || channel.getID().equals("255381642913251328")) {
-                if (message.getRoleMentions().size() != 0) { //TODO Remove @everyone & @here
+            if ((message.mentionsEveryone() || message.mentionsHere()) && !Bot.isTrusted(sender)) {
+                Chat.sendMessage(sender.mention() + ", you know that mentioning everyone like that is disabled right? xD", channel);
+            }
+
+            /*
+            //TODO Warn against mentioning staff
+            if (channel.getID().equals("239599059415859200") && !Bot.isTrusted(sender)) {
+                if (message.getRoleMentions().size() != 0 && (!message.mentionsEveryone() || !message.mentionsHere())) { //TODO Remove @everyone & @here
 
                     Chat.sendMessage(sender.mention() + ", please do not mention staff in this channel as if gets checked regularly. If it's urgent, please use " +
                             event.getMessage().getGuild().getChannelByID("239599059415859200").mention() + " Thanks! ^-^", channel);
                 }
             }
-
-            if (message.mentionsEveryone() && !Bot.userHasRoleId(guild, sender, "240228183985618954")) {
-                Chat.sendMessage(sender.mention() + ", you do know that @everyone is disabled right? xD", channel);
-            }
+            */
         }
 
         if (message.getContent() != null && message.getContent().startsWith(Command.getPrefix()) && !message.getAuthor().isBot()) {
 
-                String msg = message.getContent();
-                String command = msg.substring(1);
-                String[] args = new String[0];
-                if (msg.contains(" ")) {
-                    command = command.substring(0, msg.indexOf(" ") - 1);
-                    args = msg.substring(msg.indexOf(" ") + 1).split(" ");
-                }
-                for (Command cmd : Core.getCommands()) {
-                    if (cmd.getCommand().equalsIgnoreCase(command)) {
+            String msg = message.getContent();
+            String command = msg.substring(1);
+            String[] args = new String[0];
+            if (msg.contains(" ")) {
+                command = command.substring(0, msg.indexOf(" ") - 1);
+                args = msg.substring(msg.indexOf(" ") + 1).split(" ");
+            }
 
-                        if (cmd.getType() == CommandType.ADMINISTRATIVE && !Bot.isTrusted(sender)) {
-                            return;
-                        }
-
-                        if (cmd.getType() == CommandType.MUSIC && !Bot.getMusicTextChannels().contains(channel.getID())) {
-                            return; //TODO Use the #music channel (add "add and remove" music channels)
-                        }
-
-                        try {
-                            cmd.onCommand(shard, guild, channel, sender, message, args);
-                        } catch (Exception ex) {
-                            Core.log.error("Exception in guild " + "!\n" + '\'' + cmd.getCommand() + "' "
-                                    + Arrays.toString(args) + " in " + channel + "! Sender: " +
-                                    sender.getName() + '#' + sender.getDiscriminator(), ex);
-                            ex.printStackTrace();
-
-                        }
+            for (Command cmd : Core.getCommands()) {
+                if (cmd.getCommand().equalsIgnoreCase(command)) {
+                    if (cmd.getType() == CommandType.ADMINISTRATIVE && !Bot.isTrusted(sender)) {
                         return;
-                    } else {
-                        for (String alias : cmd.getAliases()) {
-                            if (alias.equalsIgnoreCase(command)) {
+                    }
 
-                                if (cmd.getType() == CommandType.ADMINISTRATIVE && !Bot.isTrusted(sender)) {
-                                    return;
-                                }
+                    if (cmd.getType() == CommandType.MUSIC && !Bot.getMusicTextChannels().contains(channel.getID())) {
+                        return; //TODO Use the #music channel (add "add and remove" music channels)
+                    }
 
-                                if (cmd.getType() == CommandType.MUSIC && !Bot.getMusicTextChannels().contains(channel.getID())) {
-                                    return; //TODO Use the #music channel (add "add and remove" music channels command)
-                                }
-
-                                try {
-                                    cmd.onCommand(shard, guild, channel, sender, message, args);
-                                } catch (Exception ex) {
-                                    Core.log.error("Exception in guild " + "!\n" + '\'' + cmd.getCommand() + "' "
-                                            + Arrays.toString(args) + " in " + channel + "! Sender: " +
-                                            sender.getName() + '#' + sender.getDiscriminator(), ex);
-                                    ex.printStackTrace();
-                                }
+                    try {
+                        cmd.onCommand(shard, guild, channel, sender, message, args);
+                    } catch (Exception ex) {
+                        Core.log.error("Exception in guild " + "!\n" + '\'' + cmd.getCommand() + "' "
+                                + Arrays.toString(args) + " in " + channel + "! Sender: " +
+                                sender.getName() + '#' + sender.getDiscriminator(), ex);
+                        ex.printStackTrace();
+                    }
+                    return;
+                } else {
+                    for (String alias : cmd.getAliases()) {
+                        if (alias.equalsIgnoreCase(command)) {
+                            if (cmd.getType() == CommandType.ADMINISTRATIVE && !Bot.isTrusted(sender)) {
                                 return;
-                            } else {
-                                //not a valid command
-                                Chat.setAutoDelete(message, 120);
                             }
+
+                            if (cmd.getType() == CommandType.MUSIC && !Bot.getMusicTextChannels().contains(channel.getID())) {
+                                return; //TODO Use the #music channel (add "add and remove" music channels command)
+                            }
+
+                            try {
+                                cmd.onCommand(shard, guild, channel, sender, message, args);
+                            } catch (Exception ex) {
+                                Core.log.error("Exception in guild " + "!\n" + '\'' + cmd.getCommand() + "' "
+                                        + Arrays.toString(args) + " in " + channel + "! Sender: " +
+                                        sender.getName() + '#' + sender.getDiscriminator(), ex);
+                                ex.printStackTrace();
+                            }
+                            return;
+                        } else {
+                            //not a valid command
+                            Chat.setAutoDelete(message, 120);
                         }
                     }
                 }
+            }
         }
     }
 

@@ -47,8 +47,8 @@ public class NowPlayingCommand implements Command {
     }
 
     @Override
-    public String getDescription() {
-        return null;
+    public String getArgs() {
+        return "";
     }
 
     @Override

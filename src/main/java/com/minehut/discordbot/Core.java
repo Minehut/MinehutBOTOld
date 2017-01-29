@@ -10,10 +10,7 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.manage.PurgeCommand;
 import com.minehut.discordbot.commands.manage.ReconnectVoiceCommand;
-import com.minehut.discordbot.commands.music.NowPlayingCommand;
-import com.minehut.discordbot.commands.music.PlayCommand;
-import com.minehut.discordbot.commands.music.QueueCommand;
-import com.minehut.discordbot.commands.music.SkipCommand;
+import com.minehut.discordbot.commands.music.*;
 import com.minehut.discordbot.events.ChatEvents;
 import com.minehut.discordbot.events.Commands;
 import com.minehut.discordbot.events.ServerEvents;
@@ -207,6 +204,7 @@ public class Core {
         registerCommand(new SkipCommand());
         registerCommand(new QueueCommand());
         registerCommand(new NowPlayingCommand());
+        registerCommand(new VolumeCommand());
     }
 
     public static List<Command> getCommandsByType(CommandType type) {
