@@ -54,7 +54,7 @@ public class Chat {
     }
 
     public static EmbedBuilder getEmbed() {
-        return new EmbedBuilder().withColor(CUSTOM_BLUE).ignoreNullEmptyFields(); //Default blue
+        return new EmbedBuilder().withColor(CUSTOM_BLUE).setLenient(true); //Default blue
     }
 
     public static IMessage sendMessage(CharSequence message, IChannel channel) {
