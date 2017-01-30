@@ -12,7 +12,9 @@ import java.util.List;
 public class Bot {
 
     public static void updateUsers() {
-        Core.getDiscord().streaming(getMainGuild().getUsers().size() + " Minehut users!", "https://www.minehut.com");
+        if (Core.getDiscord().isLoggedIn()) {
+            Core.getDiscord().streaming(getMainGuild().getUsers().size() + " Minehut users!", "https://www.minehut.com");
+        }
     }
 
     public static IGuild getMainGuild() {

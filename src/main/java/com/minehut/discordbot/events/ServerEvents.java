@@ -175,7 +175,7 @@ public class ServerEvents {
 
     @EventSubscriber
     public void handle(ReconnectSuccessEvent event) {
-        Bot.updateUsers();
+        //Bot.updateUsers(); <--- Causing bad stuff to happen
         //Core.broadcast("Connection to Discord has been reestablished! Disconnect reason: " + disconnectReason);
         Core.log.info("Connection to Discord has been reestablished!");
         Core.discordConnection = true;
