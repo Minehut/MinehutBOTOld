@@ -11,6 +11,7 @@ import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.general.InfoCommand;
 import com.minehut.discordbot.commands.manage.PurgeCommand;
 import com.minehut.discordbot.commands.manage.ReconnectVoiceCommand;
+import com.minehut.discordbot.commands.manage.ShutdownCommand;
 import com.minehut.discordbot.commands.music.*;
 import com.minehut.discordbot.events.ChatEvents;
 import com.minehut.discordbot.events.ServerEvents;
@@ -111,13 +112,15 @@ public class Core {
             Chat.timer.cancel();
             //TODO Remove all messages that are waiting on task timers
 
-            discord.logout();
+            if (discord.isLoggedIn()) {
+                discord.logout();
+                log.info("Disconnected from Discord.");
+            }
             discordConnection = false;
             enabled = false;
-            log.info("Disconnected from Discord");
             if (restart) {
                 log.info("Restarting...");
-                new ProcessBuilder("start.bat").start();
+                new ProcessBuilder("/bin/bash", "run.sh").start();
             } else {
                 log.info("Shut down successfully");
                 Unirest.shutdown();
@@ -220,6 +223,7 @@ public class Core {
 
         registerCommand(new PurgeCommand());
         registerCommand(new ReconnectVoiceCommand());
+        registerCommand(new ShutdownCommand());
 
         registerCommand(new PlayCommand());
         registerCommand(new SkipCommand());
