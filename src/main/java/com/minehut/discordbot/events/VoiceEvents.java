@@ -1,15 +1,10 @@
 package com.minehut.discordbot.events;
 
 import com.minehut.discordbot.Core;
-import com.minehut.discordbot.util.Bot;
-import com.minehut.discordbot.util.Voice;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelJoinEvent;
 import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelLeaveEvent;
-import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelMoveEvent;
 import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.util.MissingPermissionsException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +56,7 @@ public class VoiceEvents extends AudioEventAdapter {
         }
 
     }
-    */
+
 
     //TODO Chat.sendMessage("Playlist has been cleared since no one is in the Music channel", channel, 45);
 
@@ -73,15 +68,15 @@ public class VoiceEvents extends AudioEventAdapter {
             Core.getDiscord().getVoiceChannelByID(event.getVoiceChannel().getID()).join();
         }
     }
+    */
 
     @EventSubscriber
-    public void handle(UserVoiceChannelLeaveEvent event) throws MissingPermissionsException {
-        if (!Bot.getMusicVoiceChannels().contains(event.getVoiceChannel().getID())) return;
-        if (event.getVoiceChannel().getConnectedUsers().contains(Core.getDiscord().getOurUser()) && event.getVoiceChannel().getConnectedUsers().size() <= 1) {
-            Voice.clearPlaylist(event.getGuild());
-            Core.getDiscord().getVoiceChannelByID(event.getVoiceChannel().getID()).leave();
+    public void handle(UserVoiceChannelLeaveEvent event) {
+        if (event.getUser() == Core.getDiscord().getOurUser()) {
+            Core.getDiscord().getVoiceChannelByID(event.getVoiceChannel().getID()).join();
         }
     }
+    /*
 
     @EventSubscriber
     public void handle(UserVoiceChannelMoveEvent event) throws MissingPermissionsException {
@@ -97,6 +92,7 @@ public class VoiceEvents extends AudioEventAdapter {
         }
 
     }
+    */
 
     //public void trackStart(TrackStartEvent event) {
 

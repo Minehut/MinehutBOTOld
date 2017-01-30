@@ -22,18 +22,18 @@ public class Bot {
     public static List<String> getMusicTextChannels() { //TODO Config/fix :P
         List<String> textChannels = new ArrayList<>();
         textChannels.add("250849094208192512"); //Minehut
-        textChannels.add("244744966839074816"); //Matrix Spam
-        textChannels.add("263087009805893632"); //Informer's Home
-        textChannels.add("266232237597523968"); //Toro's Discord (bot-spam)
+        //textChannels.add("244744966839074816"); //Matrix Spam
+        //textChannels.add("263087009805893632"); //Informer's Home
+        //textChannels.add("266232237597523968"); //Toro's Discord (bot-spam)
         return textChannels;
     }
 
     public static List<String> getMusicVoiceChannels() { //TODO Config/fix :P
         List<String> musicChannels = new ArrayList<>();
         musicChannels.add("256321559872929792"); //Minehut
-        musicChannels.add("258402255391293450"); //Matrix Spam
-        musicChannels.add("262017609870868481"); //Informer's Home
-        musicChannels.add("266673502604492800"); //Toro's Discord
+        //musicChannels.add("258402255391293450"); //Matrix Spam
+        //musicChannels.add("262017609870868481"); //Informer's Home
+        //musicChannels.add("266673502604492800"); //Toro's Discord
         return musicChannels;
     }
 

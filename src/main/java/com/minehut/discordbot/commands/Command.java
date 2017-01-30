@@ -21,10 +21,6 @@ public interface Command {
 
     CommandType getType();
 
-    default String getPermission() {
-        return null;
-    }
-
     default String[] getAliases() {
         return new String[]{};
     }

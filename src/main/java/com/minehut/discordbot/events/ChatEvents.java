@@ -15,7 +15,6 @@ import sx.blah.discord.util.DiscordException;
 import sx.blah.discord.util.RateLimitException;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -23,8 +22,6 @@ import java.util.Arrays;
  * Some code provided by the FlareBot developers
  */
 public class ChatEvents {
-
-    public static ArrayList<String> badWords = new ArrayList<>();
 
     @EventSubscriber
     public void handle(MessageReceivedEvent event) throws IOException, RateLimitException, DiscordException {
@@ -52,26 +49,12 @@ public class ChatEvents {
                         sender.getName() + "): " + Chat.fixDiscordMentions(message));
             }
 
-            if (event.getMessage().getAuthor().getID().equals("258699795135201290") || event.getMessage().getAuthor().getID().equals("255103056235069440")) return;
-        /*
-        for (String word : badWords) {
-            if (event.getMessage().getContent().toLowerCase().contains(word)) {
-                if (Objects.equals(event.getMessage().getChannel().getID(), "240296608338673664"))
-                try {
-                    event.getMessage().delete();
-                    //Chat.sendDiscordMessage(event.getMessage().getAuthor().toString() + ", please do not use bad language on this discord server!", event.getMessage().getChannel());
-                    return;
-                } catch (MissingPermissionsException | RateLimitException | DiscordException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        */
+            if (event.getMessage().getAuthor().getID().equals("258699795135201290") || event.getMessage().getAuthor().getID().equals("255103056235069440")) return; //TODO Add block command
 
             if (message.toString().contains("discord.gg") && !Bot.isTrusted(sender)) {
                 Chat.removeMessage(message);
 
-                Chat.sendMessage(sender.mention() + ", please do not advertise Discord servers. Thanks! ^-^", channel);
+                Chat.sendMessage(sender.mention() + ", please do not advertise Discord servers. Thanks!", channel);
                 return;
             }
 

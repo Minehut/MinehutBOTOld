@@ -161,8 +161,10 @@ public class Chat {
         logRemove = true;
     }
 
+    public static Timer timer = new Timer();
+
     public static IMessage setAutoDelete(IMessage message, int time) {
-        new Timer().schedule(new TimerTask() {
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 removeMessage(message);

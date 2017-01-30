@@ -1,7 +1,9 @@
 package com.minehut.discordbot.util.music.extractors;
 
 import com.arsenarsen.lavaplayerbridge.player.Player;
+import com.arsenarsen.lavaplayerbridge.player.Playlist;
 import com.arsenarsen.lavaplayerbridge.player.Track;
+import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager;
@@ -14,6 +16,7 @@ import sx.blah.discord.util.EmbedBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Made by the FlareBot developers
@@ -47,32 +50,43 @@ public class YouTubeExtractor implements Extractor {
                     .withColor(Chat.CUSTOM_RED).appendField("YouTube said: ", e.getMessage(), true), message, 15);
             return;
         }
-        List<AudioTrack> tracks = new ArrayList<>();
+        List<AudioTrack> audioTracks = new ArrayList<>();
         String name;
         if (item instanceof AudioPlaylist) {
             AudioPlaylist audioPlaylist = (AudioPlaylist) item;
-            tracks.addAll(audioPlaylist.getTracks());
+            audioTracks.addAll(audioPlaylist.getTracks());
             name = audioPlaylist.getName();
         } else {
             AudioTrack track = (AudioTrack) item;
-            if (track.getInfo().length == 0 || track.getInfo().isStream) {
-                EmbedBuilder builder = Chat.getEmbed().withColor(Chat.CUSTOM_RED).withDesc("Cannot queue a livestream!");
+            if (track.getInfo().length >= 900000 && !Bot.isTrusted(user)) {
+                EmbedBuilder builder = Chat.getEmbed().withColor(Chat.CUSTOM_RED).withDesc("That track could not be queued! The video length might be too long");
                 Chat.editMessage("", builder, message, 15);
                 return;
             }
-            tracks.add(track);
+            if (track.getInfo().length == 0 || track.getInfo().isStream) {
+                EmbedBuilder builder = Chat.getEmbed().withColor(Chat.CUSTOM_RED).withDesc("Livestreams cannot be queued!");
+                Chat.editMessage("", builder, message, 15);
+                return;
+            }
+            audioTracks.add(track);
             name = track.getInfo().title;
         }
         if (name != null) {
-            for (AudioTrack t : tracks) {
-                Track track = new Track(t);
+            List<Track> tracks = audioTracks.stream().map(Track::new).map(track -> {
                 track.getMeta().put("requester", user.getID());
-                player.queue(track);
+                track.getMeta().put("guildId", player.getGuildId());
+                return track;
+            }).collect(Collectors.toList());
+            if (tracks.size() > 1) { // Double `if` https://giphy.com/gifs/ng1xAzwIkDgfm
+                Playlist p = new Playlist(tracks);
+                player.queue(p);
+            } else {
+                player.queue(tracks.get(0));
             }
             EmbedBuilder builder = Chat.getEmbed();
             builder.withDesc(String.format("%s queued the %s [`%s`](%s)", user.mention(), tracks.size() == 1 ? "song" : "playlist",
                     name, input));
-            if (tracks.size() > 1)
+            if (audioTracks.size() > 1)
                 builder.appendField("Song count:", String.valueOf(tracks.size()), true);
             Chat.editMessage("", builder, message, 20);
         }

@@ -1,19 +1,17 @@
 package com.minehut.discordbot.events;
 
 import com.minehut.discordbot.Core;
-import com.minehut.discordbot.commands.music.SkipCommand;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import sx.blah.discord.api.events.EventSubscriber;
 import sx.blah.discord.handle.impl.events.ReadyEvent;
 import sx.blah.discord.handle.impl.events.guild.member.*;
 import sx.blah.discord.handle.impl.events.shard.DisconnectedEvent;
 import sx.blah.discord.handle.impl.events.shard.ReconnectSuccessEvent;
-import sx.blah.discord.handle.obj.*;
+import sx.blah.discord.handle.obj.IGuild;
+import sx.blah.discord.handle.obj.IRole;
+import sx.blah.discord.handle.obj.IUser;
+import sx.blah.discord.handle.obj.IVoiceChannel;
 import sx.blah.discord.util.EmbedBuilder;
 
 import java.awt.*;
@@ -36,41 +34,6 @@ public class ServerEvents {
             Core.log.info("Name: \"" + role.getName() + "\" ID: \"" + role.getID() + "\" - " + role.getPermissions());
         }
 
-        Core.getMusicManager().getPlayerCreateHooks().register(player -> player.addEventListener(new AudioEventAdapter() {
-            @Override
-            public void onTrackStart(AudioPlayer player, AudioTrack track) {
-                for (String id : Bot.getMusicTextChannels()) {
-                    IChannel channel = Core.getDiscord().getChannelByID(id);
-                    AudioPlayer song = Core.getMusicManager().getPlayer(channel.getGuild().getID()).getPlayer();
-
-                    if (song == player || song.getPlayingTrack() == track) {
-                        IMessage msg = Chat.sendMessage("Now Playing: **" + track.getInfo().title + "**", channel);
-
-                        SkipCommand.votes.clear();
-                        VoiceEvents.playing.add(msg);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-                //Chat.removeMessage(msg);
-                SkipCommand.votes.clear();
-
-                for (IMessage msg : VoiceEvents.playing) {
-
-                    AudioPlayer guild = Core.getMusicManager().getPlayer(msg.getGuild().getID()).getPlayer();
-
-                    if (player == guild) {
-                        Chat.removeMessage(msg);
-                        VoiceEvents.playing.remove(msg);
-                        break;
-                    }
-                }
-            }
-        }));
-
         Core.registerCommands();
 
         for (IGuild guild : Core.getDiscord().getGuilds()) {
@@ -79,7 +42,7 @@ public class ServerEvents {
 
         for (String id : Bot.getMusicVoiceChannels()) {
             IVoiceChannel channel = Core.getDiscord().getVoiceChannelByID(id);
-            if (channel.getConnectedUsers().size() >= 1 && !channel.getConnectedUsers().contains(Core.getDiscord().getOurUser())) {
+            if (channel != null) {
                 channel.join();
             }
         }

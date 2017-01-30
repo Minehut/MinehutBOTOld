@@ -10,7 +10,6 @@ import sx.blah.discord.handle.obj.*;
 import sx.blah.discord.util.DiscordException;
 
 import java.util.List;
-import java.util.Timer;
 import java.util.TimerTask;
 
 /**
@@ -29,13 +28,11 @@ public class ReconnectVoiceCommand implements Command {
 
         List<IVoiceChannel> channels = Core.getDiscord().getConnectedVoiceChannels();
         channels.forEach(IVoiceChannel::leave);
-        new Timer().schedule(new TimerTask() {
+        Chat.timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 for (String id : Bot.getMusicVoiceChannels()) {
-                    if (Core.getDiscord().getVoiceChannelByID(id).getConnectedUsers().size() >= 1) {
-                        Core.getDiscord().getVoiceChannelByID(id).join();
-                    }
+                    Core.getDiscord().getVoiceChannelByID(id).join();
                 }
             }
         }, 2000);
