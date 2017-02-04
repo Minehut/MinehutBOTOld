@@ -40,7 +40,7 @@ public class ChatEvents {
             return;
         }
 
-        if (event.getMessage().getGuild() == Bot.getMainGuild()) {
+        if (guild == Bot.getMainGuild()) {
             if (sender.getName().equals(sender.getDisplayName(message.getGuild()))) {
                 Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(message.getGuild()) + ": " +
                         Chat.fixDiscordMentions(event.getMessage()));
@@ -49,9 +49,9 @@ public class ChatEvents {
                         sender.getName() + "): " + Chat.fixDiscordMentions(message));
             }
 
-            if (event.getMessage().getAuthor().getID().equals("258699795135201290") || event.getMessage().getAuthor().getID().equals("255103056235069440")) return; //TODO Add block command
+            if (sender.getID().equals("258699795135201290") || sender.getID().equals("255103056235069440")) return; //TODO Add block command
 
-            if (message.toString().contains("discord.gg") && !Bot.isTrusted(sender)) {
+            if (message.toString().toLowerCase().contains("discord.gg") && !Bot.isTrusted(sender)) {
                 Chat.removeMessage(message);
 
                 Chat.sendMessage(sender.mention() + ", please do not advertise Discord servers. Thanks!", channel);
@@ -74,7 +74,7 @@ public class ChatEvents {
             */
         }
 
-        if (message.getContent() != null && message.getContent().startsWith(Command.getPrefix()) && !message.getAuthor().isBot()) {
+        if (message.getContent() != null && message.getContent().startsWith(Command.getPrefix()) && !sender.isBot()) {
 
             String msg = message.getContent();
             String command = msg.substring(1);

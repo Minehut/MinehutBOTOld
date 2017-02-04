@@ -54,6 +54,8 @@ public class Core {
     private static List<Command> commands;
     private static PlayerManager musicManager;
 
+    private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
     public static void main(String[] args) {
         log.setLevel(Level.INFO);
 
@@ -63,11 +65,10 @@ public class Core {
             e.printStackTrace();
         }
 
-
         do {
             String command = "_";
             try {
-                command = (new BufferedReader(new InputStreamReader(System.in))).readLine();
+                command = (reader).readLine();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -102,7 +103,7 @@ public class Core {
                 }
 
                 for (IVoiceChannel channel : Core.getDiscord().getConnectedVoiceChannels()) {
-                    Core.log.info("[Guild: " + channel.getGuild().getName() + " left channel: \"" + channel.getName() + "\" (" + channel.getID() + ")]");
+                    Core.log.info("[Guild: \"" + channel.getGuild().getName() + "\" left channel: \"" + channel.getName() + "\" (" + channel.getID() + ")]");
                     channel.leave();
                 }
             }
@@ -183,7 +184,7 @@ public class Core {
         musicManager.getPlayerCreateHooks().register(player -> player.addEventListener(new AudioEventAdapter() {
             @Override
             public void onTrackStart(AudioPlayer player, AudioTrack track) {
-                for (String id : Bot.getMusicTextChannels()) {
+                for (String id : Bot.getMusicTextChannels()) { //TODO Replace with while
                     if (id != null) {
                         IChannel channel = Core.getDiscord().getChannelByID(id);
                         AudioPlayer song = Core.getMusicManager().getPlayer(channel.getGuild().getID()).getPlayer();
@@ -203,7 +204,7 @@ public class Core {
                 //Chat.removeMessage(msg);
                 SkipCommand.votes.clear();
 
-                for (IMessage msg : VoiceEvents.playing) {
+                for (IMessage msg : VoiceEvents.playing) { //TODO Replace with while
                     if (msg != null) {
                         AudioPlayer guildPlayer = Core.getMusicManager().getPlayer(msg.getGuild().getID()).getPlayer();
 

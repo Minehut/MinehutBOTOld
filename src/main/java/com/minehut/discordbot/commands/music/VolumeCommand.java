@@ -30,7 +30,7 @@ public class VolumeCommand implements Command {
         Chat.setAutoDelete(message, 5);
 
         Chat.sendMessage(sender.mention() + "\nSince that command was overloading the CPU, is has been removed.\n" +
-                "If you want to change the volume, do this instead: https://gfycat.com/UnrulyBountifulAfricancivet", channel, 15); //TODO Put link in message
+                "If you want to change the volume, do this instead: https://gfycat.com/UnrulyBountifulAfricancivet", channel, 25);
     }
 
     @Override
