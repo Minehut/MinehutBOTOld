@@ -35,7 +35,7 @@ public class ReconnectVoiceCommand implements Command {
                     Core.getDiscord().getVoiceChannelByID(id).join();
                 }
             }
-        }, 2000);
+        }, 3000);
     }
 
     @Override
