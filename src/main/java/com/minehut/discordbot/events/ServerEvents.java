@@ -85,10 +85,11 @@ public class ServerEvents {
         //Chat.sendDiscordMessage(event.getUser().mention() + " _has joined the Discord server._");
         Core.log.info(event.getUser().getName() + " joined the Discord server.");
 
-        //if (event.getGuild().getUsers().size() == 1000) {
-        //    Chat.sendDiscordMessage(event.getUser().toString() + " is the 1000th Discord member! Be sure and give them a big warm welcome! Maybe even buy him Legend! :D",
-        //            event.getGuild().getChannelByID("239599059415859200"));
-        //}
+        if (event.getGuild().getUsers().size() == 2000) { //TODO Change code when they join!!!
+            Chat.sendMessage(event.getUser().toString() + " is the 2000th Discord member! Be sure and give them a big warm welcome and maybe even buy him Legend! :D",
+                    guild.getChannelByID("239599059415859200"));
+        }
+
     }
 
     @EventSubscriber
