@@ -3,16 +3,17 @@ package com.minehut.discordbot.events;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.ReadyEvent;
-import sx.blah.discord.handle.impl.events.guild.member.*;
-import sx.blah.discord.handle.impl.events.shard.DisconnectedEvent;
-import sx.blah.discord.handle.impl.events.shard.ReconnectSuccessEvent;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.handle.obj.IVoiceChannel;
-import sx.blah.discord.util.EmbedBuilder;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Role;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.events.DisconnectEvent;
+import net.dv8tion.jda.core.events.ReadyEvent;
+import net.dv8tion.jda.core.events.ReconnectedEvent;
+import net.dv8tion.jda.core.events.guild.GuildBanEvent;
+import net.dv8tion.jda.core.events.guild.GuildUnbanEvent;
+import net.dv8tion.jda.core.events.guild.member.*;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
 import java.util.Date;
@@ -20,178 +21,196 @@ import java.util.Date;
 /**
  * Created by MatrixTunnel on 11/28/2016.
  */
-public class ServerEvents {
+public class ServerEvents extends ListenerAdapter {
 
-    private static String disconnectReason = "UNKNOWN";
-
-    @EventSubscriber
-    public void handle(ReadyEvent event) {
-
-        Core.discordConnection = true;
+    @Override
+    public void onReady(ReadyEvent event) {
+        Core.latch.countDown();
         Bot.updateUsers();
 
-        for (IRole role : Bot.getMainGuild().getRoles()) {
-            Core.log.info("Name: \"" + role.getName() + "\" ID: \"" + role.getID() + "\" - " + role.getPermissions());
+        for (Role role : Bot.getMainGuild().getRoles()) {
+            Core.log.info("Name: \"" + role.getName() + "\" ID: \"" + role.getId() + "\" - " + role.getPermissions());
         }
 
-        Core.registerCommands();
-
-        for (IGuild guild : Core.getDiscord().getGuilds()) {
-            Core.getMusicManager().getPlayer(guild.getID()).setVolume(25);
-        }
-
-        for (String id : Bot.getMusicVoiceChannels()) {
-            IVoiceChannel channel = Core.getDiscord().getVoiceChannelByID(id);
+        for (String id : Core.getConfig().getMusicVoiceChannels()) {
+            VoiceChannel channel = Core.getDiscord().getVoiceChannelByID(id);
             if (channel != null) {
-                channel.join();
+                channel.getGuild().getAudioManager().openAudioConnection(channel);
+                if (Core.getClient().getGuilds().contains(Bot.getMainGuild())) break; //Only join main guild else everything else
             }
         }
+
+        //for (Guild guild : Core.getClient().getGuilds()) {
+        //    Core.getMusicManager().getPlayer(guild.getId()).setVolume(25);
+        //}
 
         Core.enabled = true;
         Core.log.info("Bot ready.");
     }
 
-    @EventSubscriber
-    public void handle(UserJoinEvent event) {
+    @Override
+    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
-        IUser user = event.getUser();
-        IGuild guild = event.getGuild();
+        User user = event.getMember().getUser();
 
         Bot.updateUsers();
 
-        //TODO Test how old the account is when joining
-
-        //if (event.getUser().getCreationDate().) {
-
-        //}
-
         EmbedBuilder embed = Chat.getEmbed();
 
-        if (user.getAvatarURL().contains("null.webp")) {
-            embed.withThumbnail("https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
+        if (user.getAvatarUrl() == null) {
+            embed.setThumbnail("https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
         } else {
-            embed.withThumbnail(user.getAvatarURL());
+            embed.setThumbnail(user.getAvatarUrl());
         }
 
         //TODO Display name
-        Chat.sendMessage(embed.withTitle(Chat.getFullName(user)).withDesc("*joined the server.* \n\n**Clickable:** <@!" + user.getID() + ">" +
-                "\n**Account Creation:** " + user.getCreationDate()/*.format(DateTimeFormatter.RFC_1123_DATE_TIME)*/ + //TODO <-----
+        Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setDescription("*" + user.getAsMention() + " joined the server.*" +
+                "\n\n**Account Creation:** " + user.getCreationTime()/*.format(DateTimeFormatter.RFC_1123_DATE_TIME)*/ + //TODO <-----
                 "\n**Forums:** [`" + user.getName() + "`](https://www.minehut.com/" + user.getName().replace(" ", "") + ")")
                 //.appendField("Account Creation:", user.getCreationDate().format(DateTimeFormatter.ISO_DATE_TIME), false)
                 //.withFooterText("System time").withTimestamp(new Date().getTime())
-                .withFooterText("System time").withTimestamp(new Date().getTime())
-                .withColor(Chat.CUSTOM_GREEN), Bot.getLogChannel());
+                .setFooter("System time | " + new Date().toString(), null)
+                .setColor(Chat.CUSTOM_GREEN), Bot.getLogChannel());
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " _has joined the Discord server._");
-        Core.log.info(event.getUser().getName() + " joined the Discord server.");
+        Core.log.info(Chat.getFullName(user) + " joined the Discord server.");
 
-        if (event.getGuild().getUsers().size() == 2000) { //TODO Change code when they join!!!
+        /*
+        if (event.getGuild().getUsers().size() == 2000) {
             Chat.sendMessage(event.getUser().toString() + " is the 2000th Discord member! Be sure and give them a big warm welcome and maybe even buy him Legend! :D",
                     guild.getChannelByID("239599059415859200"));
         }
+        */
 
     }
 
-    @EventSubscriber
-    public void handle(UserLeaveEvent event) {
+    @Override
+    public void onGuildMemberLeave(GuildMemberLeaveEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
-        IUser user = event.getUser();
+        User user = event.getMember().getUser();
 
         EmbedBuilder embed = Chat.getEmbed();
 
-        if (user.getAvatarURL().contains("null.webp")) {
-            embed.withThumbnail("https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
+        if (user.getAvatarUrl() == null) {
+            embed.setThumbnail("https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
         } else {
-            embed.withThumbnail(user.getAvatarURL());
+            embed.setThumbnail(user.getAvatarUrl());
         }
 
-        Chat.sendMessage(embed.withTitle(user.getName() + "#" + user.getDiscriminator()).withDesc("*left the server.* \n\n**Clickable:** <@!" + user.getID() + ">" +
-                "\n**Forums:** [`" + user.getName() + "`](https://www.minehut.com/" + user.getName().replace(" ", "") + ")")
-                .withFooterText("System time").withTimestamp(new Date().getTime())
-                .withColor(Chat.CUSTOM_RED), Bot.getLogChannel());
+        Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setDescription("*" + user.getAsMention() + " left the server.*" +
+                "\n\n**Forums:** [`" + user.getName() + "`](https://www.minehut.com/" + user.getName().replace(" ", "") + ")")
+                .setFooter("System time | " + new Date().toString(), null)
+                .setColor(Chat.CUSTOM_RED), Bot.getLogChannel());
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " _has left the Discord server._");
-        Core.log.info(event.getUser().getName() + " left the Discord server.");
+        Core.log.info(Chat.getFullName(user) + " left the Discord server.");
         Bot.updateUsers();
     }
 
-    @EventSubscriber
-    public void handle(UserBanEvent event) {
+    @Override
+    public void onGuildBan(GuildBanEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
-        IUser user = event.getUser();
-        IGuild guild = event.getGuild();
+        User user = event.getUser();
 
-        if (user.getName().equals(user.getDisplayName(guild))) {
-            Chat.sendMessage(Chat.getEmbed().withAuthorIcon(user.getAvatarURL()).withAuthorName(user.getName() + "#" + user.getDiscriminator())
-                    .withAuthorUrl("https://minehut.com/" + user.getName())
-                    .withDesc("was banned from the Discord server.").withColor(Color.RED), Bot.getLogChannel()); //TODO Different color
-        } else {
-            Chat.sendMessage(Chat.getEmbed().withAuthorIcon(user.getAvatarURL()).withAuthorName(user.getName() + "#" + user.getDiscriminator() + " (" + user.getDisplayName(guild) + ")")
-                    .withAuthorUrl("https://minehut.com/" + user.getName())
-                    .withDesc("was banned from the Discord server.").withColor(Color.RED), Bot.getLogChannel()); //TODO Different color
-        }
+        Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://www.minehut.com/" + user.getName(), null).setDescription("*was banned from the server.*")
+                .setFooter("System time | " + new Date().toString(), null)
+                .setColor(Color.RED), Bot.getLogChannel());
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " **was banned from Discord.**");
-        Core.log.info(event.getUser().getName() + " was banned from Discord.");
+        Core.log.info(Chat.getFullName(user) + " was banned from Discord.");
         Bot.updateUsers();
     }
 
-    @EventSubscriber
-    public void handle(UserPardonEvent event) {
+    @Override
+    public void onGuildUnban(GuildUnbanEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
-        IUser user = event.getUser();
-        IGuild guild = event.getGuild();
+        User user = event.getUser();
 
-        if (user.getName().equals(user.getDisplayName(guild))) {
-            Chat.sendMessage(Chat.getEmbed().withAuthorIcon(user.getAvatarURL()).withAuthorName(user.getName() + "#" + user.getDiscriminator())
-                    .withAuthorUrl("https://minehut.com/" + user.getName())
-                    .withDesc("was unbanned from the Discord server.").withColor(Color.PINK), Bot.getLogChannel()); //TODO Different color
-        } else {
-            Chat.sendMessage(Chat.getEmbed().withAuthorIcon(user.getAvatarURL()).withAuthorName(user.getName() + "#" + user.getDiscriminator() + " (" + user.getDisplayName(guild) + ")")
-                    .withAuthorUrl("https://minehut.com/" + user.getName())
-                    .withDesc("was unbanned from the Discord server.").withColor(Color.PINK), Bot.getLogChannel()); //TODO Different color
-        }
+        Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://www.minehut.com/" + user.getName(), null).setDescription("*was unbanned from the server.*")
+                .setFooter("System time | " + new Date().toString(), null)
+                .setColor(Color.PINK), Bot.getLogChannel());
 
-        //Chat.sendDiscordMessage(event.getUser().mention() + " **was unbanned from Discord.**");
-        Core.log.info(user.getName() + " was unbanned from Discord.");
+        //Chat.sendDiscordMessage(event.getUser().mention() + " **was banned from Discord.**");
+        Core.log.info(Chat.getFullName(user) + " was unbanned from Discord.");
         Bot.updateUsers();
     }
 
-    @EventSubscriber
-    public void handle(NicknameChangedEvent event) {
-        if (event.getGuild() != Bot.getMainGuild()) return;
-        IUser user = event.getUser();
+    @Override
+    public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
+        EmbedBuilder embed = Chat.getEmbed();
 
-        if (!event.getNewNickname().orElseGet(user::getName).equals(user.getName())) {
-            Chat.sendMessage(Chat.getEmbed().withDesc(user.mention() + " changed their name from `" +
-                    event.getOldNickname().orElseGet(user::getName) + "` to `" + event.getNewNickname().orElseGet(user::getName) + "`")
-                    .withColor(Color.ORANGE), Bot.getLogChannel());
+        if (event.getRoles().contains(Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID()))) return;
+
+        if (event.getRoles().size() == 1) {
+            embed.setDescription(event.getMember().getAsMention() + " gained the role:\n");
+            embed.appendDescription("`" + event.getRoles().get(0).getName() + "`");
         } else {
-            Chat.sendMessage(Chat.getEmbed().withDesc(user.mention() + " reset their name to `" + event.getNewNickname().orElseGet(user::getName) + "`")
-                    .withColor(Color.ORANGE), Bot.getLogChannel());
+            embed.setDescription(event.getMember().getAsMention() + " gained the roles:\n");
+
+            for (Role role : event.getRoles()) {
+                embed.appendDescription("`" + role.getName() + "`, ");
+            }
         }
 
-        Core.log.info("\"" + event.getOldNickname().orElseGet(user::getName) + "\" is now known as \"" + event.getNewNickname().orElseGet(user::getName) + "\"");
+        Chat.sendMessage(embed.setFooter("System time | " + new Date().toString(), null)
+                .setColor(Chat.CUSTOM_ORANGE), Bot.getLogChannel());
     }
 
-    @EventSubscriber
-    public void handle(ReconnectSuccessEvent event) {
+    @Override
+    public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
+        EmbedBuilder embed = Chat.getEmbed();
+
+        if (event.getRoles().contains(Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID()))) return;
+
+        if (event.getRoles().size() == 1) {
+            embed.setDescription(event.getMember().getAsMention() + " lost the role:\n");
+            embed.appendDescription("`" + event.getRoles().get(0).getName() + "`");
+        } else {
+            embed.setDescription(event.getMember().getAsMention() + " lost the roles:\n");
+
+            for (Role role : event.getRoles()) {
+                embed.appendDescription("`" + role.getName() + "`, ");
+            }
+        }
+
+        Chat.sendMessage(embed.setFooter("System time | " + new Date().toString(), null)
+                .setColor(Chat.CUSTOM_ORANGE), Bot.getLogChannel());
+    }
+
+    @Override
+    public void onGuildMemberNickChange(GuildMemberNickChangeEvent event) {
+        if (event.getGuild() != Bot.getMainGuild()) return;
+        User user = event.getMember().getUser();
+
+        if (event.getPrevNick() == null) {
+            Chat.sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " changed their name from `" +
+                    user.getName() + "` to `" + event.getNewNick() + "`")
+                    .setColor(Color.ORANGE), Bot.getLogChannel());
+            return;
+        }
+
+        if (!event.getNewNick().equals(user.getName())) {
+            Chat.sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " changed their name from `" +
+                    event.getPrevNick() + "` to `" + event.getNewNick() + "`")
+                    .setColor(Color.ORANGE), Bot.getLogChannel());
+        } else {
+            Chat.sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " reset their name to `" + event.getNewNick() + "`")
+                    .setColor(Color.ORANGE), Bot.getLogChannel());
+        }
+
+        Core.log.info("\"" + event.getPrevNick() + "\" is now known as \"" + event.getNewNick() + "\"");
+    }
+
+    @Override
+    public void onReconnect(ReconnectedEvent event) {
         //Bot.updateUsers(); <--- Causing bad stuff to happen
         //Core.broadcast("Connection to Discord has been reestablished! Disconnect reason: " + disconnectReason);
         Core.log.info("Connection to Discord has been reestablished!");
-        Core.discordConnection = true;
     }
 
-    @EventSubscriber
-    public void handle(DisconnectedEvent event) {
-        if (event.getReason() != DisconnectedEvent.Reason.LOGGED_OUT) {
-            if (event.getReason() != DisconnectedEvent.Reason.RECONNECT_OP) {
-                disconnectReason = event.getReason().name();
-            }
-
-            Core.discordConnection = false;
-            Core.log.error("Disconnected from Discord.");
-        }
+    @Override
+    public void onDisconnect(DisconnectEvent event) {
+        Core.log.error("Disconnected from Discord.");
     }
 
 }

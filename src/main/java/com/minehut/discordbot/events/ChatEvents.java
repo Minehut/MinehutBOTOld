@@ -5,62 +5,78 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import sx.blah.discord.api.IShard;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageDeleteEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageUpdateEvent;
-import sx.blah.discord.handle.obj.*;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.RateLimitException;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * Created by MatrixTunnel on 11/29/2016.
  * Some code provided by the FlareBot developers
  */
-public class ChatEvents {
+public class ChatEvents extends ListenerAdapter {
 
-    @EventSubscriber
-    public void handle(MessageReceivedEvent event) throws IOException, RateLimitException, DiscordException {
-        IMessage message = event.getMessage();
-        IShard shard = message.getShard();
-        IGuild guild = message.getGuild();
-        IUser sender = message.getAuthor();
-        IChannel channel = message.getChannel();
+    HashMap<String, String> messages = new HashMap<>();
+    HashMap<String, Integer> amount = new HashMap<>();
 
-        if (guild == null || !shard.isLoggedIn() || !shard.isReady()) {
-            return;
-        }
+    @Override
+    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
+        Message message = event.getMessage();
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        User sender = message.getAuthor();
+        TextChannel channel = event.getChannel();
+        JDA jda = event.getJDA();
 
-        if (channel instanceof IPrivateChannel) {
-            Chat.sendMessage("Lol... I don't do things", channel);
+        if (guild == null || !Core.getDiscord().isReady() || sender == Core.getClient().getSelfUser()) {
             return;
         }
 
         if (guild == Bot.getMainGuild()) {
-            if (sender.getName().equals(sender.getDisplayName(message.getGuild()))) {
-                Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(message.getGuild()) + ": " +
-                        Chat.fixDiscordMentions(event.getMessage()));
+            if (guild.getMember(sender).getNickname() == null) {
+                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(sender) + ": " + message.getContent());
             } else {
-                Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(message.getGuild()) + " (" +
-                        sender.getName() + "): " + Chat.fixDiscordMentions(message));
+                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(sender) + " (" + guild.getMember(sender).getNickname() + "): " + message.getContent());
             }
 
-            if (sender.getID().equals("258699795135201290") || sender.getID().equals("255103056235069440")) return; //TODO Add block command
-
-            if (message.toString().toLowerCase().contains("discord.gg") && !Bot.isTrusted(sender)) {
+            if (message.getRawContent().toLowerCase().contains("discord.gg") && !Bot.isTrusted(sender)) {
                 Chat.removeMessage(message);
 
-                Chat.sendMessage(sender.mention() + ", please do not advertise Discord servers. Thanks!", channel);
+                Chat.sendMessage(sender.getAsMention() + ", please do not advertise Discord servers. Thanks!", channel);
                 return;
             }
 
-            if ((message.mentionsEveryone() || message.mentionsHere()) && !Bot.isTrusted(sender)) {
-                Chat.sendMessage(sender.mention() + ", you know that mentioning everyone like that is disabled right? xD", channel);
+            if (message.mentionsEveryone() && !Bot.isTrusted(sender)) {
+                Chat.sendMessage(sender.getAsMention() + ", you know that mentioning everyone is disabled right? xD", channel);
             }
+
+
+            if (!Bot.isTrusted(sender) && !message.getContent().startsWith(Command.getPrefix())) {
+                if (message.getRawContent().equalsIgnoreCase(messages.get(sender.getId()))) {
+                    amount.put(sender.getId(), (amount.get(sender.getId()) + 1));
+                } else {
+                    messages.put(sender.getId(), message.getRawContent());
+                    amount.put(sender.getId(), 0);
+                }
+
+                if (amount.get(sender.getId()) != null && (amount.get(sender.getId()) + 1) == 3) {
+                    Chat.removeMessage(event.getMessage());
+                    Chat.sendMessage(sender.getAsMention() + ", please do not repeat the same message!", channel);
+                    return;
+                } else if ((amount.get(sender.getId()) + 1) >= 4) {
+                    Chat.removeMessage(event.getMessage());
+
+                    guild.getController().addRolesToMember(member, Core.getDiscord().getRoleByID("282944825043582986")).queue();
+                    Chat.sendMessage(sender.getAsMention() + " has been auto muted for spam", channel);
+                    return;
+                }
+            }
+
 
             /*
             //TODO Warn against mentioning staff
@@ -72,11 +88,36 @@ public class ChatEvents {
                 }
             }
             */
+
+            //if (channel.getId().equals("284833888482754561") && message.getMentionedUsers().contains(jda.getSelfUser()) && !message.getRawContent().substring(14).equals("")) {
+            //    Core.log.info("test");
+//
+            //    try {
+            //        MonkeyLearn ml = new MonkeyLearn("YOUR API KEY HERE");
+//
+            //        // Classify some texts
+            //        String[] textList = {message.getRawContent().substring(14)};
+            //        String moduleId = "cl_hS9wMk9y";
+            //        MonkeyLearnResponse res = ml.classifiers.classify(moduleId, textList, true);
+//
+            //        Chat.sendMessage(res.arrayResult.toString(), channel);
+            //    } catch (MonkeyLearnException e) {
+            //        e.printStackTrace();
+            //    }
+            //    return;
+            //}
         }
 
-        if (message.getContent() != null && message.getContent().startsWith(Command.getPrefix()) && !sender.isBot()) {
+        for (String id : Core.getConfig().getBlockedUsers()) {
+            if (sender.getId().equals(id) && !Bot.isTrusted(sender)) {
+                Core.log.info("test");
+                return;
+            }
+        }
 
-            String msg = message.getContent();
+        if (message.getRawContent() != null && message.getContent().startsWith(Command.getPrefix()) && !sender.isBot()) {
+
+            String msg = event.getMessage().getRawContent();
             String command = msg.substring(1);
             String[] args = new String[0];
             if (msg.contains(" ")) {
@@ -90,12 +131,13 @@ public class ChatEvents {
                         return;
                     }
 
-                    if (cmd.getType() == CommandType.MUSIC && !Bot.getMusicTextChannels().contains(channel.getID())) {
+                    if (guild.equals(Bot.getMainGuild()) && cmd.getType() == CommandType.MUSIC &&
+                            !Arrays.asList(Core.getConfig().getMusicCommandChannels()).contains(channel.getId())) {
                         return; //TODO Use the #music channel (add "add and remove" music channels)
                     }
 
                     try {
-                        cmd.onCommand(shard, guild, channel, sender, message, args);
+                        cmd.onCommand(jda, guild, channel, member, sender, message, args);
                     } catch (Exception ex) {
                         Core.log.error("Exception in guild " + "!\n" + '\'' + cmd.getCommand() + "' "
                                 + Arrays.toString(args) + " in " + channel + "! Sender: " +
@@ -110,12 +152,13 @@ public class ChatEvents {
                                 return;
                             }
 
-                            if (cmd.getType() == CommandType.MUSIC && !Bot.getMusicTextChannels().contains(channel.getID())) {
+                            if (guild.equals(Bot.getMainGuild()) && cmd.getType() == CommandType.MUSIC &&
+                                    !Arrays.asList(Core.getConfig().getMusicCommandChannels()).contains(channel.getId())) {
                                 return; //TODO Use the #music channel (add "add and remove" music channels command)
                             }
 
                             try {
-                                cmd.onCommand(shard, guild, channel, sender, message, args);
+                                cmd.onCommand(jda, guild, channel, member, sender, message, args);
                             } catch (Exception ex) {
                                 Core.log.error("Exception in guild " + "!\n" + '\'' + cmd.getCommand() + "' "
                                         + Arrays.toString(args) + " in " + channel + "! Sender: " +
@@ -133,14 +176,14 @@ public class ChatEvents {
         }
     }
 
-    @EventSubscriber
-    public void handle(MessageUpdateEvent event) {
-        if (event.getOldMessage().getGuild() != Bot.getMainGuild()) return;
-        IMessage oldMessage = event.getOldMessage();
-        IMessage newMessage = event.getNewMessage();
-        IUser sender = oldMessage.getAuthor();
-        IChannel channel = oldMessage.getChannel();
+    @Override
+    public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
+        if (event.getGuild() != Bot.getMainGuild()) return;
+        Message message = event.getMessage();
+        User sender = message.getAuthor();
+        Channel channel = event.getChannel();
 
+        /*
         if (!sender.equals(Core.getDiscord().getOurUser())) {
             if (newMessage.getContent() == null || newMessage.getContent().equals("")) {
                 return;
@@ -158,15 +201,17 @@ public class ChatEvents {
                         Chat.fixDiscordMentions(oldMessage) + "\" -> \"" + Chat.fixDiscordMentions(newMessage) + "\"");
             }
         }
+        */
     }
 
-    @EventSubscriber
-    public void handle(MessageDeleteEvent event) {
-        if (event.getMessage().getGuild() != Bot.getMainGuild()) return;
-        IMessage message = event.getMessage();
-        IUser sender = message.getAuthor();
-        IChannel channel = message.getChannel();
+    @Override
+    public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
+        if (event.getMessage() == null || event.getMessage().getGuild() != Bot.getMainGuild()) return;
+        //Message message = event.getMessage();
+        //User sender = message.getAuthor();
+        //Channel channel = event.getChannel();
 
+        /*
         if (!sender.equals(Core.getDiscord().getOurUser())) {
             if (message.getContent() == null || message.getContent().equals("")) {
                 return;
@@ -182,6 +227,7 @@ public class ChatEvents {
                         sender.getName() + ") removed message \"" + Chat.fixDiscordMentions(message) + "\"");
             }
         }
+        */
     }
 
 }

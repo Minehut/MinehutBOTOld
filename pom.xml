@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.minehut</groupId>
     <artifactId>discordbot</artifactId>
-    <version>2.1.0</version>
+    <version>3.2.0</version>
 
     <name>MinehutBOT</name>
     <description>Discord bot for Minehut</description>
@@ -64,6 +64,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jetty.version>9.3.6.v20151106</jetty.version>
     </properties>
 
     <repositories>
@@ -87,6 +88,7 @@
     </repositories>
 
     <dependencies>
+        <!--
         <dependency>
             <groupId>org.apache.cassandra</groupId>
             <artifactId>cassandra-all</artifactId>
@@ -103,14 +105,19 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
+        </dependency> -->
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.1.7</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.21</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.7</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -123,20 +130,35 @@
             <version>1.4.9</version>
         </dependency>
         <dependency>
-            <groupId>com.github.austinv11</groupId>
-            <artifactId>Discord4j</artifactId>
-            <version>f6f60b1</version>
-            <classifier>shaded</classifier>
+            <groupId>com.sedmelluq</groupId>
+            <artifactId>jda-nas</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>3.0.BETA2_140</version>
         </dependency>
         <dependency>
             <groupId>com.arsenarsen.lavaplayer-bridge</groupId>
-            <artifactId>discord4j-impl</artifactId>
-            <version>1.9-SNAPSHOT</version>
+            <artifactId>jda-impl</artifactId>
+            <version>1.11-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>1.1.45</version>
+            <version>1.2.21</version>
+        </dependency>
+        <dependency>
+            <groupId>com.monkeylearn</groupId>
+            <artifactId>monkeylearn-java</artifactId>
+            <version>0.1.2</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.4</version>
         </dependency>
     </dependencies>
 

@@ -3,14 +3,10 @@ package com.minehut.discordbot.commands.manage;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import sx.blah.discord.api.IShard;
-import sx.blah.discord.handle.obj.*;
-import sx.blah.discord.util.DiscordException;
-
-import java.util.List;
-import java.util.TimerTask;
+import com.minehut.discordbot.util.tasks.BotTask;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.*;
 
 /**
  * Created by MatrixTunnel on 1/14/2017.
@@ -23,19 +19,16 @@ public class ReconnectVoiceCommand implements Command {
     }
 
     @Override
-    public void onCommand(IShard shard, IGuild guild, IChannel channel, IUser sender, IMessage message, String[] args) throws DiscordException {
+    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
-        List<IVoiceChannel> channels = Core.getDiscord().getConnectedVoiceChannels();
-        channels.forEach(IVoiceChannel::leave);
-        Chat.timer.schedule(new TimerTask() {
+        channel.getGuild().getAudioManager().closeAudioConnection();
+        new BotTask("Reconnect voice channel " + Core.getClient().getGuildById(guild.getId()).getSelfMember().getVoiceState().getChannel().toString()) {
             @Override
             public void run() {
-                for (String id : Bot.getMusicVoiceChannels()) {
-                    Core.getDiscord().getVoiceChannelByID(id).join();
-                }
+                guild.getAudioManager().openAudioConnection(member.getVoiceState().getChannel());
             }
-        }, 3000);
+        }.delay(2000);
     }
 
     @Override

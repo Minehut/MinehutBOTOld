@@ -8,17 +8,14 @@ import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.music.extractors.YouTubeExtractor;
-import sx.blah.discord.api.IShard;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.DiscordException;
-import sx.blah.discord.util.EmbedBuilder;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Made by the FlareBot developers
@@ -37,17 +34,41 @@ public class QueueCommand implements Command {
     }
 
     @Override
-    public void onCommand(IShard shard, IGuild guild, IChannel channel, IUser sender, IMessage message, String[] args) throws DiscordException {
+    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
         Chat.setAutoDelete(message, 5);
 
-        Player player = Core.getMusicManager().getPlayer(channel.getGuild().getID());
+        Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
 
         if (!player.getPlaylist().isEmpty()) {
-            if (args.length == 1 && args[0].equals("clear") && Bot.isTrusted(sender)) {
-                SkipCommand.votes.clear();
-                Chat.sendMessage(sender.mention() + " Cleared the current playlist.", channel, 15);
-                player.getPlaylist().clear();
-                return;
+            if (Bot.isTrusted(sender)) {
+                if (args.length == 1 && args[0].equals("clear")) {
+                    Chat.sendMessage(sender.getAsMention() + " Cleared the current playlist.", channel, 15);
+                    player.getPlaylist().clear();
+                    return;
+                } else if (args.length == 2 && args[0].equalsIgnoreCase("remove")) {
+                    int number;
+                    try {
+                        number = Integer.parseInt(args[1]);
+                    } catch (NumberFormatException e) {
+                        Chat.sendMessage("That is an invalid number!", channel, 5);
+                        return;
+                    }
+
+                    Queue<Track> queue = Core.getMusicManager().getPlayer(channel.getGuild().getId()).getPlaylist();
+
+                    if (number < 1 || number > queue.size()) {
+                        Chat.sendMessage(sender.getAsMention() + " There is no song with that index. Songs in queue: **" + queue.size() + "**", channel, 5);
+                        return;
+                    }
+
+                    List<Track> playlist = new ArrayList<>(queue);
+                    playlist.remove(number - 1);
+                    queue.clear();
+                    queue.addAll(playlist);
+
+                    Chat.sendMessage(sender.getAsMention() + " Removed song **" + number + "** from the queue!", channel, 15);
+                    return;
+                }
             }
 
             List<String> songs = new ArrayList<>();
@@ -65,17 +86,17 @@ public class QueueCommand implements Command {
                 sb.append(toAppend);
             }
             songs.add(sb.toString());
-            EmbedBuilder builder = Chat.getEmbed().withTitle("Playlist Queue");
+            EmbedBuilder builder = Chat.getEmbed().setTitle("Playlist Queue", null);
             i = 1;
             for (String s : songs) {
-                builder.appendField("\u2063", s, false);
+                builder.addField("\u2063", s, false);
             }
 
-            Chat.sendMessage(builder.appendField("Total songs: ", String.valueOf(player.getPlaylist().size()), true)
-                    .appendField("Volume: ", String.valueOf(player.getVolume()) + "%", true)
-                    .appendField("Paused: ", String.valueOf(player.getPaused()).toLowerCase().replace("true", ":white_check_mark:").replace("false", ":x:"), true), channel, 25);
+            Chat.sendMessage(builder.addField("Total songs: ", String.valueOf(player.getPlaylist().size()), true)
+                    .addField("Volume: ", String.valueOf(player.getVolume()) + "%", true)
+                    .addField("Paused: ", String.valueOf(player.getPaused()).toLowerCase().replace("true", ":white_check_mark:").replace("false", ":x:"), true), channel, 25);
         } else {
-            Chat.sendMessage(Chat.getEmbed().withDesc("There are no songs in the queue!").withColor(Chat.CUSTOM_RED), channel, 15);
+            Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs in the queue!").setColor(Chat.CUSTOM_RED), channel, 15);
         }
     }
 

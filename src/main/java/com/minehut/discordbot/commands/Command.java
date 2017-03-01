@@ -1,11 +1,8 @@
 package com.minehut.discordbot.commands;
 
-import sx.blah.discord.api.IShard;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.DiscordException;
+import com.minehut.discordbot.Core;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.*;
 
 /**
  * Made by the FlareBot developers
@@ -15,7 +12,7 @@ public interface Command {
 
     String getCommand();
 
-    void onCommand(IShard shard, IGuild guild, IChannel channel, IUser sender, IMessage message, String[] args) throws DiscordException;
+    void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args);
 
     String getArgs();
 
@@ -26,6 +23,6 @@ public interface Command {
     }
 
     static String getPrefix() {
-        return "!";
+        return Core.getConfig().getCommandPrefix();
     }
 }

@@ -1,10 +1,7 @@
 package com.minehut.discordbot.events;
 
-import com.minehut.discordbot.Core;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.guild.voice.user.UserVoiceChannelLeaveEvent;
-import sx.blah.discord.handle.obj.IMessage;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +9,9 @@ import java.util.List;
 /**
  * Created by MatrixTunnel on 12/8/2016.
  */
-public class VoiceEvents extends AudioEventAdapter {
+public class VoiceEvents extends ListenerAdapter {
 
-    public static List<IMessage> playing = new ArrayList<>();
+    public static List<Message> playing = new ArrayList<>();
 
     /*
     @Override
@@ -70,12 +67,6 @@ public class VoiceEvents extends AudioEventAdapter {
     }
     */
 
-    @EventSubscriber
-    public void handle(UserVoiceChannelLeaveEvent event) {
-        if (event.getUser() == Core.getDiscord().getOurUser()) {
-            Core.getDiscord().getVoiceChannelByID(event.getVoiceChannel().getID()).join();
-        }
-    }
     /*
 
     @EventSubscriber

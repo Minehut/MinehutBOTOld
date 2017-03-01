@@ -10,9 +10,9 @@ import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager
 import com.sedmelluq.discord.lavaplayer.track.AudioItem;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.EmbedBuilder;
+import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,37 +34,43 @@ public class YouTubeExtractor implements Extractor {
     }
 
     @Override
-    public void process(String input, Player player, IMessage message, IUser user) throws Exception {
+    public void process(String input, Player player, Message message, User user) throws Exception {
         AudioItem item;
         try {
             item = player.resolve(input);
             if (item == null) {
                 Chat.editMessage("", Chat.getEmbed()
-                        .withDesc("Could not get that video/playlist! Make sure the URL is correct!")
-                        .withColor(Chat.CUSTOM_RED), message, 15);
+                        .setDescription("Could not get that video/playlist! Make sure the URL is correct!")
+                        .setColor(Chat.CUSTOM_RED), message, 15);
                 return;
             }
         } catch (RuntimeException e) {
             Chat.editMessage("", Chat.getEmbed()
-                    .withDesc("Could not get that video/playlist!")
-                    .withColor(Chat.CUSTOM_RED).appendField("YouTube said: ", e.getMessage(), true), message, 15);
+                    .setDescription("Could not get that video/playlist!")
+                    .setColor(Chat.CUSTOM_RED).addField("YouTube said: ", e.getMessage(), true), message, 15);
             return;
         }
         List<AudioTrack> audioTracks = new ArrayList<>();
         String name;
         if (item instanceof AudioPlaylist) {
-            AudioPlaylist audioPlaylist = (AudioPlaylist) item;
-            audioTracks.addAll(audioPlaylist.getTracks());
-            name = audioPlaylist.getName();
+            if (Bot.isTrusted(user)) {
+                AudioPlaylist audioPlaylist = (AudioPlaylist) item;
+                audioTracks.addAll(audioPlaylist.getTracks());
+                name = audioPlaylist.getName();
+            } else {
+                EmbedBuilder builder = Chat.getEmbed().setColor(Chat.CUSTOM_RED).setDescription("That playlist could not be queued! If you want this queued, please ask a staff member");
+                Chat.editMessage("", builder, message, 15);
+                return;
+            }
         } else {
             AudioTrack track = (AudioTrack) item;
             if (track.getInfo().length >= 900000 && !Bot.isTrusted(user)) {
-                EmbedBuilder builder = Chat.getEmbed().withColor(Chat.CUSTOM_RED).withDesc("That track could not be queued! The video length might be too long");
+                EmbedBuilder builder = Chat.getEmbed().setColor(Chat.CUSTOM_RED).setDescription("That track could not be queued! The video length is too long");
                 Chat.editMessage("", builder, message, 15);
                 return;
             }
             if (track.getInfo().length == 0 || track.getInfo().isStream) {
-                EmbedBuilder builder = Chat.getEmbed().withColor(Chat.CUSTOM_RED).withDesc("Livestreams cannot be queued!");
+                EmbedBuilder builder = Chat.getEmbed().setColor(Chat.CUSTOM_RED).setDescription("Livestreams cannot be queued!");
                 Chat.editMessage("", builder, message, 15);
                 return;
             }
@@ -73,7 +79,7 @@ public class YouTubeExtractor implements Extractor {
         }
         if (name != null) {
             List<Track> tracks = audioTracks.stream().map(Track::new).map(track -> {
-                track.getMeta().put("requester", user.getID());
+                track.getMeta().put("requester", user.getId());
                 track.getMeta().put("guildId", player.getGuildId());
                 return track;
             }).collect(Collectors.toList());
@@ -84,10 +90,9 @@ public class YouTubeExtractor implements Extractor {
                 player.queue(tracks.get(0));
             }
             EmbedBuilder builder = Chat.getEmbed();
-            builder.withDesc(String.format("%s queued the %s [`%s`](%s)", user.mention(), tracks.size() == 1 ? "song" : "playlist",
-                    name, input));
+            builder.setDescription(String.format("%s queued the %s [`%s`](%s)", user.getAsMention(), tracks.size() == 1 ? "song" : "playlist", name, input));
             if (audioTracks.size() > 1)
-                builder.appendField("Song count:", String.valueOf(tracks.size()), true);
+                builder.addField("Song count:", String.valueOf(tracks.size()), true);
             Chat.editMessage("", builder, message, 20);
         }
     }

@@ -1,10 +1,11 @@
 package com.minehut.discordbot.util;
 
 import com.minehut.discordbot.Core;
-import sx.blah.discord.handle.obj.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by MatrixTunnel on 12/8/2016.
@@ -12,59 +13,55 @@ import java.util.List;
 public class Bot {
 
     public static void updateUsers() {
-        if (Core.getDiscord().isLoggedIn()) {
-            Core.getDiscord().streaming(getMainGuild().getUsers().size() + " Minehut users!", "https://www.minehut.com");
+        if (Core.getClient().getGuilds().contains(Core.getClient().getGuildById("239599059415859200"))) { //Minehut
+            Core.getDiscord().streaming(getMainGuild().getMembers().size() + " Minehut users!", "https://minehut.com");
+        } else {
+            Core.getDiscord().streaming("the with my code", "https://minehut.com");
         }
     }
 
-    public static IGuild getMainGuild() {
-        return Core.getDiscord().getGuildByID("239599059415859200");
+    public static Guild getMainGuild() {
+        return Core.getClient().getGuildById(Core.getConfig().getMainGuildID());
     }
 
-    public static List<String> getMusicTextChannels() { //TODO Config/fix :P
-        List<String> textChannels = new ArrayList<>();
-        textChannels.add("250849094208192512"); //Minehut
-        //textChannels.add("244744966839074816"); //Matrix Spam
-        //textChannels.add("263087009805893632"); //Informer's Home
-        //textChannels.add("266232237597523968"); //Toro's Discord (bot-spam)
-        return textChannels;
+    public static TextChannel getLogChannel() {
+        return Core.getDiscord().getChannelByID(Core.getConfig().getLogChannelID());
     }
 
-    public static List<String> getMusicVoiceChannels() { //TODO Config/fix :P
-        List<String> musicChannels = new ArrayList<>();
-        musicChannels.add("256321559872929792"); //Minehut
-        //musicChannels.add("258402255391293450"); //Matrix Spam
-        //musicChannels.add("262017609870868481"); //Informer's Home
-        //musicChannels.add("266673502604492800"); //Toro's Discord
-        return musicChannels;
-    }
-
-    public static IChannel getMusicChannel() {
-        return getMainGuild().getChannelByID("250849094208192512");
-    }
-
-    public static IChannel getLogChannel() {
-        return getMainGuild().getChannelByID("253063123781550080");
-    }
-
-    public static boolean isTrusted(IUser user) {
-        return userHasRoleId(getMainGuild(), user, "240228183985618954") || userHasRoleId(getMainGuild(), user, "246487117000212480");
-    }
-
-    public static boolean userHasRoleId(IGuild guild, IUser user, String id) {
-        return user.getRolesForGuild(guild).stream().map(IDiscordObject::getID).anyMatch(s -> s.equals(id));
-    }
-
-    public static String getContent(String[] args, int start, int end) {
-        String content = "";
-        for (int i = start; i < Math.min(end, args.length); i++) {
-            content += args[i];
-            if (i != Math.min(end, args.length) - 1) {
-                content += " ";
+    public static boolean isTrusted(User user) {
+        for (String role : Core.getConfig().getTrustedRoles()) {
+            if (Core.getDiscord().userHasRoleId(getMainGuild(), user, role)) {
+                return true;
             }
         }
+        return false;
+    }
 
-        return content;
+    public static String millisToString(long millis) {
+        long days = TimeUnit.MILLISECONDS.toDays(millis);
+        millis -= TimeUnit.DAYS.toMillis(days);
+        long hours = TimeUnit.MILLISECONDS.toHours(millis);
+        millis -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(millis);
+        millis -= TimeUnit.MINUTES.toMillis(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
+
+        StringBuilder sb = new StringBuilder(64);
+        if (days > 0) {
+            sb.append(days);
+            sb.append(":");
+        }
+        if (hours > 0) {
+            sb.append(hours);
+            sb.append(":");
+        }
+        if (minutes > 0) {
+            sb.append(minutes);
+            sb.append(":");
+        }
+        sb.append(seconds);
+
+        return (sb.toString());
     }
 
 }

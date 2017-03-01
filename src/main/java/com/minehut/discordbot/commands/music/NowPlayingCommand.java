@@ -6,12 +6,8 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.music.extractors.YouTubeExtractor;
-import sx.blah.discord.api.IShard;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.DiscordException;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.entities.*;
 
 /**
  * Created by MatrixTunnel on 1/8/2017.
@@ -29,20 +25,20 @@ public class NowPlayingCommand implements Command {
     }
 
     @Override
-    public void onCommand(IShard shard, IGuild guild, IChannel channel, IUser sender, IMessage message, String[] args) throws DiscordException {
+    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
         Chat.setAutoDelete(message, 5);
 
-        Player player = Core.getMusicManager().getPlayer(channel.getGuild().getID());
+        Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
 
-        if (Core.getMusicManager().getPlayer(guild.getID()).getPlayingTrack() != null) {
-            Chat.sendMessage(Chat.getEmbed().appendField("Currently Playing: ", "[`" + player.getPlayingTrack().getTrack().getInfo().title + "`](" + //TODO Move to now playing command
+        if (Core.getMusicManager().getPlayer(guild.getId()).getPlayingTrack() != null) {
+            Chat.sendMessage(Chat.getEmbed().addField("Currently Playing: ", "[`" + player.getPlayingTrack().getTrack().getInfo().title + "`](" + //TODO Move to now playing command
                     YouTubeExtractor.WATCH_URL + player.getPlayingTrack().getTrack().getIdentifier() +
                     ") added by <@!" + player.getPlayingTrack().getMeta().get("requester") + ">", false)
-                    .appendField("Volume: ", String.valueOf(player.getVolume()) + "%", true)
-                    .appendField("Repeating: ", String.valueOf(player.getLooping()).toLowerCase().replace("true", ":white_check_mark:").replace("false", ":x:"), true)
-                    .appendField("Paused: ", String.valueOf(player.getPaused()).toLowerCase().replace("true", ":white_check_mark:").replace("false", ":x:"), true), channel, 25);
+                    .addField("Volume: ", String.valueOf(player.getVolume()) + "%", true)
+                    .addField("Repeating: ", String.valueOf(player.getLooping()).toLowerCase().replace("true", ":white_check_mark:").replace("false", ":x:"), true)
+                    .addField("Paused: ", String.valueOf(player.getPaused()).toLowerCase().replace("true", ":white_check_mark:").replace("false", ":x:"), true), channel, 25);
         } else {
-            Chat.sendMessage(Chat.getEmbed().withDesc("There are no songs playing!").withColor(Chat.CUSTOM_RED), channel, 20);
+            Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs playing!").setColor(Chat.CUSTOM_RED), channel, 20);
         }
     }
 

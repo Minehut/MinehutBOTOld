@@ -1,40 +1,42 @@
 package com.minehut.discordbot;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import com.arsenarsen.lavaplayerbridge.PlayerManager;
 import com.arsenarsen.lavaplayerbridge.libraries.LibraryFactory;
 import com.arsenarsen.lavaplayerbridge.libraries.UnknownBindingException;
-import com.mashape.unirest.http.Unirest;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.general.InfoCommand;
-import com.minehut.discordbot.commands.manage.PurgeCommand;
-import com.minehut.discordbot.commands.manage.ReconnectVoiceCommand;
-import com.minehut.discordbot.commands.manage.ShutdownCommand;
+import com.minehut.discordbot.commands.manage.*;
 import com.minehut.discordbot.commands.music.*;
 import com.minehut.discordbot.events.ChatEvents;
 import com.minehut.discordbot.events.ServerEvents;
 import com.minehut.discordbot.events.VoiceEvents;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.Config;
+import com.minehut.discordbot.util.IDiscordClient;
+import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
+import net.dv8tion.jda.core.JDABuilder;
+import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.exceptions.RateLimitedException;
+import net.dv8tion.jda.core.requests.RestAction;
+import net.dv8tion.jda.core.utils.SimpleLog;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sx.blah.discord.Discord4J;
-import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IVoiceChannel;
-import sx.blah.discord.util.DiscordException;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 /**
@@ -45,94 +47,125 @@ public class Core {
 
     public static boolean enabled = false;
     public static String discordLogChatID = "253063123781550080";
-    public static boolean discordConnection;
-    public static Logger log = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
 
+    private static Config config;
     private static IDiscordClient discord;
-    private static String token = Secret.getDiscordToken();
-    private static String youTubeKey = Secret.getYouTubeAPIKey();
+    private static JDA client;
     private static List<Command> commands;
     private static PlayerManager musicManager;
 
-    private static BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private static final Map<String, Logger> LOGGERS = new ConcurrentHashMap<>();
+    public static final Logger log = getLog(Core.class);
+    private static Logger getLog(String name) {
+        return LOGGERS.computeIfAbsent(name, LoggerFactory::getLogger);
+    }
+    private static Logger getLog(Class<?> clazz) {
+        return getLog(clazz.getName());
+    }
 
-    public static void main(String[] args) {
-        log.setLevel(Level.INFO);
+    public static JDA getClient() {
+        return client;
+    }
+    public static CountDownLatch latch;
 
-        try {
-            new Core().init();
-        } catch (UnknownBindingException e) {
-            e.printStackTrace();
-        }
-
-        do {
-            String command = "_";
-            try {
-                command = (reader).readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            if (command.startsWith("!")) {
-                switch (command.substring(1)) {
-                    case "shutdown":
-                        log.info("Shutting down...");
-                        shutdown(false);
+    public static void main(String[] args) throws InterruptedException, UnknownBindingException {
+        RestAction.DEFAULT_FAILURE = t -> log.error("RestAction failed!", t);
+        SimpleLog.LEVEL = SimpleLog.Level.OFF;
+        SimpleLog.addListener(new SimpleLog.LogListener() {
+            @Override
+            public void onLog(SimpleLog log, SimpleLog.Level logLevel, Object message) {
+                switch (logLevel) {
+                    case ALL:
+                    case INFO:
+                        getLog(log.name).info(String.valueOf(message));
                         break;
-                    default:
-                        log.info("Not a valid command");
+                    case FATAL:
+                        getLog(log.name).error(String.valueOf(message));
+                        break;
+                    case WARNING:
+                        getLog(log.name).warn(String.valueOf(message));
+                        break;
+                    case DEBUG:
+                        getLog(log.name).debug(String.valueOf(message));
+                        break;
+                    case TRACE:
+                        getLog(log.name).trace(String.valueOf(message));
+                        break;
+                    case OFF:
                         break;
                 }
-
-            } else if (command.startsWith("|")) {
-                broadcast(command.substring(1), Core.getDiscord().getChannelByID("239599059415859200"));
             }
 
-            //broadcast(command);
+            @Override
+            public void onError(SimpleLog log, Throwable err) {
+
+            }
+        });
+
+        Thread.setDefaultUncaughtExceptionHandler(((t, e) -> log.error("Uncaught exception in thread " + t, e)));
+        Thread.currentThread().setUncaughtExceptionHandler(((t, e) -> log.error("Uncaught exception in thread " + t, e)));
+
+        try {
+            config = new Config();
+            Core.log.info("Loading config...");
+            config.load();
+        } catch (IOException e) {
+            log.error("Config failed to load!", e);
+            shutdown(false);
+        }
+
+        new Core().init();
+        Scanner scanner = new Scanner(System.in);
+
+        do {
+            try {
+                if (scanner.next().equalsIgnoreCase("exit")) {
+                    shutdown(false);
+                } else if (scanner.next().equalsIgnoreCase("restart")) {
+                    shutdown(true);
+                }
+            } catch (NoSuchElementException ignored) {
+            }
         } while (enabled);
 
     }
 
     public static void shutdown(boolean restart) {
+        enabled = false;
+        //log.info("Turning myself off...");
         try {
-            //broadcast("Turning myself off...");
-            if (discord.getConnectedVoiceChannels().size() > 0) {
-                for (IGuild guild : Core.getDiscord().getGuilds()) {
-                    musicManager.getPlayer(guild.getID()).getPlaylist().clear();
-                    musicManager.getPlayer(guild.getID()).skip();
-                }
-
-                for (IVoiceChannel channel : Core.getDiscord().getConnectedVoiceChannels()) {
-                    Core.log.info("[Guild: \"" + channel.getGuild().getName() + "\" left channel: \"" + channel.getName() + "\" (" + channel.getID() + ")]");
-                    channel.leave();
+            if (!VoiceEvents.playing.isEmpty()) {
+                if (!SkipCommand.votes.isEmpty()) {
+                    SkipCommand.votes.clear();
                 }
             }
 
-            SkipCommand.votes.clear();
-            VoiceEvents.playing.forEach(Chat::removeMessage);
-            Chat.timer.cancel();
             //TODO Remove all messages that are waiting on task timers
 
-            if (discord.isLoggedIn()) {
-                discord.logout();
-                log.info("Disconnected from Discord.");
+            if (discord.getConnectedVoiceChannels().size() > 0) {
+                for (VoiceChannel voiceChannel : discord.getConnectedVoiceChannels()) {
+                    Core.getMusicManager().getPlayer(voiceChannel.getGuild().getId()).getPlaylist().clear();
+                    Core.getMusicManager().getPlayer(voiceChannel.getGuild().getId()).skip();
+                }
+
+                VoiceEvents.playing.forEach(Chat::removeMessage);
             }
-            discordConnection = false;
-            enabled = false;
+
+            log.info("Disconnected from Discord.");
             if (restart) {
                 log.info("Restarting...");
                 new ProcessBuilder("/bin/bash", "run.sh").start();
             } else {
                 log.info("Shut down successfully");
-                Unirest.shutdown();
             }
+
             System.exit(0);
-        } catch (DiscordException | IOException e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            log.info("Could not start restart process!");
         }
     }
 
-    public static void broadcast(String message, IChannel channel) {
+    public static void broadcast(String message, MessageChannel channel) {
         if (message != null) {
             log.info("<MinehutBOT> " + message);
 
@@ -144,7 +177,7 @@ public class Core {
         if (message != null) {
             log.info(message);
 
-            Chat.sendMessage("**[BOT]** " + message, Core.getDiscord().getChannelByID(discordLogChatID));
+            Chat.sendMessage("**[BOT]** " + message, client.getTextChannelById(discordLogChatID));
         }
     }
 
@@ -152,12 +185,12 @@ public class Core {
         if (message != null) {
             log.info(message);
 
-            Chat.sendMessage(message, Core.getDiscord().getChannelByID(discordLogChatID));
+            Chat.sendMessage(message, client.getTextChannelById(discordLogChatID));
         }
     }
 
-    public static String getYoutubeKey() {
-        return youTubeKey;
+    public static Config getConfig() {
+        return config;
     }
 
     public static IDiscordClient getDiscord() {
@@ -173,27 +206,26 @@ public class Core {
     }
 
     private void registerEvents() {
-        discord.getDispatcher().registerListener(new ChatEvents());
-        discord.getDispatcher().registerListener(new ServerEvents());
-        discord.getDispatcher().registerListener(new VoiceEvents());
-
-        musicManager.getPlayerCreateHooks().register(player -> player.addEventListener(new AudioEventAdapter() {
-
-        }));
-
         musicManager.getPlayerCreateHooks().register(player -> player.addEventListener(new AudioEventAdapter() {
             @Override
-            public void onTrackStart(AudioPlayer player, AudioTrack track) {
-                for (String id : Bot.getMusicTextChannels()) { //TODO Replace with while
+            public void onTrackStart(AudioPlayer aplayer, AudioTrack atrack) {
+                for (String id : Core.getConfig().getMusicCommandChannels()) {
                     if (id != null) {
-                        IChannel channel = Core.getDiscord().getChannelByID(id);
-                        AudioPlayer song = Core.getMusicManager().getPlayer(channel.getGuild().getID()).getPlayer();
+                        TextChannel channel = client.getTextChannelById(id);
+                        if (channel != null) {
+                            AudioPlayer song = getMusicManager().getPlayer(channel.getGuild().getId()).getPlayer();
+                            User user = Core.getDiscord().getUserByID(player.getPlayingTrack().getMeta().get("requester").toString());
 
-                        if (song == player || song.getPlayingTrack() == track) {
-                            IMessage msg = Chat.sendMessage("Now Playing: **" + track.getInfo().title + "**", channel);
+                            if (song == aplayer || song.getPlayingTrack() == atrack) {
+                                Message msg = Chat.sendMessage(Chat.getEmbed().addField("**Now playing**", "**[" + atrack.getInfo().title + "](https://www.youtube.com/watch?v=" +
+                                                song.getPlayingTrack().getIdentifier() + ")** `[" + Bot.millisToString(song.getPlayingTrack().getDuration()) + "]`", true)
+                                        .setImage("https://img.youtube.com/vi/" + atrack.getInfo().identifier + "/mqdefault.jpg")
+                                        .setFooter("Queued by: @" + Chat.getFullName(user), null)
+                                        .setColor(Chat.CUSTOM_GREEN), channel);
 
-                            SkipCommand.votes.clear();
-                            VoiceEvents.playing.add(msg);
+                                SkipCommand.votes.clear();
+                                VoiceEvents.playing.add(msg);
+                            }
                         }
                     }
                 }
@@ -204,13 +236,18 @@ public class Core {
                 //Chat.removeMessage(msg);
                 SkipCommand.votes.clear();
 
-                for (IMessage msg : VoiceEvents.playing) { //TODO Replace with while
+                for (Message msg : VoiceEvents.playing) {
+                    if (VoiceEvents.playing.isEmpty()) {
+                        break;
+                    }
+
                     if (msg != null) {
-                        AudioPlayer guildPlayer = Core.getMusicManager().getPlayer(msg.getGuild().getID()).getPlayer();
+                        AudioPlayer guildPlayer = Core.getMusicManager().getPlayer(msg.getGuild().getId()).getPlayer();
 
                         if (guildPlayer == player) {
                             Chat.removeMessage(msg);
                             VoiceEvents.playing.remove(msg);
+                            break;
                         }
                     }
                 }
@@ -222,13 +259,17 @@ public class Core {
         //TODO registerCommand(new HelpCommand());
         registerCommand(new InfoCommand());
 
-        registerCommand(new PurgeCommand());
+        registerCommand(new JoinCommand());
+        registerCommand(new MuteCommand());
+        //registerCommand(new PurgeCommand());
         registerCommand(new ReconnectVoiceCommand());
+        registerCommand(new ReloadCommand());
         registerCommand(new ShutdownCommand());
 
         registerCommand(new PlayCommand());
         registerCommand(new SkipCommand());
         registerCommand(new QueueCommand());
+        registerCommand(new RandomSongCommand());
         registerCommand(new NowPlayingCommand());
         registerCommand(new VolumeCommand());
     }
@@ -237,28 +278,37 @@ public class Core {
         return commands.stream().filter(command -> command.getType() == type).collect(Collectors.toList());
     }
 
-    private void init() throws UnknownBindingException {
+    private void init() throws InterruptedException, UnknownBindingException {
+        discord = new IDiscordClient();
+        latch = new CountDownLatch(1);
+
         try {
-            discord = new ClientBuilder()
-                    .setMaxReconnectAttempts(Integer.MAX_VALUE)
-                    .withToken(token).login();
+            try {
+                client = new JDABuilder(AccountType.BOT)
+                        .addListener(new ChatEvents(), new ServerEvents(), new VoiceEvents())
+                        .setToken(config.getDiscordToken())
+                        .setAudioSendFactory(new NativeAudioSendFactory())
+                        .buildAsync();
+            } catch (RateLimitedException e) {
+                Thread.sleep(e.getRetryAfter());
+            }
 
             commands = new ArrayList<>();
-
-            //Discord4J.disableAudio();
-            Discord4J.disableChannelWarnings();
-            musicManager = PlayerManager.getPlayerManager(LibraryFactory.getLibrary(discord));
+            musicManager = PlayerManager.getPlayerManager(LibraryFactory.getLibrary(client));
             registerEvents();
-        } catch (DiscordException e) {
+        } catch (LoginException e) {
             log.error("Could not login to Discord!", e);
+            Thread.sleep(500);
             shutdown(false);
         }
-
         System.setErr(new PrintStream(new OutputStream() {
             @Override
             public void write(int b) throws IOException {
             }
         })); // No operation STDERR. Will not do much of anything, except to filter out some Jsoup spam
+
+        latch.await();
+        registerCommands();
     }
 
     private static void registerCommand(Command command) {

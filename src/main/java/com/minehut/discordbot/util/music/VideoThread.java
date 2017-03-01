@@ -1,17 +1,20 @@
 package com.minehut.discordbot.util.music;
 
 import com.arsenarsen.lavaplayerbridge.PlayerManager;
-import com.arsenarsen.lavaplayerbridge.libraries.LibraryFactory;
-import com.arsenarsen.lavaplayerbridge.libraries.UnknownBindingException;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.music.extractors.*;
+import com.minehut.discordbot.util.music.extractors.Extractor;
+import com.minehut.discordbot.util.music.extractors.YouTubeExtractor;
+import com.minehut.discordbot.util.music.extractors.YouTubeSearchExtractor;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Made by the FlareBot developers
@@ -23,23 +26,20 @@ public class VideoThread extends Thread {
     private static final List<Class<? extends Extractor>> extractors = Collections.singletonList(YouTubeExtractor.class);
     private static final Set<Class<? extends AudioSourceManager>> managers = new HashSet<>();
     public static final ThreadGroup VIDEO_THREADS = new ThreadGroup("Video Threads");
-    private IUser user;
-    private IChannel channel;
+    private User user;
+    private TextChannel channel;
     private String url;
     private Extractor extractor;
 
     private VideoThread() {
-        if (manager == null) try {
-            manager = PlayerManager.getPlayerManager(LibraryFactory.getLibrary(Core.getDiscord()));
-        } catch (UnknownBindingException e) {
-            e.printStackTrace(System.out);
-        }
+        if (manager == null)
+            manager = Core.getMusicManager();
         setName("Video Thread " + VIDEO_THREADS.activeCount());
     }
 
     @Override
     public void run() {
-        IMessage message = Chat.sendMessage("Processing...", channel, 120);
+        Message message = Chat.sendMessage("Processing...", channel, 120);
         try {
             if (extractor == null)
                 for (Class<? extends Extractor> clazz : extractors) {
@@ -55,7 +55,7 @@ public class VideoThread extends Thread {
             }
             if (managers.add(extractor.getSourceManagerClass()))
                 manager.getManager().registerSourceManager(extractor.getSourceManagerClass().newInstance());
-            extractor.process(url, manager.getPlayer(channel.getGuild().getID()), message, user);
+            extractor.process(url, manager.getPlayer(channel.getGuild().getId()), message, user);
         } catch (Exception e) {
             Core.log.error("Could not init extractor for '{}'".replace("{}", url), e);
             Chat.editMessage(message, "Something went wrong! Issue logged", 30);
@@ -69,7 +69,7 @@ public class VideoThread extends Thread {
         super.start();
     }
 
-    public static VideoThread getThread(String url, IChannel channel, IUser user) {
+    public static VideoThread getThread(String url, TextChannel channel, User user) {
         VideoThread thread = new VideoThread();
         thread.url = url;
         thread.channel = channel;
@@ -77,7 +77,7 @@ public class VideoThread extends Thread {
         return thread;
     }
 
-    public static VideoThread getSearchThread(String term, IChannel channel, IUser user) {
+    public static VideoThread getSearchThread(String term, TextChannel channel, User user) {
         VideoThread thread = new VideoThread();
         thread.url = term;
         thread.channel = channel;
