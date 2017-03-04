@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -64,15 +65,19 @@ public class ChatEvents extends ListenerAdapter {
                     amount.put(sender.getId(), 0);
                 }
 
-                if (amount.get(sender.getId()) != null && (amount.get(sender.getId()) + 1) == 3) {
+                if (amount.get(sender.getId()) != null && ((amount.get(sender.getId()) + 1) == 3 || (amount.get(sender.getId()) + 1) == 4)) {
                     Chat.removeMessage(event.getMessage());
                     Chat.sendMessage(sender.getAsMention() + ", please do not repeat the same message!", channel);
                     return;
-                } else if ((amount.get(sender.getId()) + 1) >= 4) {
+                } else if ((amount.get(sender.getId()) + 1) >= 5) {
                     Chat.removeMessage(event.getMessage());
 
-                    guild.getController().addRolesToMember(member, Core.getDiscord().getRoleByID("282944825043582986")).queue();
+                    guild.getController().addRolesToMember(member, Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID())).queue();
                     Chat.sendMessage(sender.getAsMention() + " has been auto muted for spam", channel);
+
+                    Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  *" + member.getAsMention() + " was auto muted for spam!*")
+                            .setFooter("System time | " + new Date().toString(), null)
+                            .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
                     return;
                 }
             }
@@ -110,7 +115,6 @@ public class ChatEvents extends ListenerAdapter {
 
         for (String id : Core.getConfig().getBlockedUsers()) {
             if (sender.getId().equals(id) && !Bot.isTrusted(sender)) {
-                Core.log.info("test");
                 return;
             }
         }

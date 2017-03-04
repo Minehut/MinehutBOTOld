@@ -25,7 +25,7 @@ public class MuteCommand implements Command {
         Chat.removeMessage(message);
 
         User muteUser = Core.getDiscord().getUserByID(args[0].replace("<@", "").replace("!", "").replace(">", ""));
-        Role muteRole = Core.getDiscord().getRoleByID("282944825043582986"); //282944825043582986
+        Role muteRole = Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID());
 
         if (args.length == 1) {
             if (muteUser == null) {
