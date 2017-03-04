@@ -137,6 +137,7 @@ public class ServerEvents extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
+        if (event.getGuild() != Bot.getMainGuild()) return;
         EmbedBuilder embed = Chat.getEmbed();
 
         if (event.getRoles().contains(Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID()))) return;
@@ -158,6 +159,7 @@ public class ServerEvents extends ListenerAdapter {
 
     @Override
     public void onGuildMemberRoleRemove(GuildMemberRoleRemoveEvent event) {
+        if (event.getGuild() != Bot.getMainGuild()) return;
         EmbedBuilder embed = Chat.getEmbed();
 
         if (event.getRoles().contains(Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID()))) return;
