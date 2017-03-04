@@ -66,7 +66,7 @@ public class ServerEvents extends ListenerAdapter {
         //TODO Display name
         Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setDescription("*" + user.getAsMention() + " joined the server.*" +
                 "\n\n**Account Creation:** " + user.getCreationTime()/*.format(DateTimeFormatter.RFC_1123_DATE_TIME)*/ + //TODO <-----
-                "\n**Forums:** [`" + user.getName() + "`](https://www.minehut.com/" + user.getName().replace(" ", "") + ")")
+                "\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 //.appendField("Account Creation:", user.getCreationDate().format(DateTimeFormatter.ISO_DATE_TIME), false)
                 //.withFooterText("System time").withTimestamp(new Date().getTime())
                 .setFooter("System time | " + new Date().toString(), null)
@@ -98,7 +98,7 @@ public class ServerEvents extends ListenerAdapter {
         }
 
         Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setDescription("*" + user.getAsMention() + " left the server.*" +
-                "\n\n**Forums:** [`" + user.getName() + "`](https://www.minehut.com/" + user.getName().replace(" ", "") + ")")
+                "\n\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 .setFooter("System time | " + new Date().toString(), null)
                 .setColor(Chat.CUSTOM_RED), Bot.getLogChannel());
 
@@ -112,7 +112,7 @@ public class ServerEvents extends ListenerAdapter {
         if (event.getGuild() != Bot.getMainGuild()) return;
         User user = event.getUser();
 
-        Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://www.minehut.com/" + user.getName(), null).setDescription("*was banned from the server.*")
+        Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://minehut.com/" + user.getName(), null).setDescription("*was banned from the server.*")
                 .setFooter("System time | " + new Date().toString(), null)
                 .setColor(Color.RED), Bot.getLogChannel());
 
@@ -126,7 +126,7 @@ public class ServerEvents extends ListenerAdapter {
         if (event.getGuild() != Bot.getMainGuild()) return;
         User user = event.getUser();
 
-        Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://www.minehut.com/" + user.getName(), null).setDescription("*was unbanned from the server.*")
+        Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://minehut.com/" + user.getName(), null).setDescription("*was unbanned from the server.*")
                 .setFooter("System time | " + new Date().toString(), null)
                 .setColor(Color.PINK), Bot.getLogChannel());
 
