@@ -13,7 +13,7 @@
     <url>Minehut.com</url>
 
     <build>
-        <defaultGoal>clean package -U</defaultGoal>
+        <defaultGoal>clean package</defaultGoal>
         <finalName>MinehutBOT</finalName>
         <sourceDirectory>src/main/java</sourceDirectory>
         <resources>
@@ -88,27 +88,6 @@
     </repositories>
 
     <dependencies>
-        <!--
-        <dependency>
-            <groupId>org.apache.cassandra</groupId>
-            <artifactId>cassandra-all</artifactId>
-            <version>0.8.1</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.21</version>
-        </dependency> -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -137,7 +116,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.0.BETA2_140</version>
+            <version>3.0.BETA2_143</version>
         </dependency>
         <dependency>
             <groupId>com.arsenarsen.lavaplayer-bridge</groupId>
@@ -147,7 +126,7 @@
         <dependency>
             <groupId>com.sedmelluq</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>1.2.21</version>
+            <version>1.2.23</version>
         </dependency>
         <dependency>
             <groupId>com.monkeylearn</groupId>
