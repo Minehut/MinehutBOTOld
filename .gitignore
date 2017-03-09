@@ -31,5 +31,6 @@ fabric.properties
 
 # Custom
 /modules/
-/META-INF/
+/src/main/resources/META-INF/
+/src/test/
 /settings.json
