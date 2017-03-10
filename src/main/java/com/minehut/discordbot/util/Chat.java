@@ -21,6 +21,7 @@ public class Chat {
     public static final Color CUSTOM_BLUE = new Color(66, 173, 244);
     public static final Color CUSTOM_RED = new Color(244, 78, 66);
     public static final Color CUSTOM_ORANGE = new Color(236, 150, 43);
+    public static final Color CUSTOM_DARK_ORANGE = new Color(255, 111, 0);
     public static final Color CUSTOM_GREEN = new Color(64, 192, 61);
     public static final Color CUSTOM_GRAY = new Color(98, 98, 98);
     public static final Color CUSTOM_PURPLE = new Color(151, 74, 191);
@@ -57,36 +58,33 @@ public class Chat {
         return setAutoDelete(sendMessage(message, channel), removeTime);
     }
 
-    public static void editMessage(String s, EmbedBuilder embed, Message message, int removeTime) {
-        message.editMessage(new MessageBuilder().append(s).setEmbed(embed.build()).build()).queue(m -> setAutoDelete(m, removeTime));
+    public static void editMessage(String s, EmbedBuilder embed, Message message) {
+        if (message != null) message.editMessage(new MessageBuilder().append(s).setEmbed(embed.build()).build()).queue();
     }
 
-    public static void editMessage(String s, EmbedBuilder embed, Message message) {
-        if (message != null) {
-            message.editMessage(new MessageBuilder().append(s).setEmbed(embed.build()).build()).queue();
-        }
+    public static void editMessage(String s, EmbedBuilder embed, Message message, int removeTime) {
+        if (message != null) message.editMessage(new MessageBuilder().append(s).setEmbed(embed.build()).build()).queue(m -> setAutoDelete(m, removeTime));
     }
 
     public static void editMessage(EmbedBuilder embed, Message message) {
-        editMessage(message.getRawContent(), embed, message);
+        if (message != null) editMessage(message.getRawContent(), embed, message);
     }
 
     public static void editMessage(EmbedBuilder embed, Message message, int removeTime) {
-        message.editMessage(new MessageBuilder().append(message.getRawContent()).setEmbed(embed.build()).build()).queue(m -> setAutoDelete(m, removeTime));
+        if (message != null) message.editMessage(new MessageBuilder().append(message.getRawContent()).setEmbed(embed.build()).build()).queue(m -> setAutoDelete(m, removeTime));
     }
 
     public static void editMessage(Message message, String content) {
-        message.editMessage(content).queue();
+        if (message != null) message.editMessage(content).queue();
     }
 
     public static void editMessage(Message message, String content, int removeTime) {
-        message.editMessage(content).queue(m -> setAutoDelete(m, removeTime));
+        if (message != null) message.editMessage(content).queue(m -> setAutoDelete(m, removeTime));
     }
 
     public static void removeMessage(Message message) {
-        if (message.getTextChannel().getGuild().getSelfMember()
-                .getPermissions(message.getTextChannel()).contains(Permission.MESSAGE_MANAGE)) {
-            message.delete().queue();
+        if (message.getTextChannel().getGuild().getSelfMember().getPermissions(message.getTextChannel()).contains(Permission.MESSAGE_MANAGE)) {
+            message.delete().complete();
         }
 
         logRemove = true;
@@ -134,7 +132,7 @@ public class Chat {
     */
 
     public static String getChannelName(Channel channel) {
-        return "[" + channel.getName() + "] ";
+        return "[#" + channel.getName() + "] ";
     }
 
     public static String getContent(String[] args, int start, int end) {
