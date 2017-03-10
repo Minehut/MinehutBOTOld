@@ -22,7 +22,7 @@ public class ReconnectVoiceCommand implements Command {
     public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
-        channel.getGuild().getAudioManager().closeAudioConnection();
+        guild.getAudioManager().closeAudioConnection();
         new BotTask("Reconnect voice channel " + Core.getClient().getGuildById(guild.getId()).getSelfMember().getVoiceState().getChannel().toString()) {
             @Override
             public void run() {

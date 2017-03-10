@@ -42,7 +42,7 @@ public class PlayCommand implements Command {
                     term += s + " ";
                 }
                 term = term.trim();
-                VideoThread.getSearchThread(term, channel, sender).start();
+                VideoThread.getSearchThread(term, channel, sender).start(); //YouTube only
             }
         }
 

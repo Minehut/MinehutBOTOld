@@ -34,7 +34,7 @@ public class ChatEvents extends ListenerAdapter {
         TextChannel channel = event.getChannel();
         JDA jda = event.getJDA();
 
-        if (guild == null || !Core.getDiscord().isReady() || sender == Core.getClient().getSelfUser()) {
+        if (guild == null || !Core.getDiscord().isReady() || sender.equals(Core.getClient().getSelfUser()) || sender.isBot() || sender.isFake()) {
             return;
         }
 
@@ -44,18 +44,6 @@ public class ChatEvents extends ListenerAdapter {
             } else {
                 Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(sender) + " (" + guild.getMember(sender).getNickname() + "): " + message.getContent());
             }
-
-            if (message.getRawContent().toLowerCase().contains("discord.gg") && !Bot.isTrusted(sender)) {
-                Chat.removeMessage(message);
-
-                Chat.sendMessage(sender.getAsMention() + ", please do not advertise Discord servers. Thanks!", channel);
-                return;
-            }
-
-            if (message.mentionsEveryone() && !Bot.isTrusted(sender)) {
-                Chat.sendMessage(sender.getAsMention() + ", you know that mentioning everyone is disabled right? xD", channel);
-            }
-
 
             if (!Bot.isTrusted(sender) && !message.getContent().startsWith(Command.getPrefix())) {
                 if (message.getRawContent().equalsIgnoreCase(messages.get(sender.getId()))) {
@@ -82,17 +70,15 @@ public class ChatEvents extends ListenerAdapter {
                 }
             }
 
+            if (message.getRawContent().toLowerCase().contains("discord.gg") && !Bot.isTrusted(sender)) {
+                Chat.removeMessage(message);
 
-            /*
-            //TODO Warn against mentioning staff
-            if (channel.getID().equals("239599059415859200") && !Bot.isTrusted(sender)) {
-                if (message.getRoleMentions().size() != 0 && (!message.mentionsEveryone() || !message.mentionsHere())) { //TODO Remove @everyone & @here
-
-                    Chat.sendMessage(sender.mention() + ", please do not mention staff in this channel as if gets checked regularly. If it's urgent, please use " +
-                            event.getMessage().getGuild().getChannelByID("239599059415859200").mention() + " Thanks! ^-^", channel);
-                }
+                Chat.sendMessage(sender.getAsMention() + ", please do not advertise Discord servers. Thanks!", channel);
+                return;
             }
-            */
+
+
+            }
 
             //if (channel.getId().equals("284833888482754561") && message.getMentionedUsers().contains(jda.getSelfUser()) && !message.getRawContent().substring(14).equals("")) {
             //    Core.log.info("test");
@@ -137,7 +123,7 @@ public class ChatEvents extends ListenerAdapter {
 
                     if (guild.equals(Bot.getMainGuild()) && cmd.getType() == CommandType.MUSIC &&
                             !Arrays.asList(Core.getConfig().getMusicCommandChannels()).contains(channel.getId())) {
-                        return; //TODO Use the #music channel (add "add and remove" music channels)
+                        return;
                     }
 
                     try {
@@ -158,7 +144,7 @@ public class ChatEvents extends ListenerAdapter {
 
                             if (guild.equals(Bot.getMainGuild()) && cmd.getType() == CommandType.MUSIC &&
                                     !Arrays.asList(Core.getConfig().getMusicCommandChannels()).contains(channel.getId())) {
-                                return; //TODO Use the #music channel (add "add and remove" music channels command)
+                                return;
                             }
 
                             try {

@@ -78,11 +78,11 @@ public class SkipCommand implements Command {
 
             if (maxSkips - votes.size() <= 0 || maxSkips == -1) {
                 votes.clear();
-                Chat.sendMessage("Skipped **" + player.getPlayingTrack().getTrack().getInfo().title + "**", channel, 25); //TODO Make command format better :P
+                Chat.sendMessage("Skipped **" + player.getPlayingTrack().getTrack().getInfo().title + "**", channel, 20);
                 player.skip();
             } else {
                 Chat.sendMessage(sender.getAsMention() + " voted to skip!\n **" +
-                        (maxSkips - votes.size()) + "** more votes are required to skip the current song.", channel, 25); //TODO Make command format better :P
+                        (maxSkips - votes.size()) + "** more votes are required to skip the current song.", channel, 20);
             }
         }
     }
