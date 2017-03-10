@@ -5,6 +5,7 @@ import com.arsenarsen.lavaplayerbridge.libraries.LibraryFactory;
 import com.arsenarsen.lavaplayerbridge.libraries.UnknownBindingException;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.commands.general.HelpCommand;
 import com.minehut.discordbot.commands.general.InfoCommand;
 import com.minehut.discordbot.commands.manage.*;
 import com.minehut.discordbot.commands.music.*;
@@ -277,8 +278,8 @@ public class Core {
         }));
     }
 
-    public static void registerCommands() {
-        //TODO registerCommand(new HelpCommand());
+    private static void registerCommands() {
+        registerCommand(new HelpCommand());
         registerCommand(new InfoCommand());
 
         registerCommand(new JoinCommand());

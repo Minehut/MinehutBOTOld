@@ -11,36 +11,23 @@ import java.util.List;
 public enum CommandType {
 
     GENERAL,
-    ADMINISTRATIVE(false),
-    MUSIC(false);
-
-    private boolean dms;
-
-    CommandType() {
-        this(true);
-    }
-
-    CommandType(boolean dms) {
-        this.dms = dms;
-    }
+    ADMINISTRATIVE,
+    MUSIC,
+    MASTER;
 
     public String toString() {
         return name().charAt(0) + name().substring(1).toLowerCase();
     }
 
     public static CommandType[] getTypes() {
-        return new CommandType[]{GENERAL, ADMINISTRATIVE, MUSIC};
+        return new CommandType[]{GENERAL, ADMINISTRATIVE, MUSIC, MASTER};
     }
 
     public List<Command> getCommands() {
         return Core.getCommandsByType(this);
     }
 
-    public boolean usableInDMs() {
-        return dms;
-    }
-
     public String formattedName() {
-        return Character.toUpperCase(name().charAt(0)) + name().substring(1).toLowerCase();
+        return toString();
     }
 }
