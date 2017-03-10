@@ -18,9 +18,12 @@ import com.minehut.discordbot.util.IDiscordClient;
 import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
 import net.dv8tion.jda.core.entities.*;
@@ -217,11 +220,30 @@ public class Core {
                             User user = Core.getDiscord().getUserByID(player.getPlayingTrack().getMeta().get("requester").toString());
 
                             if (song == aplayer || song.getPlayingTrack() == atrack) {
-                                Message msg = Chat.sendMessage(Chat.getEmbed().addField("**Now playing**", "**[" + atrack.getInfo().title + "](https://www.youtube.com/watch?v=" +
-                                                song.getPlayingTrack().getIdentifier() + ")** `[" + Bot.millisToString(song.getPlayingTrack().getDuration()) + "]`", true)
-                                        .setImage("https://img.youtube.com/vi/" + atrack.getInfo().identifier + "/mqdefault.jpg")
-                                        .setFooter("Queued by: @" + Chat.getFullName(user), null)
-                                        .setColor(Chat.CUSTOM_GREEN), channel);
+
+                                EmbedBuilder embed = Chat.getEmbed();
+
+                                if (atrack instanceof YoutubeAudioTrack) {
+
+                                    embed.addField("**Now playing** - YouTube", "**[" + atrack.getInfo().title + "](" + atrack.getInfo().uri + ")** " +
+                                            "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration()) + "]`", true)
+                                            .setImage("https://img.youtube.com/vi/" + song.getPlayingTrack().getIdentifier() + "/mqdefault.jpg")
+                                            .setFooter("Queued by: @" + Chat.getFullName(user), null)
+                                            .setColor(Chat.CUSTOM_GREEN);
+                                } else if (atrack instanceof SoundCloudAudioTrack) {
+                                    embed.addField("**Now playing** - SoundCloud", "**[" + atrack.getInfo().title + "](" + atrack.getInfo().uri + ")** " +
+                                            "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration()) + "]`", true)
+                                            .setImage("http://www.logospike.com/wp-content/uploads/2014/11/Soundcloud_logo-5.png")
+                                            .setFooter("Queued by: @" + Chat.getFullName(user), null)
+                                            .setColor(Chat.CUSTOM_DARK_ORANGE);
+                                } else {
+                                    embed.addField("**Now playing** - ???", "**[" + atrack.getInfo().title + "](" + atrack.getInfo().uri + ")** " +
+                                            "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration()) + "]`", true)
+                                            .setFooter("Queued by: @" + Chat.getFullName(user), null)
+                                            .setColor(Chat.CUSTOM_GREEN);
+                                }
+
+                                Message msg = Chat.sendMessage(embed, channel);
 
                                 SkipCommand.votes.clear();
                                 VoiceEvents.playing.add(msg);

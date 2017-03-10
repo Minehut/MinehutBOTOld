@@ -4,6 +4,7 @@ import com.arsenarsen.lavaplayerbridge.PlayerManager;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.music.extractors.Extractor;
+import com.minehut.discordbot.util.music.extractors.SoundCloudExtractor;
 import com.minehut.discordbot.util.music.extractors.YouTubeExtractor;
 import com.minehut.discordbot.util.music.extractors.YouTubeSearchExtractor;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
@@ -11,10 +12,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Made by the FlareBot developers
@@ -23,7 +21,7 @@ import java.util.Set;
 public class VideoThread extends Thread {
 
     private static PlayerManager manager;
-    private static final List<Class<? extends Extractor>> extractors = Collections.singletonList(YouTubeExtractor.class);
+    private static final List<Class<? extends Extractor>> extractors = Arrays.asList(YouTubeExtractor.class, SoundCloudExtractor.class);
     private static final Set<Class<? extends AudioSourceManager>> managers = new HashSet<>();
     public static final ThreadGroup VIDEO_THREADS = new ThreadGroup("Video Threads");
     private User user;

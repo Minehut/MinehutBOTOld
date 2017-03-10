@@ -7,7 +7,8 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.music.extractors.YouTubeExtractor;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
+import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
@@ -66,7 +67,7 @@ public class QueueCommand implements Command {
                     queue.clear();
                     queue.addAll(playlist);
 
-                    Chat.sendMessage(sender.getAsMention() + " Removed song **" + number + "** from the queue!", channel, 15);
+                    Chat.sendMessage(sender.getAsMention() + " Removed song **#" + number + "** from the queue!", channel, 15);
                     return;
                 }
             }
@@ -77,8 +78,19 @@ public class QueueCommand implements Command {
             Iterator<Track> it = player.getPlaylist().iterator();
             while (it.hasNext() && songs.size() < 25) {
                 Track next = it.next();
-                String toAppend = String.format("**%s.** [`%s`](%s) added by <@!%s>\n", i++,
-                        next.getTrack().getInfo().title, YouTubeExtractor.WATCH_URL + next.getTrack().getIdentifier(), next.getMeta().get("requester"));
+
+                String toAppend; //TODO Add something to show soundcloud and youtube songs separate from each other
+                if (next.getTrack() instanceof YoutubeAudioTrack) {
+                    toAppend = String.format("**%s.** [%s](%s) `[%s]` | <@!%s>\n", i++, next.getTrack().getInfo().title,
+                            next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration()), next.getMeta().get("requester"));
+                } else if (next.getTrack() instanceof SoundCloudAudioTrack) {
+                    toAppend = String.format("**%s.** [%s](%s) `[%s]` | <@!%s>\n", i++, next.getTrack().getInfo().title,
+                            next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration()), next.getMeta().get("requester"));
+                } else {
+                    toAppend = String.format("**%s.** [%s](%s) `[%s]` | <@!%s>\n", i++, next.getTrack().getInfo().title,
+                            next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration()), next.getMeta().get("requester"));
+                }
+
                 if (sb.length() + toAppend.length() > 1024) {
                     songs.add(sb.toString());
                     sb = new StringBuilder();
@@ -93,8 +105,8 @@ public class QueueCommand implements Command {
             }
 
             Chat.sendMessage(builder.addField("Total songs: ", String.valueOf(player.getPlaylist().size()), true)
-                    .addField("Volume: ", String.valueOf(player.getVolume()) + "%", true)
-                    .addField("Paused: ", String.valueOf(player.getPaused()).toLowerCase().replace("true", ":white_check_mark:").replace("false", ":x:"), true), channel, 25);
+                    .addField("Volume: ", player.getVolume() + "%", true)
+                    .addField("Paused: ", player.getPaused() ? ":white_check_mark:" : ":x:", true), channel, 25);
         } else {
             Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs in the queue!").setColor(Chat.CUSTOM_RED), channel, 15);
         }

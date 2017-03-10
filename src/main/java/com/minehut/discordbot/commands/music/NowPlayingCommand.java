@@ -4,8 +4,8 @@ import com.arsenarsen.lavaplayerbridge.player.Player;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.music.extractors.YouTubeExtractor;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 
@@ -31,12 +31,12 @@ public class NowPlayingCommand implements Command {
         Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
 
         if (Core.getMusicManager().getPlayer(guild.getId()).getPlayingTrack() != null) {
-            Chat.sendMessage(Chat.getEmbed().addField("Currently Playing: ", "[`" + player.getPlayingTrack().getTrack().getInfo().title + "`](" + //TODO Move to now playing command
-                    YouTubeExtractor.WATCH_URL + player.getPlayingTrack().getTrack().getIdentifier() +
-                    ") added by <@!" + player.getPlayingTrack().getMeta().get("requester") + ">", false)
-                    .addField("Volume: ", String.valueOf(player.getVolume()) + "%", true)
-                    .addField("Repeating: ", String.valueOf(player.getLooping()).toLowerCase().replace("true", ":white_check_mark:").replace("false", ":x:"), true)
-                    .addField("Paused: ", String.valueOf(player.getPaused()).toLowerCase().replace("true", ":white_check_mark:").replace("false", ":x:"), true), channel, 25);
+            Chat.sendMessage(Chat.getEmbed().addField("Currently Playing: ", String.format("**[%s](%s)** `[%s]` | <@!%s>",
+                    player.getPlayingTrack().getTrack().getInfo().title, player.getPlayingTrack().getTrack().getInfo().uri,
+                    Bot.millisToTime(player.getPlayingTrack().getTrack().getDuration()), player.getPlayingTrack().getMeta().get("requester")), false)
+                    .addField("Volume: ", player.getVolume() + "%", true)
+                    .addField("Repeating: ", player.getLooping() ? ":white_check_mark:" : ":x:", true)
+                    .addField("Paused: ", player.getPaused() ? ":white_check_mark:" : ":x:", true), channel, 25);
         } else {
             Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs playing!").setColor(Chat.CUSTOM_RED), channel, 20);
         }

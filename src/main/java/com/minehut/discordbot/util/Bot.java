@@ -37,7 +37,7 @@ public class Bot {
         return false;
     }
 
-    public static String millisToString(long millis) {
+    public static String millisToTime(long millis) {
         long days = TimeUnit.MILLISECONDS.toDays(millis);
         millis -= TimeUnit.DAYS.toMillis(days);
         long hours = TimeUnit.MILLISECONDS.toHours(millis);
