@@ -57,14 +57,8 @@ public class ServerEvents extends ListenerAdapter {
 
         EmbedBuilder embed = Chat.getEmbed();
 
-        if (user.getAvatarUrl() == null) {
-            embed.setThumbnail("https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
-        } else {
-            embed.setThumbnail(user.getAvatarUrl());
-        }
-
-        //TODO Display name
-        Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setDescription("*" + user.getAsMention() + " joined the server.*" +
+        Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
+                .setDescription("*" + user.getAsMention() + " joined the server.*" +
                 "\n\n**Account Creation:** " + user.getCreationTime()/*.format(DateTimeFormatter.RFC_1123_DATE_TIME)*/ + //TODO <-----
                 "\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 //.appendField("Account Creation:", user.getCreationDate().format(DateTimeFormatter.ISO_DATE_TIME), false)
@@ -91,13 +85,8 @@ public class ServerEvents extends ListenerAdapter {
 
         EmbedBuilder embed = Chat.getEmbed();
 
-        if (user.getAvatarUrl() == null) {
-            embed.setThumbnail("https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png");
-        } else {
-            embed.setThumbnail(user.getAvatarUrl());
-        }
-
-        Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setDescription("*" + user.getAsMention() + " left the server.*" +
+        Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
+                .setDescription("*" + user.getAsMention() + " left the server.*" +
                 "\n\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 .setFooter("System time | " + new Date().toString(), null)
                 .setColor(Chat.CUSTOM_RED), Bot.getLogChannel());

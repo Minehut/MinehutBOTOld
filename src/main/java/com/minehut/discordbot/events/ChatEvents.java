@@ -210,28 +210,25 @@ public class ChatEvents extends ListenerAdapter {
 
     @Override
     public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
-        if (event.getMessage() == null || event.getMessage().getGuild() != Bot.getMainGuild()) return;
-        //Message message = event.getMessage();
-        //User sender = message.getAuthor();
-        //Channel channel = event.getChannel();
+        if (event.getMessage() == null || event.getGuild() != Bot.getMainGuild()) return;
+        Message message = event.getMessage();
+        User sender = message.getAuthor();
+        Channel channel = event.getChannel();
+        Guild guild = event.getGuild();
 
-        /*
-        if (!sender.equals(Core.getDiscord().getOurUser())) {
-            if (message.getContent() == null || message.getContent().equals("")) {
-                return;
-            }
+        if (guild == null || !Core.getDiscord().isReady() || sender.isBot() || sender.isFake() ||
+                message.getContent() == null || message.getContent().equals("") || !Chat.logRemove) {
+            return;
+        }
 
-            if (message.getContent().startsWith(Command.getPrefix())) return;
-            if (!Chat.logRemove) return;
-
-            if (sender.getName().equals(sender.getDisplayName(message.getGuild()))) {
-                Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(message.getGuild()) + " removed message \"" + Chat.fixDiscordMentions(message) + "\"");
+        if (!sender.equals(Core.getClient().getSelfUser()) && message.getContent().startsWith(Command.getPrefix())) {
+            if (guild.getMember(sender).getNickname() == null) {
+                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(sender) + " removed message \"\"\"" + message.getContent() + "\"\"\"");
             } else {
-                Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(message.getGuild()) + " (" +
-                        sender.getName() + ") removed message \"" + Chat.fixDiscordMentions(message) + "\"");
+                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(sender) + " (" + guild.getMember(sender).getNickname() + ") removed message \"\"\"" + message.getContent() + "\"\"\"");
             }
         }
-        */
+
     }
 
 }
