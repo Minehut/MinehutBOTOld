@@ -100,37 +100,6 @@ public class Chat {
         return message;
     }
 
-    /*
-    public static String fixDiscordMentions(Message message) {
-        String workingText = message.getContent();
-
-        List<User> mentionedUsersList = message.getMentionedUsers();
-        List<TextChannel> mentionedChannelsList = message.getMentionedChannels();
-        List<Role> mentionedRolesList = message.getMentionedRoles();
-
-        if (mentionedUsersList != null) {
-            for (User user : mentionedUsersList) {
-                workingText = workingText.replace("<@!" + user.getId() + ">", "@" + user.getDisplayName(message.getGuild()));
-                workingText = workingText.replace("<@" + user.getId() + ">", "@" + user.getDisplayName(message.getGuild()));
-            }
-        }
-
-        if (mentionedChannelsList != null) {
-            for (Channel channel : mentionedChannelsList) {
-                workingText = workingText.replace("<#" + channel.getId() + ">", "#" + channel.getName());
-            }
-        }
-
-        if (mentionedRolesList != null) {
-            for (Role role : mentionedRolesList) {
-                workingText = workingText.replace("<@&" + role.getId() + ">", "@" + role.getName());
-            }
-        }
-
-        return workingText;
-    }
-    */
-
     public static String getChannelName(Channel channel) {
         return "[#" + channel.getName() + "] ";
     }

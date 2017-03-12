@@ -53,7 +53,6 @@ import java.util.stream.Collectors;
 public class Core {
 
     public static boolean enabled = false;
-    public static String discordLogChatID = "253063123781550080";
 
     private static Config config;
     private static IDiscordClient discord;
@@ -174,31 +173,6 @@ public class Core {
             log.info("Client shutdown");
             System.exit(0);
         } catch (IOException e) {
-            log.info("Could not start restart process!");
-        }
-    }
-
-    public static void broadcast(String message, MessageChannel channel) {
-        if (message != null) {
-            log.info("<MinehutBOT> " + message);
-
-            Chat.sendMessage("**[BOT]** " + message, channel);
-        }
-    }
-
-    public static void broadcast(String message) {
-        if (message != null) {
-            log.info(message);
-
-            Chat.sendMessage("**[BOT]** " + message, client.getTextChannelById(discordLogChatID));
-        }
-    }
-
-    public static void broadcastRaw(String message) {
-        if (message != null) {
-            log.info(message);
-
-            Chat.sendMessage(message, client.getTextChannelById(discordLogChatID));
             log.warn("Could not start restart process!", e);
         } catch (InterruptedException e) {
             log.warn("Could not pause shutdown thread!", e);
