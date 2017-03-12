@@ -27,7 +27,10 @@ import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.VoiceChannel;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.requests.RestAction;
 import net.dv8tion.jda.core.utils.SimpleLog;
@@ -155,14 +158,20 @@ public class Core {
                 VoiceEvents.playing.forEach(Chat::removeMessage);
             }
 
+            client.removeEventListener(new ChatEvents(), new ServerEvents(), new VoiceEvents());
+
             log.info("Disconnected from Discord.");
             if (restart) {
                 log.info("Restarting...");
                 new ProcessBuilder("/bin/bash", "run.sh").start();
             } else {
-                log.info("Shut down successfully");
+                log.info("Cleaning things up...");
             }
 
+            Thread.sleep(2000);
+
+            client.shutdown();
+            log.info("Client shutdown");
             System.exit(0);
         } catch (IOException e) {
             log.info("Could not start restart process!");
@@ -190,6 +199,10 @@ public class Core {
             log.info(message);
 
             Chat.sendMessage(message, client.getTextChannelById(discordLogChatID));
+            log.warn("Could not start restart process!", e);
+        } catch (InterruptedException e) {
+            log.warn("Could not pause shutdown thread!", e);
+            e.printStackTrace();
         }
     }
 
