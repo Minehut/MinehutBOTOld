@@ -2,10 +2,12 @@ package com.minehut.discordbot.util;
 
 import com.minehut.discordbot.Core;
 import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
  * Created by MatrixTunnel on 12/8/2016.
@@ -35,6 +37,10 @@ public class Bot {
             }
         }
         return false;
+    }
+
+    public static boolean hasInvite(Message message) {
+        return Pattern.compile("(?:https?://)?discord(?:app\\.com/invite|\\.gg)/(\\S+?)").matcher(message.getRawContent()).find();
     }
 
     public static String millisToTime(long millis) {
