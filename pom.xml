@@ -89,9 +89,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.dv8tion</groupId>
+            <groupId>com.github.DV8FromTheWorld</groupId>
             <artifactId>JDA</artifactId>
-            <version>3.0.BETA2_146</version>
+            <version>f2fb9fd</version>
         </dependency>
         <dependency>
             <groupId>com.arsenarsen.lavaplayer-bridge</groupId>
