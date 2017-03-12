@@ -37,8 +37,8 @@ public class MuteCommand implements Command {
                 guild.getController().removeRolesFromMember(guild.getMember(muteUser), muteRole).queue();
                 Chat.sendMessage("User " + muteUser.getAsMention() + " has been unmuted by " + sender.getAsMention() + ".", channel);
 
-                Chat.sendMessage(Chat.getEmbed().setDescription(":loud_sound:  *" + muteUser.getAsMention() + " was unmuted*")
-                        .addField("Staff Member", sender.getAsMention() + " | " + Chat.getFullName(sender), true)
+                Chat.sendMessage(Chat.getEmbed().setDescription(":loud_sound:  " + sender.getAsMention() + " | " + Chat.getFullName(sender) + " was unmuted.")
+                        .addField("Staff Member", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true)
                         .setFooter("System time | " + new Date().toString(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
@@ -48,8 +48,8 @@ public class MuteCommand implements Command {
                 guild.getController().addRolesToMember(guild.getMember(muteUser), muteRole).queue();
                 Chat.sendMessage("User " + muteUser.getAsMention() + " has been muted by " + sender.getAsMention() + ".", channel);
 
-                Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  *" + muteUser.getAsMention() + " was muted*")
-                        .addField("Staff Member", sender.getAsMention() + " | " + Chat.getFullName(sender), true)
+                Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  " + sender.getAsMention() + " | " + Chat.getFullName(sender) + " was muted.")
+                        .addField("Staff Member", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true)
                         .setFooter("System time | " + new Date().toString(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());

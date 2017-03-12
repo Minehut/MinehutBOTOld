@@ -63,9 +63,9 @@ public class ChatEvents extends ListenerAdapter {
                     guild.getController().addRolesToMember(member, Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID())).queue();
                     Chat.sendMessage(sender.getAsMention() + " has been auto muted for spam", channel);
 
-                    Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  *" + member.getAsMention() + " was auto muted for spam!*")
-                            .addField("Message", "```" + event.getMessage() + "```", true)
+                    Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  " + sender.getAsMention() + " | " + Chat.getFullName(sender) + " was auto muted for spam!")
                             .addField("Channel", channel.getAsMention(), true)
+                            .addField("Message", "```" + event.getMessage().getContent() + "```", false)
                             .setFooter("System time | " + new Date().toString(), null)
                             .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
                     return;
@@ -73,8 +73,8 @@ public class ChatEvents extends ListenerAdapter {
             }
 
             if (message.getContent().length() >= Core.getConfig().getMaxMessageLength()) {
-                Chat.sendMessage(Chat.getEmbed().setDescription(":exclamation: Possible message spam")
-                        .addField("User", member.getAsMention(), true)
+                Chat.sendMessage(Chat.getEmbed().setDescription(":exclamation: Possible message spam - **" + Chat.getFullName(sender) + "**")
+                        .addField("User", sender.getAsMention(), true)
                         .addField("Length", String.valueOf(message.getContent().length()), true)
                         .addField("Channel", channel.getAsMention(), true)
                         .addField("Message", "```" + event.getMessage().getContent() + "```", false)
@@ -82,12 +82,12 @@ public class ChatEvents extends ListenerAdapter {
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
             }
 
-            if (Bot.hasInvite(message) && Bot.isTrusted(sender)) {
+            if (Bot.hasInvite(message) && !Bot.isTrusted(sender)) {
                 Chat.removeMessage(message);
 
                 Chat.sendMessage(sender.getAsMention() + ", please do not advertise Discord servers. Thanks!", channel);
-                Chat.sendMessage(Chat.getEmbed().setDescription(":exclamation: Discord server advertisement")
-                        .addField("User", member.getAsMention(), true)
+                Chat.sendMessage(Chat.getEmbed().setDescription(":exclamation: Discord server advertisement - **" + Chat.getFullName(sender) + "**")
+                        .addField("User", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true)
                         .addField("Message", "```" + event.getMessage().getContent() + "```", false)
                         .setFooter("System time | " + new Date().toString(), null)
