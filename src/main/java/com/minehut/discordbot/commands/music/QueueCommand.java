@@ -101,7 +101,7 @@ public class QueueCommand implements Command {
             EmbedBuilder builder = Chat.getEmbed().setTitle("Playlist Queue", null);
             i = 1;
             for (String s : songs) {
-                builder.addField("\u2063", s, false);
+                builder.addField("\u200e", s, false);
             }
 
             Chat.sendMessage(builder.addField("Total songs: ", String.valueOf(player.getPlaylist().size()), true)

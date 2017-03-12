@@ -100,7 +100,7 @@ public class ChatEvents extends ListenerAdapter {
                     "▔╲▂▂▂▂╱▔╲▂")) {
 
                 Chat.removeMessage(message);
-                Chat.sendMessage(sender.getAsMention() + ", please do not post cooldog in this channel.", channel, 60);
+                Chat.sendMessage(sender.getAsMention() + ", please do not post cooldog in this channel.", channel);
                 return;
             } else if (message.getRawContent().contains("He is going around sending friend requests to random Discord users, " +
                     "and those who accept his friend requests will have their accounts DDoSed and their IP Addresses revealed to him. " +

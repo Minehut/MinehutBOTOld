@@ -52,12 +52,9 @@ public class ServerEvents extends ListenerAdapter {
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
         User user = event.getMember().getUser();
-
         Bot.updateUsers();
 
-        EmbedBuilder embed = Chat.getEmbed();
-
-        Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
+        Chat.sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
                 .setDescription("*" + user.getAsMention() + " joined the server.*" +
                 "\n\n**Account Creation:** " + user.getCreationTime()/*.format(DateTimeFormatter.RFC_1123_DATE_TIME)*/ + //TODO <-----
                 "\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
@@ -83,9 +80,7 @@ public class ServerEvents extends ListenerAdapter {
         if (event.getGuild() != Bot.getMainGuild()) return;
         User user = event.getMember().getUser();
 
-        EmbedBuilder embed = Chat.getEmbed();
-
-        Chat.sendMessage(embed.setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
+        Chat.sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
                 .setDescription("*" + user.getAsMention() + " left the server.*" +
                 "\n\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 .setFooter("System time | " + new Date().toString(), null)
