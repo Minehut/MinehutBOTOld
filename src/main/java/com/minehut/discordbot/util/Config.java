@@ -11,7 +11,7 @@ import java.io.*;
  */
 public class Config {
 
-    private int shardCount;
+    private int shardCount, maxMessageLength;
     private String mainGuildID, logChannelID, mutedRoleID, commandPrefix, discordToken, googleAPIKey, secretKey;
     private String[] trustedRoles, blockedUsers, musicVoiceChannels, musicCommandChannels;
     private String BOT_JSON = "settings.json";
@@ -22,6 +22,7 @@ public class Config {
      */
     public Config() throws IOException {
         shardCount = 1;
+        maxMessageLength = 250;
         mainGuildID = "";
         logChannelID = "";
         mutedRoleID = "";
@@ -62,6 +63,7 @@ public class Config {
         String json = new String(buffer);
         Config file = new Gson().fromJson(json, Config.class);
         shardCount = file.shardCount;
+        maxMessageLength = file.maxMessageLength;
         mainGuildID = file.mainGuildID;
         logChannelID = file.logChannelID;
         mutedRoleID = file.mutedRoleID;
@@ -78,6 +80,10 @@ public class Config {
 
     public int getShardCount() {
         return shardCount;
+    }
+
+    public int getMaxMessageLength() {
+        return maxMessageLength;
     }
 
     public String getMainGuildID() {
