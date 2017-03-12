@@ -221,7 +221,7 @@ public class Core {
                                 } else if (atrack instanceof SoundCloudAudioTrack) {
                                     embed.addField("**Now playing** - SoundCloud", "**[" + atrack.getInfo().title + "](" + atrack.getInfo().uri + ")** " +
                                             "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration()) + "]`", true)
-                                            .setImage("http://www.logospike.com/wp-content/uploads/2014/11/Soundcloud_logo-5.png")
+                                            .setImage("https://cdn.discordapp.com/attachments/233737506955329538/290302284381028352/soundcloud_icon.png") //I made this -Matrix
                                             .setFooter("Queued by: @" + Chat.getFullName(user), null)
                                             .setColor(Chat.CUSTOM_DARK_ORANGE);
                                 } else {
