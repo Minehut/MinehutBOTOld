@@ -270,6 +270,7 @@ public class Core {
         registerCommand(new InfoCommand());
 
         registerCommand(new JoinCommand());
+        registerCommand(new LeaveCommand());
         registerCommand(new MuteCommand());
         //registerCommand(new PurgeCommand());
         registerCommand(new ReconnectVoiceCommand());
