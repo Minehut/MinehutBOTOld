@@ -60,7 +60,7 @@ public class ServerEvents extends ListenerAdapter {
                 "\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 //.appendField("Account Creation:", user.getCreationDate().format(DateTimeFormatter.ISO_DATE_TIME), false)
                 //.withFooterText("System time").withTimestamp(new Date().getTime())
-                .setFooter("System time | " + new Date().toString(), null)
+                .setFooter("System time | " + Bot.getBotTime(), null)
                 .setColor(Chat.CUSTOM_GREEN), Bot.getLogChannel());
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " _has joined the Discord server._");
@@ -83,7 +83,7 @@ public class ServerEvents extends ListenerAdapter {
         Chat.sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
                 .setDescription("*" + user.getAsMention() + " left the server.*" +
                 "\n\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
-                .setFooter("System time | " + new Date().toString(), null)
+                .setFooter("System time | " + Bot.getBotTime(), null)
                 .setColor(Chat.CUSTOM_RED), Bot.getLogChannel());
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " _has left the Discord server._");
@@ -97,7 +97,7 @@ public class ServerEvents extends ListenerAdapter {
         User user = event.getUser();
 
         Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://minehut.com/" + user.getName(), null).setDescription("*was banned from the server.*")
-                .setFooter("System time | " + new Date().toString(), null)
+                .setFooter("System time | " + Bot.getBotTime(), null)
                 .setColor(Color.RED), Bot.getLogChannel());
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " **was banned from Discord.**");

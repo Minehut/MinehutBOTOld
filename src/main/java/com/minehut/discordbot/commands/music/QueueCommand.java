@@ -99,13 +99,16 @@ public class QueueCommand implements Command {
             }
             songs.add(sb.toString());
             EmbedBuilder builder = Chat.getEmbed().setTitle("Playlist Queue", null);
-            i = 1;
             for (String s : songs) {
                 builder.addField("\u200e", s, false);
             }
 
+            long totalTime = 0;
+            for (Track track : player.getPlaylist()) {
+                totalTime = totalTime + track.getTrack().getDuration();
+            }
             Chat.sendMessage(builder.addField("Total songs: ", String.valueOf(player.getPlaylist().size()), true)
-                    .addField("Volume: ", player.getVolume() + "%", true)
+                    .addField("Total Playlist Time", Bot.millisToTime(totalTime, true), true)
                     .addField("Paused: ", player.getPaused() ? ":white_check_mark:" : ":x:", true), channel, 25);
         } else {
             Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs in the queue!").setColor(Chat.CUSTOM_RED), channel, 15);
