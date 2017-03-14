@@ -31,7 +31,7 @@ public class NowPlayingCommand implements Command {
         Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
 
         if (Core.getMusicManager().getPlayer(guild.getId()).getPlayingTrack() != null) {
-            Chat.sendMessage(Chat.getEmbed().addField("Currently Playing: ", String.format("**[%s](%s)** `[%s]` | <@!%s>",
+            Chat.sendMessage(Chat.getEmbed().addField("Currently Playing", String.format("**[%s](%s)** `[%s]` | <@!%s>",
                     player.getPlayingTrack().getTrack().getInfo().title, player.getPlayingTrack().getTrack().getInfo().uri,
                     Bot.millisToTime(player.getPlayingTrack().getTrack().getDuration(), false), player.getPlayingTrack().getMeta().get("requester")), false)
                     .addField("Volume: ", player.getVolume() + "%", true)

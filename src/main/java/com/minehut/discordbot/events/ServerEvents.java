@@ -58,12 +58,9 @@ public class ServerEvents extends ListenerAdapter {
                 .setDescription("*" + user.getAsMention() + " joined the server.*" +
                 "\n\n**Account Creation:** " + Bot.formatTime(LocalDateTime.from(user.getCreationTime())) +
                 "\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
-                //.appendField("Account Creation:", user.getCreationDate().format(DateTimeFormatter.ISO_DATE_TIME), false)
-                //.withFooterText("System time").withTimestamp(new Date().getTime())
                 .setFooter("System time | " + Bot.getBotTime(), null)
                 .setColor(Chat.CUSTOM_GREEN), Bot.getLogChannel());
 
-        //Chat.sendDiscordMessage(event.getUser().mention() + " _has joined the Discord server._");
         Core.log.info(Chat.getFullName(user) + " joined the Discord server.");
 
         /*
@@ -72,7 +69,6 @@ public class ServerEvents extends ListenerAdapter {
                     guild.getChannelByID("239599059415859200"));
         }
         */
-
     }
 
     @Override
@@ -86,7 +82,6 @@ public class ServerEvents extends ListenerAdapter {
                 .setFooter("System time | " + Bot.getBotTime(), null)
                 .setColor(Chat.CUSTOM_RED), Bot.getLogChannel());
 
-        //Chat.sendDiscordMessage(event.getUser().mention() + " _has left the Discord server._");
         Core.log.info(Chat.getFullName(user) + " left the Discord server.");
         Bot.updateUsers();
     }
