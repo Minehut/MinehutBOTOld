@@ -111,7 +111,7 @@ public class ServerEvents extends ListenerAdapter {
         User user = event.getUser();
 
         Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://minehut.com/" + user.getName(), null).setDescription("*was unbanned from the server.*")
-                .setFooter("System time | " + new Date().toString(), null)
+                .setFooter("System time | " + Bot.getBotTime(), null)
                 .setColor(Color.PINK), Bot.getLogChannel());
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " **was banned from Discord.**");
@@ -137,7 +137,7 @@ public class ServerEvents extends ListenerAdapter {
             }
         }
 
-        Chat.sendMessage(embed.setFooter("System time | " + new Date().toString(), null)
+        Chat.sendMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
                 .setColor(Chat.CUSTOM_ORANGE), Bot.getLogChannel());
     }
 
@@ -159,7 +159,7 @@ public class ServerEvents extends ListenerAdapter {
             }
         }
 
-        Chat.sendMessage(embed.setFooter("System time | " + new Date().toString(), null)
+        Chat.sendMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
                 .setColor(Chat.CUSTOM_ORANGE), Bot.getLogChannel());
     }
 

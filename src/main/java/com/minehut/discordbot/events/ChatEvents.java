@@ -13,7 +13,6 @@ import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -66,7 +65,7 @@ public class ChatEvents extends ListenerAdapter {
                     Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  " + sender.getAsMention() + " | " + Chat.getFullName(sender) + " was auto muted for spam!")
                             .addField("Channel", channel.getAsMention(), true)
                             .addField("Message", "```" + event.getMessage().getContent() + "```", false)
-                            .setFooter("System time | " + new Date().toString(), null)
+                            .setFooter("System time | " + Bot.getBotTime(), null)
                             .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
                     return;
                 }
@@ -78,7 +77,7 @@ public class ChatEvents extends ListenerAdapter {
                         .addField("Length", String.valueOf(message.getContent().length()), true)
                         .addField("Channel", channel.getAsMention(), true)
                         .addField("Message", "```" + event.getMessage().getContent() + "```", false)
-                        .setFooter("System time | " + new Date().toString(), null)
+                        .setFooter("System time | " + Bot.getBotTime(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
             }
 
@@ -90,7 +89,7 @@ public class ChatEvents extends ListenerAdapter {
                         .addField("User", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true)
                         .addField("Message", "```" + event.getMessage().getContent() + "```", false)
-                        .setFooter("System time | " + new Date().toString(), null)
+                        .setFooter(Bot.getBotTime(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
                 return;
             }

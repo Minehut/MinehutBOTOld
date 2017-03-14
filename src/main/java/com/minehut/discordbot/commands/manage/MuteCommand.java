@@ -8,8 +8,6 @@ import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 
-import java.util.Date;
-
 /**
  * Created by MatrixTunnel on 1/27/2017.
  */
@@ -40,7 +38,7 @@ public class MuteCommand implements Command {
                 Chat.sendMessage(Chat.getEmbed().setDescription(":loud_sound:  " + sender.getAsMention() + " | " + Chat.getFullName(sender) + " was unmuted.")
                         .addField("Staff Member", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true)
-                        .setFooter("System time | " + new Date().toString(), null)
+                        .setFooter("System time | " + Bot.getBotTime(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
 
                 Core.log.info(Chat.getFullName(muteUser) + " was unmuted by " + Chat.getFullName(sender) + ".");
@@ -51,7 +49,7 @@ public class MuteCommand implements Command {
                 Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  " + sender.getAsMention() + " | " + Chat.getFullName(sender) + " was muted.")
                         .addField("Staff Member", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true)
-                        .setFooter("System time | " + new Date().toString(), null)
+                        .setFooter("System time | " + Bot.getBotTime(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
 
                 Core.log.info(Chat.getFullName(muteUser) + " was muted by " + Chat.getFullName(sender) + ".");

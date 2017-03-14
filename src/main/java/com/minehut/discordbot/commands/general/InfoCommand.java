@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,7 +94,7 @@ public class InfoCommand implements Command {
                     }
 
                     Chat.editMessage("", embed.setDescription("`" + motd + "`")
-                            .setFooter("System time | " + new Date().toString(), null)
+                            .setFooter("System time | " + Bot.getBotTime(), null)
                             .setColor(Chat.CUSTOM_GREEN), mainMessage, 30);
                     break;
                 case "server":
@@ -122,7 +121,7 @@ public class InfoCommand implements Command {
                                         .addField("Total Server Starts:", String.valueOf(obj.getInt("starts")), true)
                                         .addField("Server Host:", String.valueOf(obj.get("host")), true);
 
-                                Chat.editMessage("", embed.setFooter("System time | " + new Date().toString(), null)
+                                Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
                                         .setColor(Chat.CUSTOM_GREEN), mainMessage, 30);
                                 return;
                             }
@@ -187,7 +186,7 @@ public class InfoCommand implements Command {
                             embed.addField("Rank:", getUserRank(user), true);
                         }
 
-                        Chat.editMessage("", embed.setFooter("System time | " + new Date().toString(), null)
+                        Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
                                 .setColor(isOnlineColor(user)), mainMessage, 30);
                         return;
                     }
@@ -236,7 +235,7 @@ public class InfoCommand implements Command {
                     }
 
                     embed.setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
-                    Chat.editMessage("", embed.setFooter("System time | " + new Date().toString(), null)
+                    Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
                             .setColor(Chat.CUSTOM_GREEN), mainMessage, 40);
                     break;
                 case "bot":
@@ -249,7 +248,7 @@ public class InfoCommand implements Command {
                             .addField("Total threads:", String.valueOf(Thread.getAllStackTraces().size()), true)
                             .addField("CPU Usage:", ((int) (ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getSystemCpuLoad() * 10000)) / 100f + "%", true)
                             .addField("JDA Version:", JDAInfo.VERSION, true)
-                            .setColor(Chat.CUSTOM_GREEN).setFooter("System time | " + new Date().toString(), null), mainMessage, 30);
+                            .setColor(Chat.CUSTOM_GREEN).setFooter("System time | " + Bot.getBotTime(), null), mainMessage, 30);
                     break;
                 default:
                     Chat.editMessage("", embed.clearFields().setDescription("Usage: `" + Command.getPrefix() + getCommand() + getArgs() + "`")
