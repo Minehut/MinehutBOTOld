@@ -22,7 +22,7 @@ public class Config {
      */
     public Config() throws IOException {
         shardCount = 1;
-        maxMessageLength = 250;
+        maxMessageLength = 275;
         mainGuildID = "";
         logChannelID = "";
         mutedRoleID = "";
