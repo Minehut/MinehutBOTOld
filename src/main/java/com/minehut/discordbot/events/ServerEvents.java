@@ -16,7 +16,7 @@ import net.dv8tion.jda.core.events.guild.member.*;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * Created by MatrixTunnel on 11/28/2016.
@@ -56,7 +56,7 @@ public class ServerEvents extends ListenerAdapter {
 
         Chat.sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
                 .setDescription("*" + user.getAsMention() + " joined the server.*" +
-                "\n\n**Account Creation:** " + user.getCreationTime()/*.format(DateTimeFormatter.RFC_1123_DATE_TIME)*/ + //TODO <-----
+                "\n\n**Account Creation:** " + Bot.formatTime(LocalDateTime.from(user.getCreationTime())) +
                 "\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 //.appendField("Account Creation:", user.getCreationDate().format(DateTimeFormatter.ISO_DATE_TIME), false)
                 //.withFooterText("System time").withTimestamp(new Date().getTime())

@@ -73,7 +73,7 @@ public class Bot {
         return Pattern.compile("(?:https?://)?discord(?:app\\.com/invite|\\.gg)/(\\S+?)").matcher(message.getRawContent()).find();
     }
 
-    public static String millisToTime(long millis) {
+    public static String millisToTime(long millis, boolean format) {
         long days = TimeUnit.MILLISECONDS.toDays(millis);
         millis -= TimeUnit.DAYS.toMillis(days);
         long hours = TimeUnit.MILLISECONDS.toHours(millis);
@@ -85,17 +85,18 @@ public class Bot {
         StringBuilder sb = new StringBuilder(64);
         if (days > 0) {
             sb.append(days);
-            sb.append(":");
+            sb.append(format ? "d " : ":");
         }
         if (hours > 0) {
             sb.append(hours);
-            sb.append(":");
+            sb.append(format ? "h " : ":");
         }
         if (minutes > 0) {
             sb.append(minutes);
-            sb.append(":");
+            sb.append(format ? "m " : ":");
         }
         sb.append(seconds);
+        sb.append(format ? "s" : "");
 
         return (sb.toString());
     }

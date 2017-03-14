@@ -82,13 +82,13 @@ public class QueueCommand implements Command {
                 String toAppend; //TODO Add something to show soundcloud and youtube songs separate from each other
                 if (next.getTrack() instanceof YoutubeAudioTrack) {
                     toAppend = String.format("**%s.** [%s](%s) `[%s]` | <@!%s>\n", i++, next.getTrack().getInfo().title,
-                            next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration()), next.getMeta().get("requester"));
+                            next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration(), false), next.getMeta().get("requester"));
                 } else if (next.getTrack() instanceof SoundCloudAudioTrack) {
                     toAppend = String.format("**%s.** [%s](%s) `[%s]` | <@!%s>\n", i++, next.getTrack().getInfo().title,
-                            next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration()), next.getMeta().get("requester"));
+                            next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration(), false), next.getMeta().get("requester"));
                 } else {
                     toAppend = String.format("**%s.** [%s](%s) `[%s]` | <@!%s>\n", i++, next.getTrack().getInfo().title,
-                            next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration()), next.getMeta().get("requester"));
+                            next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration(), false), next.getMeta().get("requester"));
                 }
 
                 if (sb.length() + toAppend.length() > 1024) {

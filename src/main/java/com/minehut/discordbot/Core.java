@@ -214,19 +214,19 @@ public class Core {
                                 if (atrack instanceof YoutubeAudioTrack) {
 
                                     embed.addField("**Now playing** - YouTube", "**[" + atrack.getInfo().title + "](" + atrack.getInfo().uri + ")** " +
-                                            "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration()) + "]`", true)
+                                            "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration(), false) + "]`", true)
                                             .setImage("https://img.youtube.com/vi/" + song.getPlayingTrack().getIdentifier() + "/mqdefault.jpg")
                                             .setFooter("Queued by: @" + Chat.getFullName(user), null)
                                             .setColor(Chat.CUSTOM_GREEN);
                                 } else if (atrack instanceof SoundCloudAudioTrack) {
                                     embed.addField("**Now playing** - SoundCloud", "**[" + atrack.getInfo().title + "](" + atrack.getInfo().uri + ")** " +
-                                            "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration()) + "]`", true)
+                                            "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration(), false) + "]`", true)
                                             .setImage("https://cdn.discordapp.com/attachments/233737506955329538/290302284381028352/soundcloud_icon.png") //I made this -Matrix
                                             .setFooter("Queued by: @" + Chat.getFullName(user), null)
                                             .setColor(Chat.CUSTOM_DARK_ORANGE);
                                 } else {
                                     embed.addField("**Now playing** - ???", "**[" + atrack.getInfo().title + "](" + atrack.getInfo().uri + ")** " +
-                                            "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration()) + "]`", true)
+                                            "`[" + Bot.millisToTime(song.getPlayingTrack().getDuration(), false) + "]`", true)
                                             .setFooter("Queued by: @" + Chat.getFullName(user), null)
                                             .setColor(Chat.CUSTOM_GREEN);
                                 }
