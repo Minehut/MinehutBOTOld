@@ -81,7 +81,7 @@ public class Bot {
     }
 
     public static boolean hasInvite(Message message) {
-        return Pattern.compile("(?:https?://)?discord(?:app\\.com/invite|\\.gg)/(\\S+?)").matcher(message.getRawContent()).find();
+        return Pattern.compile("(?:https?://)?discord(?:app\\.com/invite|\\.gg|\\.io)/(\\S+?)").matcher(message.getRawContent()).find();
     }
 
     public static String millisToTime(long millis, boolean format) {
