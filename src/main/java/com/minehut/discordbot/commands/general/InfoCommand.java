@@ -33,16 +33,6 @@ public class InfoCommand implements Command {
     private String minehutLogo = "https://cdn.discordapp.com/attachments/239599059415859200/249694020593254400/" +
             "eJwNyEsSgyAMANC7cACCfAp4mxQpOqOGIbGbTu-ub_l-6hq7mtUq0nkGWDYuNBbNQgNb1Y2o7RX7xrrQASiCZT3qKQzWJxtTitmlHH2Ygn0qv7IL2U8mGRdMtICfL75R97Op_w3lzyJF.png";
 
-    private static String getOwnerName(String UUID) {
-        try {
-            JSONArray json = URLJson.readJsonArrayFromUrl("https://api.mojang.com/user/profiles/" + UUID.replaceAll("-", "") + "/names");
-            return json.getJSONObject(json.length() - 1).getString("name");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return "null";
-    }
-
     @Override
     public String getCommand() {
         return "info";
@@ -114,9 +104,18 @@ public class InfoCommand implements Command {
                             if (obj.get("name").equals(args[1])) {
                                 embed.clearFields()
                                         .setAuthor(obj.get("name") + " - Server Info", "https://minehut.com/s/" + obj.get("name"), minehutLogo)
-                                        .setDescription("`" + String.valueOf(obj.get("motd")) + "`")
-                                        .addField("Owner:", "[`" + getOwnerName(obj.getString("owner")) + "`](https://minehut.com/" + getOwnerName(obj.getString("owner")) + ")", true)
-                                        .addField("Players Online:", obj.getInt("player_count") + "/" + obj.getInt("max_players"), true)
+                                        .setDescription("`" + String.valueOf(obj.get("motd")) + "`");
+
+                                try {
+                                    JSONArray json = URLJson.readJsonArrayFromUrl("https://api.mojang.com/user/profiles/" + obj.getString("owner").replaceAll("-", "") + "/names");
+                                    String name = json.getJSONObject(json.length() - 1).getString("name");
+
+                                    embed.addField("Owner:", "[`" + name + "`](https://minehut.com/" + name + ")", true);
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+
+                                embed.addField("Players Online:", obj.getInt("player_count") + "/" + obj.getInt("max_players"), true)
                                         .addField("Total Joins:", String.valueOf(obj.getInt("total_joins")), true)
                                         .addField("Unique Joins:", String.valueOf(obj.getJSONArray("user_joins").length()), true)
                                         .addField("Total Server Starts:", String.valueOf(obj.getInt("starts")), true)

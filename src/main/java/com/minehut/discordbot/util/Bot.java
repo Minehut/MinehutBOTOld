@@ -5,6 +5,7 @@ import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
+import org.json.JSONArray;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -67,6 +68,16 @@ public class Bot {
             default:
                 return "th";
         }
+    }
+
+    public static String getMCOwnerName(String UUID) {
+        try {
+            JSONArray json = URLJson.readJsonArrayFromUrl("https://api.mojang.com/user/profiles/" + UUID.replaceAll("-", "") + "/names");
+            return json.getJSONObject(json.length() - 1).getString("name");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return "null";
     }
 
     public static boolean hasInvite(Message message) {
