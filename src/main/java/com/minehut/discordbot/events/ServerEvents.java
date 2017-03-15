@@ -170,12 +170,15 @@ public class ServerEvents extends ListenerAdapter {
             return;
         }
 
+        if (event.getNewNick() == null) {
+            Chat.sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " reset their name to `" + user.getName() + "`")
+                    .setColor(Color.ORANGE), Bot.getLogChannel());
+            return;
+        }
+
         if (!event.getNewNick().equals(user.getName())) {
             Chat.sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " changed their name from `" +
                     event.getPrevNick() + "` to `" + event.getNewNick() + "`")
-                    .setColor(Color.ORANGE), Bot.getLogChannel());
-        } else {
-            Chat.sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " reset their name to `" + event.getNewNick() + "`")
                     .setColor(Color.ORANGE), Bot.getLogChannel());
         }
 
