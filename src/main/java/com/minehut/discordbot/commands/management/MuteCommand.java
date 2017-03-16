@@ -22,10 +22,10 @@ public class MuteCommand implements Command {
     public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
-        User muteUser = Core.getDiscord().getUserByID(args[0].replace("<@", "").replace("!", "").replace(">", ""));
-        Role muteRole = Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID());
-
         if (args.length == 1) {
+            User muteUser = Core.getDiscord().getUserByID(args[0].replace("<@", "").replace("!", "").replace(">", ""));
+            Role muteRole = Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID());
+
             if (muteUser == null) {
                 Chat.sendMessage(Chat.getEmbed().setDescription("Not a valid user!").setColor(Chat.CUSTOM_RED), channel, 5);
                 return;
