@@ -8,7 +8,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 
 /**
- * Made by the FlareBot developers
+ * Made by the developers of FlareBot.
  * Changed by MatrixTunnel on 1/8/2017.
  */
 public class PlayCommand implements Command {
@@ -37,12 +37,12 @@ public class PlayCommand implements Command {
             if (args[0].startsWith("http") || args[0].startsWith("www.")) {
                 VideoThread.getThread(args[0], channel, sender).start();
             } else {
-                String term = "";
+                StringBuilder term = new StringBuilder();
                 for (String s : args) {
-                    term += s + " ";
+                    term.append(s).append(" ");
                 }
-                term = term.trim();
-                VideoThread.getSearchThread(term, channel, sender).start(); //YouTube only
+                term = new StringBuilder(term.toString().trim());
+                VideoThread.getSearchThread(term.toString(), channel, sender).start(); //YouTube only
             }
         }
 

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Made by the FlareBot developers
+ * Made by the developers of FlareBot.
  * Major changes by MatrixTunnel on 3/9/2017.
  */
 public class SoundCloudExtractor implements Extractor {

@@ -34,9 +34,9 @@ public class NowPlayingCommand implements Command {
             Chat.sendMessage(Chat.getEmbed().addField("Currently Playing", String.format("**[%s](%s)** `[%s]` | <@!%s>",
                     player.getPlayingTrack().getTrack().getInfo().title, player.getPlayingTrack().getTrack().getInfo().uri,
                     Bot.millisToTime(player.getPlayingTrack().getTrack().getDuration(), false), player.getPlayingTrack().getMeta().get("requester")), false)
-                    .addField("Volume: ", player.getVolume() + "%", true)
-                    .addField("Repeating: ", player.getLooping() ? ":white_check_mark:" : ":x:", true)
-                    .addField("Paused: ", player.getPaused() ? ":white_check_mark:" : ":x:", true), channel, 25);
+                    .addField("Volume", player.getVolume() + "%", true)
+                    .addField("Repeating", player.getLooping() ? ":white_check_mark:" : ":x:", true)
+                    .addField("Paused", player.getPaused() ? ":white_check_mark:" : ":x:", true), channel, 25);
         } else {
             Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs playing!").setColor(Chat.CUSTOM_RED), channel, 20);
         }

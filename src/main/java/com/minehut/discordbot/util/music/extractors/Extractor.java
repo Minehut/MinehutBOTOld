@@ -6,7 +6,7 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
 
 /**
- * Made by the FlareBot developers
+ * Made by the developers of FlareBot
  */
 public interface Extractor {
     Class<? extends AudioSourceManager> getSourceManagerClass();

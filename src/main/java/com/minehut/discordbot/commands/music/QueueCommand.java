@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * Made by the FlareBot developers
+ * Made by the developers of FlareBot.
  * Changed by MatrixTunnel on 1/8/2017.
  */
 public class QueueCommand implements Command {
@@ -107,9 +107,9 @@ public class QueueCommand implements Command {
             for (Track track : player.getPlaylist()) {
                 totalTime = totalTime + track.getTrack().getDuration();
             }
-            Chat.sendMessage(builder.addField("Total songs: ", String.valueOf(player.getPlaylist().size()), true)
+            Chat.sendMessage(builder.addField("Total songs", String.valueOf(player.getPlaylist().size()), true)
                     .addField("Total Playlist Time", Bot.millisToTime(totalTime, true), true)
-                    .addField("Paused: ", player.getPaused() ? ":white_check_mark:" : ":x:", true), channel, 25);
+                    .addField("Paused", player.getPaused() ? ":white_check_mark:" : ":x:", true), channel, 25);
         } else {
             Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs in the queue!").setColor(Chat.CUSTOM_RED), channel, 15);
         }

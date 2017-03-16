@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
 
 /**
  * Created by MatrixTunnel on 1/29/2017.
- * Matcher code/regex made by my friend MeowingTwurtle.
- * Info help from Draem.
+ * Matcher code/regex made by MeowingTwurtle.
+ * Info help from Draem and ReduxRedstone.
  */
 public class InfoCommand implements Command {
 

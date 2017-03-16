@@ -6,7 +6,7 @@ import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 
 /**
- * Made by the FlareBot developers
+ * Made by the developers of FlareBot.
  * Changed by MatrixTunnel on 12/18/2016.
  */
 public class PurgeCommand implements Command {

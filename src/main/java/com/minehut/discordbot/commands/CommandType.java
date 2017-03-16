@@ -5,7 +5,7 @@ import com.minehut.discordbot.Core;
 import java.util.List;
 
 /**
- * Made by the FlareBot developers
+ * Made by the developers of FlareBot.
  * Changed by MatrixTunnel on 12/27/2016.
  */
 public enum CommandType {

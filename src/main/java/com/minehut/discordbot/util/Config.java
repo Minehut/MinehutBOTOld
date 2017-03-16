@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder;
 import java.io.*;
 
 /**
- * Originally created by Zachary Kozar (masterzach32) for SwagBot.
+ * Originally created by the developer of SwagBot.
  * Changed by MatrixTunnel on 2/4/2017.
  */
 public class Config {

@@ -17,12 +17,12 @@ import java.util.HashMap;
 
 /**
  * Created by MatrixTunnel on 11/29/2016.
- * Some code provided by the FlareBot developers
+ * Some code used from FlareBot.
  */
 public class ChatEvents extends ListenerAdapter {
 
-    HashMap<String, String> messages = new HashMap<>();
-    HashMap<String, Integer> amount = new HashMap<>();
+    private HashMap<String, String> messages = new HashMap<>();
+    private HashMap<String, Integer> amount = new HashMap<>();
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
@@ -127,7 +127,7 @@ public class ChatEvents extends ListenerAdapter {
             }
         }
 
-        if (message.getRawContent() != null && message.getContent().startsWith(Command.getPrefix()) && !sender.isBot()) {
+        if (message.getRawContent() != null && message.getContent().startsWith(Command.getPrefix())) {
 
             String msg = event.getMessage().getRawContent();
             String command = msg.substring(1);
@@ -224,8 +224,7 @@ public class ChatEvents extends ListenerAdapter {
         Channel channel = event.getChannel();
         Guild guild = event.getGuild();
 
-        if (guild == null || !Core.getDiscord().isReady() || sender.isBot() || sender.isFake() ||
-                message.getContent() == null || message.getContent().equals("") || !Chat.logRemove) {
+        if (guild == null || !Core.getDiscord().isReady() || sender.isBot() || sender.isFake()) {
             return;
         }
 

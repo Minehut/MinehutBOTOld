@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * Original idea and most code from FlareBot.
+ * Original idea and some code from FlareBot.
  * Created by MatrixTunnel on 2/7/2017.
  */
 public class IDiscordClient {
