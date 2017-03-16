@@ -30,9 +30,9 @@ public class ReloadCommand implements Command {
 
         try {
             Core.getConfig().load();
+            Core.log.info("Config reloaded!");
         } catch (IOException e) {
-            e.printStackTrace();
-            Core.log.info("Boop!");
+            Core.log.info("Error reloading config", e);
         }
     }
 

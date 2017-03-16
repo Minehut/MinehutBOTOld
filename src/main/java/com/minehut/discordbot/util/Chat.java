@@ -104,16 +104,4 @@ public class Chat {
         return "[#" + channel.getName() + "] ";
     }
 
-    public static String getContent(String[] args, int start, int end) {
-        String content = "";
-        for (int i = start; i < Math.min(end, args.length); i++) {
-            content += args[i];
-            if (i != Math.min(end, args.length) - 1) {
-                content += " ";
-            }
-        }
-
-        return content;
-    }
-
 }
