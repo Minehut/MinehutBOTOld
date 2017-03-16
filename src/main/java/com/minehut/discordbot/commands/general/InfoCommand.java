@@ -56,7 +56,7 @@ public class InfoCommand implements Command {
 
             switch (args[0]) {
                 case "network":
-                    String motd = "";
+                    StringBuilder motd = new StringBuilder();
 
                     try {
                         JSONObject status = URLJson.readJsonObjectFromUrl("https://minehut.com/api/status/");
@@ -64,16 +64,16 @@ public class InfoCommand implements Command {
                         embed.clearFields()
                                 .setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo)
 
-                                .addField("Users Online:", status.getJSONObject("ping").getJSONObject("players").get("online") + "/" +
+                                .addField("Users Online", status.getJSONObject("ping").getJSONObject("players").get("online") + "/" +
                                         status.getJSONObject("ping").getJSONObject("players").get("max"), true)
-                                .addField("Servers Online:", status.getInt("totalPlayerServerCount") + "/" + status.getInt("totalPlayerMaxServerCount"), true)
-                                .addField("Ram Usage:", (status.getInt("totalPlayerServerRamUsage") / 1024) + "/" + status.getInt("totalPlayerServerMaxRam") + " GB", true)
-                                .addField("Players on Player Servers:", String.valueOf(status.getInt("totalPlayerServerPlayerCount")), true);
+                                .addField("Servers Online", status.getInt("totalPlayerServerCount") + "/" + status.getInt("totalPlayerMaxServerCount"), true)
+                                .addField("Ram Usage", (status.getInt("totalPlayerServerRamUsage") / 1024) + "/" + status.getInt("totalPlayerServerMaxRam") + " GB", true)
+                                .addField("Players on Player Servers", String.valueOf(status.getInt("totalPlayerServerPlayerCount")), true);
 
                         Matcher matcher = Pattern.compile("(?<=\"text\":\").*?(?=\")").matcher(String.valueOf(status.getJSONObject("ping").getJSONObject("description")));
 
                         while (matcher.find()) {
-                            motd += matcher.group();
+                            motd.append(matcher.group());
                         }
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -110,16 +110,16 @@ public class InfoCommand implements Command {
                                     JSONArray json = URLJson.readJsonArrayFromUrl("https://api.mojang.com/user/profiles/" + obj.getString("owner").replaceAll("-", "") + "/names");
                                     String name = json.getJSONObject(json.length() - 1).getString("name");
 
-                                    embed.addField("Owner:", "[`" + name + "`](https://minehut.com/" + name + ")", true);
+                                    embed.addField("Owner", "[`" + name + "`](https://minehut.com/" + name + ")", true);
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
 
-                                embed.addField("Players Online:", obj.getInt("player_count") + "/" + obj.getInt("max_players"), true)
-                                        .addField("Total Joins:", String.valueOf(obj.getInt("total_joins")), true)
-                                        .addField("Unique Joins:", String.valueOf(obj.getJSONArray("user_joins").length()), true)
-                                        .addField("Total Server Starts:", String.valueOf(obj.getInt("starts")), true)
-                                        .addField("Server Host:", String.valueOf(obj.get("host")), true);
+                                embed.addField("Players Online", obj.getInt("player_count") + "/" + obj.getInt("max_players"), true)
+                                        .addField("Total Joins", String.valueOf(obj.getInt("total_joins")), true)
+                                        .addField("Unique Joins", String.valueOf(obj.getJSONArray("user_joins").length()), true)
+                                        .addField("Total Server Starts", String.valueOf(obj.getInt("starts")), true)
+                                        .addField("Server Host", String.valueOf(obj.get("host")), true);
 
                                 Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
                                         .setColor(Chat.CUSTOM_GREEN), mainMessage, 30);
@@ -135,6 +135,35 @@ public class InfoCommand implements Command {
                         return;
                     }
 
+                    // Offline?
+                    /*
+                    JSONObject server;
+
+                    try {
+                        server = URLJson.readJsonObjectFromUrl("http://mctoolbox.me/minehut/serverowner/?server=" + args[1]);
+
+                        embed.clearFields()
+                                .setAuthor(args[1] + " - User Info", "https://minehut.com/" + args[1], minehutLogo)
+
+                                .addField("Profile:", "[`" + args[1] + "`](https://minehut.com/" + args[1] + ")", true)
+                                .addField("First Joined:", getJoinDate(server), true)
+                                .addField("Friend Count:", getUserFriendCount(server), true)
+                                .addField("Total Online Time:", getUserOnlineTime(server).replace(" of online time.", ""), true)
+                                .setThumbnail("https://mc-heads.net/avatar/" + args[1] + "/100.png");
+
+                        if (!isOnline(server)) {
+                            embed.addField("Last Online:", getLastOnline(server), true);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        embed.clearFields().setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
+
+                        Chat.editMessage("", embed.setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
+                                .setColor(Chat.CUSTOM_RED), mainMessage, 15);
+                        return;
+                    }
+                    */
+
 
                     Chat.editMessage("", embed.clearFields().addField("Whoops! :banana: :monkey:", "The server `" + args[1] + "` is offline or not found. Please try again with a different name!", true).setColor(Chat.CUSTOM_RED), mainMessage, 15);
                     break;
@@ -147,22 +176,29 @@ public class InfoCommand implements Command {
                         JSONObject user;
 
                         try {
-                            user = URLJson.readJsonObjectFromUrl("http://mctoolbox.me/minehut/friends/?user=" + args[1]);
+                            user = URLJson.readJsonObjectFromUrl("http://mctoolbox.me/minehut/user/?user=" + args[1]);
 
                             embed.clearFields()
                                     .setAuthor(args[1] + " - User Info", "https://minehut.com/" + args[1], minehutLogo)
 
-                                    .addField("Profile:", "[`" + args[1] + "`](https://minehut.com/" + args[1] + ")", true)
-                                    .addField("First Joined:", getJoinDate(user), true)
-                                    .addField("Friend Count:", getUserFriendCount(user), true)
-                                    .addField("Total Online Time:", getUserOnlineTime(user).replace(" of online time.", ""), true)
-                                    .setThumbnail("https://mc-heads.net/avatar/" + args[1] + "/100.png");
+                                    .setDescription("```" + user.getString("about") + "```")
+                                    .addField("Profile", "[`" + args[1] + "`](https://minehut.com/" + args[1] + ")", true)
+                                    .addField("Friend Count", user.getJSONObject("friends").getString("total"), true)
+                                    .addField("Total Online Time", user.getJSONObject("stats").getString("time_online").replace(" of online time.", ""), true)
+                                    .addField("Server", user.getJSONObject("server").getString("name"), true) //TODO null will break this. Need to fix that......
+                                    .addField("Rank", user.getString("rank"), true)
+                                    .setImage(user.getJSONObject("icons").getString("body"))
+                                    .setThumbnail(user.getJSONObject("icons").getString("face"));
+                                    //.setThumbnail("https://mc-heads.net/avatar/" + args[1] + "/100.png");
 
                             if (!isOnline(user)) {
-                                embed.addField("Last Online:", getLastOnline(user), true);
+                                embed.addField("Last Online", user.getString("last_seen").replace("Last seen ", ""), true);
                             }
+
+                            embed.addField("First Joined", user.getJSONObject("stats").getString("date_joined"), false);
                         } catch (JSONException e) {
-                            Chat.editMessage("", embed.clearFields().addField("Whoops! :banana: :monkey:", "The user `" + args[1] + "` was not found. Please try again with a different name!", true)
+                            Chat.editMessage("", embed.setAuthor(null, null, null).setDescription(null).setThumbnail(null).setImage(null)
+                                    .clearFields().addField("Whoops! :banana: :monkey:", "The user `" + args[1] + "` was not found. Please try again with a different name!", true)
                                     .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                             return;
                         } catch (IOException e) {
@@ -174,23 +210,10 @@ public class InfoCommand implements Command {
                             return;
                         }
 
-                        String rank = null;
-                        try {
-                            rank = getUserRank(user);
-                        } catch (JSONException ignored) {
-                        }
-
-                        if (rank == null) {
-                            embed.addField("Rank:", "Default", true);
-                        } else {
-                            embed.addField("Rank:", getUserRank(user), true);
-                        }
-
                         Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
                                 .setColor(isOnlineColor(user)), mainMessage, 30);
                         return;
                     }
-
 
                     break;
                 case "hosts":
@@ -207,7 +230,6 @@ public class InfoCommand implements Command {
                     try {
                         JSONArray hosts = URLJson.readJsonArrayFromUrl("http://mctoolbox.me/minehut/hosts/?token=" + Core.getConfig().getSecretKey());
 
-                        //Chat.editMessage("", embed.clearFields(), mainMessage);
                         embed.clearFields();
 
                         for (Object host : hosts) {
@@ -241,15 +263,15 @@ public class InfoCommand implements Command {
                 case "bot":
                     Chat.editMessage("", Chat.getEmbed().clearFields()
                             .setAuthor(jda.getSelfUser().getName() + " - Info", "https://minehut.com", jda.getSelfUser().getAvatarUrl())
-                            .addField("Memory Usage:", getMb(runtime.totalMemory() - runtime.freeMemory()), true)
-                            .addField("Memory Free:", getMb(runtime.freeMemory()), true)
-                            .addField("Total Memory:", getMb(runtime.totalMemory()), true)
-                            .addField("Video Threads:", String.valueOf(VideoThread.VIDEO_THREADS.activeCount()), true)
-                            .addField("Total Threads:", String.valueOf(Thread.getAllStackTraces().size()), true) // .availableProcessors()
-                            .addField("Total Cores:", String.valueOf(runtime.availableProcessors()), true)
-                            .addField("CPU Usage:", ((int) (ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getSystemCpuLoad() * 10000)) / 100f + "%", true)
-                            .addField("Lavaplayer Version:", "1.2.30", true)
-                            .addField("JDA Version:", JDAInfo.VERSION, true)
+                            .addField("Memory Usage", getMb(runtime.totalMemory() - runtime.freeMemory()), true)
+                            .addField("Memory Free", getMb(runtime.freeMemory()), true)
+                            .addField("Total Memory", getMb(runtime.totalMemory()), true)
+                            .addField("Video Threads", String.valueOf(VideoThread.VIDEO_THREADS.activeCount()), true)
+                            .addField("Total Threads", String.valueOf(Thread.getAllStackTraces().size()), true) // .availableProcessors()
+                            .addField("Total Cores", String.valueOf(runtime.availableProcessors()), true)
+                            .addField("CPU Usage", ((int) (ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getSystemCpuLoad() * 10000)) / 100f + "%", true)
+                            .addField("Lavaplayer Version", "1.2.30", true)
+                            .addField("JDA Version", JDAInfo.VERSION, true)
                             .setColor(Chat.CUSTOM_GREEN).setFooter("System time | " + Bot.getBotTime(), null), mainMessage, 30);
                     break;
                 default:
@@ -264,22 +286,13 @@ public class InfoCommand implements Command {
         String status;
 
         try {
-            status = json.getJSONArray("children").getJSONObject(1)
-                    .getJSONArray("children").getJSONObject(1)
-                    .getJSONArray("children").getJSONObject(2)
-                    .getJSONArray("children").getJSONObject(0)
-                    .getJSONArray("children").getJSONObject(0)
-                    .getJSONArray("children").getJSONObject(1)
-                    .getJSONArray("children").getJSONObject(1)
-                    .getJSONArray("children").getJSONObject(0)
-                    .getJSONArray("children").getJSONObject(0)
-                    .getString("html");
+            status = json.getString("status");
         } catch (JSONException e1) {
             status = "Offline";
         }
 
         switch (status) {
-            case " Online ":
+            case "Online":
                 return true;
             case "Offline":
                 return false;
@@ -289,99 +302,7 @@ public class InfoCommand implements Command {
     }
 
     private Color isOnlineColor(JSONObject json) {
-        String status;
-
-        try {
-            status = json.getJSONArray("children").getJSONObject(1)
-                    .getJSONArray("children").getJSONObject(1)
-                    .getJSONArray("children").getJSONObject(2)
-                    .getJSONArray("children").getJSONObject(0)
-                    .getJSONArray("children").getJSONObject(0)
-                    .getJSONArray("children").getJSONObject(1)
-                    .getJSONArray("children").getJSONObject(1)
-                    .getJSONArray("children").getJSONObject(0)
-                    .getJSONArray("children").getJSONObject(0)
-                    .getString("html");
-        } catch (JSONException e1) {
-            status = "Offline";
-        }
-
-        switch (status) {
-            case " Online ":
-                return Chat.CUSTOM_GREEN;
-            case "Offline":
-                return Chat.CUSTOM_RED;
-            default:
-                return Chat.CUSTOM_RED;
-        }
-    }
-
-    private String getUserRank(JSONObject json) {
-        return json.getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(2)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(2)
-                .getJSONArray("children").getJSONObject(0)
-                .getString("html").replaceAll("\n", "");
-    }
-
-    private String getJoinDate(JSONObject json) {
-        return json.getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(2)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getString("html");
-    }
-
-    private String getUserFriendCount(JSONObject json) {
-        return json.getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(2)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(4)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(0)
-                .getString("html");
-    }
-
-    private String getLastOnline(JSONObject json) {
-        return json.getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(2)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(2)
-                .getJSONArray("children").getJSONObject(1)
-                .getString("html");
-    }
-
-    private String getUserOnlineTime(JSONObject json) {
-        return json.getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(2)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(1)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(0)
-                .getJSONArray("children").getJSONObject(1)
-                .getString("html");
+        return isOnline(json) ? Chat.CUSTOM_GREEN : Chat.CUSTOM_RED;
     }
 
     @Override
