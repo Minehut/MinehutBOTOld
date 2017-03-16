@@ -1,4 +1,4 @@
-package com.minehut.discordbot.commands.manage;
+package com.minehut.discordbot.commands.management;
 
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;

@@ -1,6 +1,5 @@
-package com.minehut.discordbot.commands.manage;
+package com.minehut.discordbot.commands.management;
 
-import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Chat;
@@ -23,7 +22,7 @@ public class ReconnectVoiceCommand implements Command {
         Chat.removeMessage(message);
 
         guild.getAudioManager().closeAudioConnection();
-        new BotTask("Reconnect voice channel " + Core.getClient().getGuildById(guild.getId()).getSelfMember().getVoiceState().getChannel().toString()) {
+        new BotTask("Reconnect Voice Channel") {
             @Override
             public void run() {
                 guild.getAudioManager().openAudioConnection(member.getVoiceState().getChannel());

@@ -1,27 +1,24 @@
-package com.minehut.discordbot.commands.manage;
+package com.minehut.discordbot.commands.management;
 
-import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 
-import java.io.IOException;
-
 /**
- * Created by MatrixTunnel on 2/27/2017.
+ * Created by MatrixTunnel on 1/14/2017.
  */
-public class ReloadCommand implements Command {
+public class LeaveCommand implements Command {
 
     @Override
     public String getCommand() {
-        return "reload";
+        return "leave";
     }
 
     @Override
     public String[] getAliases() {
-        return new String[]{"rl"};
+        return new String[]{"goaway"};
     }
 
     @Override
@@ -29,10 +26,9 @@ public class ReloadCommand implements Command {
         Chat.removeMessage(message);
 
         try {
-            Core.getConfig().load();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Core.log.info("Boop!");
+            guild.getAudioManager().closeAudioConnection();
+        } catch (Exception e) {
+            Chat.sendMessage("Could not leave! Reason:\n```" + e.getMessage() + "```", channel, 10);
         }
     }
 
