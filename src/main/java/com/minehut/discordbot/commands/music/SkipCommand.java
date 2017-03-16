@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Made by the SwagBot developers
+ * Made by the developer of SwagBot
  * Changed by MatrixTunnel on 1/9/2017.
  */
 public class SkipCommand implements Command {

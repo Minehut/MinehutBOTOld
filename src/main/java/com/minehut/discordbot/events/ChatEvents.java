@@ -94,20 +94,11 @@ public class ChatEvents extends ListenerAdapter {
                 return;
             }
 
-
             if (!channel.getName().contains("meme") && message.getRawContent().contains(
                     "▔╲▂▂▂▂╱▔╲▂")) {
 
                 Chat.removeMessage(message);
                 Chat.sendMessage(sender.getAsMention() + ", please do not post cooldog in this channel.", channel);
-                return;
-            } else if (message.getRawContent().contains("He is going around sending friend requests to random Discord users, " +
-                    "and those who accept his friend requests will have their accounts DDoSed and their IP Addresses revealed to him. " +
-                    "Spread the word and send this to as many discord servers as you can. " +
-                    "If you see this user, DO NOT accept his friend request and immediately block him")) {
-                Chat.removeMessage(message);
-                Chat.sendMessage(sender.getAsMention() + "\n\nDiscord doesn't relay ips through how they do things. If users could somehow get your ip like this, " +
-                        "Discord would have banned these users already. Please don't copy paste that message everywhere since it is not real.", channel, 120);
                 return;
             }
 

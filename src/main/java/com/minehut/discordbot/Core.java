@@ -7,11 +7,10 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.general.HelpCommand;
 import com.minehut.discordbot.commands.general.InfoCommand;
-import com.minehut.discordbot.commands.manage.*;
+import com.minehut.discordbot.commands.management.*;
 import com.minehut.discordbot.commands.music.*;
 import com.minehut.discordbot.events.ChatEvents;
 import com.minehut.discordbot.events.ServerEvents;
-import com.minehut.discordbot.events.VoiceEvents;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.Config;
@@ -140,7 +139,7 @@ public class Core {
         enabled = false;
         //log.info("Turning myself off...");
         try {
-            if (!VoiceEvents.playing.isEmpty()) {
+            if (!Bot.nowPlaying.isEmpty()) {
                 if (!SkipCommand.votes.isEmpty()) {
                     SkipCommand.votes.clear();
                 }
@@ -154,10 +153,10 @@ public class Core {
                     Core.getMusicManager().getPlayer(voiceChannel.getGuild().getId()).skip();
                 }
 
-                VoiceEvents.playing.forEach(Chat::removeMessage);
+                Bot.nowPlaying.forEach(Chat::removeMessage);
             }
 
-            client.removeEventListener(new ChatEvents(), new ServerEvents(), new VoiceEvents());
+            client.removeEventListener(new ChatEvents(), new ServerEvents());
 
             log.info("Disconnected from Discord.");
             if (restart) {
@@ -234,7 +233,7 @@ public class Core {
                                 Message msg = Chat.sendMessage(embed, channel);
 
                                 SkipCommand.votes.clear();
-                                VoiceEvents.playing.add(msg);
+                                Bot.nowPlaying.add(msg);
                             }
                         }
                     }
@@ -246,8 +245,8 @@ public class Core {
                 //Chat.removeMessage(msg);
                 SkipCommand.votes.clear();
 
-                for (Message msg : VoiceEvents.playing) {
-                    if (VoiceEvents.playing.isEmpty()) {
+                for (Message msg : Bot.nowPlaying) {
+                    if (Bot.nowPlaying.isEmpty()) {
                         break;
                     }
 
@@ -256,7 +255,7 @@ public class Core {
 
                         if (guildPlayer == player) {
                             Chat.removeMessage(msg);
-                            VoiceEvents.playing.remove(msg);
+                            Bot.nowPlaying.remove(msg);
                             break;
                         }
                     }
@@ -296,7 +295,7 @@ public class Core {
         try {
             try {
                 client = new JDABuilder(AccountType.BOT)
-                        .addListener(new ChatEvents(), new ServerEvents(), new VoiceEvents())
+                        .addListener(new ChatEvents(), new ServerEvents())
                         .setToken(config.getDiscordToken())
                         .setAudioSendFactory(new NativeAudioSendFactory())
                         .buildAsync();

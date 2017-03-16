@@ -16,7 +16,6 @@ import java.net.URLEncoder;
  * Few small changes by MatrixTunnel
  */
 public class YouTubeSearchExtractor extends YouTubeExtractor {
-    public static final String SEARCH_URL = "https://www.youtube.com/results?search_query=";
 
     @Override
     public void process(String input, Player player, Message message, User user) throws Exception {
