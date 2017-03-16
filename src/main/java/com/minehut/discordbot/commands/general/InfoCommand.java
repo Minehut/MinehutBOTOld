@@ -178,11 +178,16 @@ public class InfoCommand implements Command {
                         try {
                             user = URLJson.readJsonObjectFromUrl("http://mctoolbox.me/minehut/user/?user=" + args[1]);
 
-                            embed.clearFields()
-                                    .setAuthor(args[1] + " - User Info", "https://minehut.com/" + args[1], minehutLogo)
+                            embed.clearFields().setAuthor(args[1] + " - User Info", "https://minehut.com/" + args[1], minehutLogo);
 
-                                    .setDescription("```" + user.getString("about") + "```")
-                                    .addField("Profile", "[`" + args[1] + "`](https://minehut.com/" + args[1] + ")", true)
+                            String about = user.getString("about");
+                            if (about.length() > 50) {
+                                embed.setDescription("```" + about.substring(0, 50) + "...```");
+                            } else {
+                                embed.setDescription("```" + about + "```");
+                            }
+
+                                    embed.addField("Profile", "[`" + args[1] + "`](https://minehut.com/" + args[1] + ")", true)
                                     .addField("Friend Count", user.getJSONObject("friends").getString("total"), true)
                                     .addField("Total Online Time", user.getJSONObject("stats").getString("time_online").replace(" of online time.", ""), true)
                                     .addField("Server", user.getJSONObject("server").getString("name"), true) //TODO null will break this. Need to fix that......
