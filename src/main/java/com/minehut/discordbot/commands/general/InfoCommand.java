@@ -30,8 +30,7 @@ import java.util.regex.Pattern;
 public class InfoCommand implements Command {
 
     private Runtime runtime = Runtime.getRuntime();
-    private String minehutLogo = "https://cdn.discordapp.com/attachments/239599059415859200/249694020593254400/" +
-            "eJwNyEsSgyAMANC7cACCfAp4mxQpOqOGIbGbTu-ub_l-6hq7mtUq0nkGWDYuNBbNQgNb1Y2o7RX7xrrQASiCZT3qKQzWJxtTitmlHH2Ygn0qv7IL2U8mGRdMtICfL75R97Op_w3lzyJF.png";
+    private String minehutLogo = "https://cdn.discordapp.com/attachments/233737506955329538/292430804246855681/NEW_Minehut_logo.jpg";
 
     @Override
     public String getCommand() {
