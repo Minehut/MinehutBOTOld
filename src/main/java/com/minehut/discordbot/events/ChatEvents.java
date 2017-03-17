@@ -139,6 +139,10 @@ public class ChatEvents extends ListenerAdapter {
 
             for (Command cmd : Core.getCommands()) {
                 if (cmd.getCommand().equalsIgnoreCase(command)) {
+                    if (cmd.getType() == CommandType.MASTER && !sender.getId().equals("118088732753526784")) {
+                        return;
+                    }
+
                     if (cmd.getType() == CommandType.ADMINISTRATIVE && !Bot.isTrusted(sender)) {
                         return;
                     }
@@ -160,6 +164,10 @@ public class ChatEvents extends ListenerAdapter {
                 } else {
                     for (String alias : cmd.getAliases()) {
                         if (alias.equalsIgnoreCase(command)) {
+                            if (cmd.getType() == CommandType.MASTER && !sender.getId().equals("118088732753526784")) {
+                                return;
+                            }
+
                             if (cmd.getType() == CommandType.ADMINISTRATIVE && !Bot.isTrusted(sender)) {
                                 return;
                             }

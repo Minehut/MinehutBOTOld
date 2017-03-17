@@ -8,6 +8,7 @@ import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.general.HelpCommand;
 import com.minehut.discordbot.commands.general.InfoCommand;
 import com.minehut.discordbot.commands.management.*;
+import com.minehut.discordbot.commands.master.SayCommand;
 import com.minehut.discordbot.commands.music.*;
 import com.minehut.discordbot.events.ChatEvents;
 import com.minehut.discordbot.events.ServerEvents;
@@ -275,6 +276,8 @@ public class Core {
         registerCommand(new ReconnectVoiceCommand());
         registerCommand(new ReloadCommand());
         registerCommand(new ShutdownCommand());
+
+        registerCommand(new SayCommand());
 
         registerCommand(new PlayCommand());
         registerCommand(new SkipCommand());
