@@ -37,7 +37,7 @@ public class MuteCommand implements Command {
 
                 Chat.sendMessage(Chat.getEmbed().setDescription(":loud_sound:  " + muteUser.getAsMention() + " | " + Chat.getFullName(muteUser) + " was unmuted.")
                         .addField("Staff Member", sender.getAsMention(), true)
-                        .addField("Channel", channel.getAsMention(), true)
+                        .addField("Channel", channel.getAsMention(), true) //TODO reason if args > 2
                         .setFooter("System time | " + Bot.getBotTime(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
 
@@ -48,7 +48,7 @@ public class MuteCommand implements Command {
 
                 Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  " + muteUser.getAsMention() + " | " + Chat.getFullName(muteUser) + " was muted.")
                         .addField("Staff Member", sender.getAsMention(), true)
-                        .addField("Channel", channel.getAsMention(), true)
+                        .addField("Channel", channel.getAsMention(), true) //TODO reason if args > 2
                         .setFooter("System time | " + Bot.getBotTime(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
 

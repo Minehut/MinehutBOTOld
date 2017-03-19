@@ -180,8 +180,8 @@ public class InfoCommand implements Command {
                             embed.clearFields().setAuthor(args[1] + " - User Info", "https://minehut.com/" + args[1], minehutLogo);
 
                             String about = user.getString("about");
-                            if (about.length() > 50) {
-                                embed.setDescription("```" + about.substring(0, 50) + "...```");
+                            if (about.length() > 75) {
+                                embed.setDescription("```" + about.substring(0, 75) + "...```");
                             } else {
                                 embed.setDescription("```" + about + "```");
                             }
