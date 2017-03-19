@@ -189,7 +189,7 @@ public class InfoCommand implements Command {
                                     embed.addField("Profile", "[`" + args[1] + "`](https://minehut.com/" + args[1] + ")", true)
                                     .addField("Friend Count", user.getJSONObject("friends").getString("total"), true)
                                     .addField("Total Online Time", user.getJSONObject("stats").getString("time_online").replace(" of online time.", ""), true)
-                                    .addField("Server", user.getJSONObject("server").getString("name"), true) //TODO null will break this. Need to fix that......
+                                    .addField("Server", "`" + user.getJSONObject("server").getString("name") + "`", true) //TODO null will break this. Need to fix that......
                                     .addField("Rank", user.getString("rank").replace("\u00e2\u009d\u00a4", ":heart:"), true)
                                     .setImage(user.getJSONObject("icons").getString("body"))
                                     .setThumbnail(user.getJSONObject("icons").getString("face"));
