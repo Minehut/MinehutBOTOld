@@ -18,6 +18,10 @@ public class Scheduler {
     private static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(10, r -> new Thread(r, "Bot Scheduled Task"));
     private static final Map<String, ScheduledFuture<?>> tasks = new HashMap<>();
 
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(timer::shutdownNow));
+    }
+
     public static boolean scheduleRepeating(Runnable task, String taskName, long delay, long interval) {
         if (tasks.containsKey(taskName)) {
             return false;
