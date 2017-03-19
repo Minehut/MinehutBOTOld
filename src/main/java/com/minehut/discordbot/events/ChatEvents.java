@@ -5,6 +5,7 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
@@ -62,22 +63,32 @@ public class ChatEvents extends ListenerAdapter {
                     guild.getController().addRolesToMember(member, Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID())).queue();
                     Chat.sendMessage(sender.getAsMention() + " has been auto muted for spam", channel);
 
-                    Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  " + sender.getAsMention() + " | " + Chat.getFullName(sender) + " was auto muted for spam!")
-                            .addField("Channel", channel.getAsMention(), true)
-                            .addField("Message", "```" + event.getMessage().getContent() + "```", false)
-                            .setFooter("System time | " + Bot.getBotTime(), null)
+                    EmbedBuilder builder = Chat.getEmbed().setDescription(":no_bell:  " + sender.getAsMention() + " | " + Chat.getFullName(sender) + " was auto muted for spam!")
+                            .addField("Channel", channel.getAsMention(), true);
+                    if (event.getMessage().getContent().length() >= 1024) {
+                        builder.addField("Message", "```" + event.getMessage().getContent().substring(0, 1014) + "...```", false);
+                    } else {
+                        builder.addField("Message", "```" + event.getMessage().getContent() + "```", false);
+                    }
+
+                    Chat.sendMessage(builder.setFooter("System time | " + Bot.getBotTime(), null)
                             .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
                     return;
                 }
             }
 
             if (message.getContent().length() >= Core.getConfig().getMaxMessageLength()) {
-                Chat.sendMessage(Chat.getEmbed().setDescription(":exclamation: Possible message spam - **" + Chat.getFullName(sender) + "**")
+                EmbedBuilder builder = Chat.getEmbed().setDescription(":exclamation: Possible message spam - **" + Chat.getFullName(sender) + "**")
                         .addField("User", sender.getAsMention(), true)
                         .addField("Length", String.valueOf(message.getContent().length()), true)
-                        .addField("Channel", channel.getAsMention(), true)
-                        .addField("Message", "```" + event.getMessage().getContent() + "```", false)
-                        .setFooter("System time | " + Bot.getBotTime(), null)
+                        .addField("Channel", channel.getAsMention(), true);
+                if (event.getMessage().getContent().length() >= 1024) {
+                    builder.addField("Message", "```" + event.getMessage().getContent().substring(0, 1014) + "...```", false);
+                } else {
+                    builder.addField("Message", "```" + event.getMessage().getContent() + "```", false);
+                }
+
+                Chat.sendMessage(builder.setFooter("System time | " + Bot.getBotTime(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
             }
 
@@ -85,11 +96,16 @@ public class ChatEvents extends ListenerAdapter {
                 Chat.removeMessage(message);
 
                 Chat.sendMessage(sender.getAsMention() + ", please do not advertise Discord servers. Thanks!", channel);
-                Chat.sendMessage(Chat.getEmbed().setDescription(":exclamation: Discord server advertisement - **" + Chat.getFullName(sender) + "**")
+                EmbedBuilder builder = Chat.getEmbed().setDescription(":exclamation: Discord server advertisement - **" + Chat.getFullName(sender) + "**")
                         .addField("User", sender.getAsMention(), true)
-                        .addField("Channel", channel.getAsMention(), true)
-                        .addField("Message", "```" + event.getMessage().getContent() + "```", false)
-                        .setFooter(Bot.getBotTime(), null)
+                        .addField("Channel", channel.getAsMention(), true);
+                if (event.getMessage().getContent().length() >= 1024) {
+                    builder.addField("Message", "```" + event.getMessage().getContent().substring(0, 1014) + "...```", false);
+                } else {
+                    builder.addField("Message", "```" + event.getMessage().getContent() + "```", false);
+                }
+
+                Chat.sendMessage(builder.setFooter(Bot.getBotTime(), null)
                         .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
                 return;
             }
