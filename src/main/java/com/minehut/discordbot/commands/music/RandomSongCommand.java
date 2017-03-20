@@ -48,7 +48,7 @@ public class RandomSongCommand implements Command {
         if (args.length == 0) {
             embed.setAuthor("Random Song Categories", "https://temp.discord.fm", null)
                     .setDescription("Be sure to spell the name as shown! (not cap sensitive)\n\n" +
-                            //"[`all`](https://temp.discord.fm)\n" +
+                            //"[`all`](https://temp.discord.fm)\n" + //TODO Add "all" category
                             "[`Electro Hub`](https://temp.discord.fm/libraries/electro-hub)\n" +
                             "[`Chill Corner`](https://temp.discord.fm/libraries/chill-corner)\n" +
                             "[`Korean Madness`](https://temp.discord.fm/libraries/korean-madness)\n" +
@@ -66,17 +66,17 @@ public class RandomSongCommand implements Command {
             Message mainMessage = Chat.sendMessage(embed.addField("Processing...", "This may take a few moments", true)
                     .setColor(Chat.CUSTOM_ORANGE), channel, 120);
 
-            String term = "";
+            StringBuilder term = new StringBuilder();
             for (String s : args) {
-                term += s + "-";
+                term.append(s).append("-");
             }
 
             try {
-                JSONArray array = URLJson.readJsonArrayFromUrl("http://temp.discord.fm/libraries/" + term.toLowerCase().substring(0, term.length() - 1) + "/json");
+                JSONArray array = URLJson.readJsonArrayFromUrl("http://temp.discord.fm/libraries/" + term.toString().toLowerCase().substring(0, term.length() - 1) + "/json");
                 Integer random = new Random().nextInt((array.length() - 1) + 1) + 1;
                 JSONObject obj = array.getJSONObject(random);
 
-                VideoThread.getThread("https://www.youtube.com/watch?v=" + obj.getString("identifier"), channel, sender).start();
+                VideoThread.getThread(obj.getString("url"), channel, sender).start();
             } catch (JSONException e) {
                 e.printStackTrace();
                 return;
@@ -88,7 +88,6 @@ public class RandomSongCommand implements Command {
             }
 
             Chat.removeMessage(mainMessage);
-            //Chat.editMessage("", embed, mainMessage, 15);
         }
     }
 
