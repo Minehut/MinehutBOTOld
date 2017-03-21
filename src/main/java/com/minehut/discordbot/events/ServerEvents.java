@@ -13,6 +13,7 @@ import net.dv8tion.jda.core.events.ReconnectedEvent;
 import net.dv8tion.jda.core.events.guild.GuildBanEvent;
 import net.dv8tion.jda.core.events.guild.GuildUnbanEvent;
 import net.dv8tion.jda.core.events.guild.member.*;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
@@ -46,6 +47,13 @@ public class ServerEvents extends ListenerAdapter {
 
         Core.enabled = true;
         Core.log.info("Bot ready.");
+    }
+
+    @Override
+    public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
+        if (event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
+            event.getGuild().getAudioManager().setSelfDeafened(true);
+        }
     }
 
     @Override
