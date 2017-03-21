@@ -274,7 +274,7 @@ public class InfoCommand implements Command {
                             .addField("Total Threads", String.valueOf(Thread.getAllStackTraces().size()), true) // .availableProcessors()
                             .addField("Total Cores", String.valueOf(runtime.availableProcessors()), true)
                             .addField("CPU Usage", ((int) (ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getSystemCpuLoad() * 10000)) / 100f + "%", true)
-                            .addField("Lavaplayer Version", "1.2.30", true)
+                            .addField("Lavaplayer Version", PlayerLibrary.VERSION, true)
                             .addField("JDA Version", JDAInfo.VERSION, true)
                             .setColor(Chat.CUSTOM_GREEN).setFooter("System time | " + Bot.getBotTime(), null), mainMessage, 30);
                     break;
