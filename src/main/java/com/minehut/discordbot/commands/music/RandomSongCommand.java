@@ -73,17 +73,20 @@ public class RandomSongCommand implements Command {
 
             try {
                 JSONArray array = URLJson.readJsonArrayFromUrl("http://temp.discord.fm/libraries/" + term.toString().toLowerCase().substring(0, term.length() - 1) + "/json");
-                Integer random = new Random().nextInt((array.length() - 1) + 1) + 1;
-                JSONObject obj = array.getJSONObject(random);
+                JSONObject obj = array.getJSONObject(new Random().nextInt(array.length()) + 1); // .nextInt(max) + min
 
-                VideoThread.getThread(obj.getString("url"), channel, sender).start();
-            } catch (JSONException e) {
+                if (obj.getString("service").equals("YouTubeVideo")) {
+                    VideoThread.getThread("https://youtu.be/" + obj.getString("identifier"), channel, sender).start();
+                } else {
+                    VideoThread.getThread(obj.getString("url"), channel, sender).start(); //Might break if new SoundCloud tracks don't have a url :(
+                }
+
+
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-                Chat.editMessage(embed.clearFields().addField("Whoops! :banana: :monkey:", "The category `" + term + "` was not found. Please try again with a different term!", true)
-                        .setColor(Chat.CUSTOM_RED), mainMessage);
+                Chat.editMessage(embed.clearFields().addField("Whoops! :banana: :monkey:",
+                        "The category `" + term.toString().replace("-", " ").substring(0, term.length() - 1) + "` was not found. Please try again with a different term!", true)
+                        .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                 return;
             }
 
