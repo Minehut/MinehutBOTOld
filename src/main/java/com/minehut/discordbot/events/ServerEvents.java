@@ -4,6 +4,7 @@ import com.minehut.discordbot.Core;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.EmbedBuilder;
+import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 import net.dv8tion.jda.core.entities.VoiceChannel;
@@ -28,6 +29,7 @@ public class ServerEvents extends ListenerAdapter {
     public void onReady(ReadyEvent event) {
         Core.latch.countDown();
         Bot.updateUsers();
+        Core.getClient().getPresence().setStatus(OnlineStatus.ONLINE);
 
         for (Role role : Bot.getMainGuild().getRoles()) {
             Core.log.info("Name: \"" + role.getName() + "\" ID: \"" + role.getId() + "\" - " + role.getPermissions());

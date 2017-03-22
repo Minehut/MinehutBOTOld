@@ -23,14 +23,8 @@ import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import net.dv8tion.jda.core.AccountType;
-import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
-import net.dv8tion.jda.core.entities.VoiceChannel;
+import net.dv8tion.jda.core.*;
+import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.requests.RestAction;
 import net.dv8tion.jda.core.utils.SimpleLog;
@@ -138,7 +132,10 @@ public class Core {
 
     public static void shutdown(boolean restart) {
         enabled = false;
-        //log.info("Turning myself off...");
+
+        Core.getClient().getPresence().setGame(Game.of("shutting down..."));
+        Core.getClient().getPresence().setStatus(OnlineStatus.DO_NOT_DISTURB);
+
         try {
             if (!Bot.nowPlaying.isEmpty()) {
                 if (!SkipCommand.votes.isEmpty()) {
@@ -167,7 +164,7 @@ public class Core {
                 log.info("Cleaning things up...");
             }
 
-            Thread.sleep(2000);
+            Thread.sleep(1000);
 
             client.shutdown();
             log.info("Client shutdown");
@@ -301,6 +298,8 @@ public class Core {
                         .addListener(new ChatEvents(), new ServerEvents())
                         .setToken(config.getDiscordToken())
                         .setAudioSendFactory(new NativeAudioSendFactory())
+                        .setGame(Game.of("loading..."))
+                        .setStatus(OnlineStatus.IDLE)
                         .buildAsync();
             } catch (RateLimitedException e) {
                 Thread.sleep(e.getRetryAfter());

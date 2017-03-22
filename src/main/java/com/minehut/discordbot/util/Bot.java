@@ -24,7 +24,7 @@ public class Bot {
         if (Core.getClient().getGuilds().contains(Core.getClient().getGuildById("239599059415859200"))) { //Minehut
             Core.getDiscord().streaming(getMainGuild().getMembers().size() + " Discord users!", "https://minehut.com");
         } else {
-            Core.getDiscord().streaming("the with my code", "https://minehut.com");
+            Core.getDiscord().streaming("with my code", "https://minehut.com");
         }
     }
 
