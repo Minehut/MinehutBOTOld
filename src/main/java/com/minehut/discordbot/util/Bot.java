@@ -1,7 +1,10 @@
 package com.minehut.discordbot.util;
 
 import com.minehut.discordbot.Core;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
+import net.dv8tion.jda.core.entities.User;
 import org.json.JSONArray;
 
 import java.time.LocalDateTime;
@@ -107,7 +110,7 @@ public class Bot {
             sb.append(minutes);
             sb.append(format ? "m " : ":");
         }
-        sb.append(seconds);
+        sb.append(format ? seconds : seconds < 10 ? "0" + seconds : seconds);
         sb.append(format ? "s" : "");
 
         return (sb.toString());
