@@ -113,12 +113,6 @@
             <groupId>com.sedmelluq</groupId>
             <artifactId>jda-nas</artifactId>
             <version>1.0.3</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.dv8tion</groupId>
-                    <artifactId>JDA</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.monkeylearn</groupId>
