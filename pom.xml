@@ -91,7 +91,7 @@
         <dependency>
             <groupId>com.github.DV8FromTheWorld</groupId>
             <artifactId>JDA</artifactId>
-            <version>dabe092</version>
+            <version>8de5129</version>
         </dependency>
         <dependency>
             <groupId>com.arsenarsen.lavaplayer-bridge</groupId>
@@ -113,6 +113,12 @@
             <groupId>com.sedmelluq</groupId>
             <artifactId>jda-nas</artifactId>
             <version>1.0.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.dv8tion</groupId>
+                    <artifactId>JDA</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.monkeylearn</groupId>
@@ -151,5 +157,4 @@
             <version>1.4.9</version>
         </dependency>
     </dependencies>
-
 </project>
