@@ -74,11 +74,11 @@ public class Chat {
         if (message != null) message.editMessage(new MessageBuilder().append(message.getRawContent()).setEmbed(embed.build()).build()).queue(m -> setAutoDelete(m, removeTime));
     }
 
-    public static void editMessage(Message message, String content) {
+    public static void editMessage(String content, Message message) {
         if (message != null) message.editMessage(content).queue();
     }
 
-    public static void editMessage(Message message, String content, int removeTime) {
+    public static void editMessage(String content, Message message, int removeTime) {
         if (message != null) message.editMessage(content).queue(m -> setAutoDelete(m, removeTime));
     }
 

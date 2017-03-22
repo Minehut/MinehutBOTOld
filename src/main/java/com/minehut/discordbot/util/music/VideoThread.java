@@ -48,7 +48,7 @@ public class VideoThread extends Thread {
                     break;
                 }
             if (extractor == null) {
-                Chat.editMessage(message, "Could not find a way to process that..", 30);
+                Chat.editMessage("Could not find a way to process that..", message, 30);
                 return;
             }
             if (managers.add(extractor.getSourceManagerClass()))
@@ -56,7 +56,7 @@ public class VideoThread extends Thread {
             extractor.process(url, manager.getPlayer(channel.getGuild().getId()), message, user);
         } catch (Exception e) {
             Core.log.error("Could not init extractor for '{}'".replace("{}", url), e);
-            Chat.editMessage(message, "Something went wrong! Issue logged", 30);
+            Chat.editMessage("Something went wrong! Issue logged", message, 30);
         }
     }
 
