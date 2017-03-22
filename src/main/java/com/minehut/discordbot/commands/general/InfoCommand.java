@@ -7,6 +7,7 @@ import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.URLJson;
 import com.minehut.discordbot.util.music.VideoThread;
+import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import com.sun.management.OperatingSystemMXBean;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.JDA;
@@ -101,15 +102,14 @@ public class InfoCommand implements Command {
                             JSONObject obj = (JSONObject) server;
 
                             if (obj.get("name").equals(args[1])) {
-                                embed.clearFields()
-                                        .setAuthor(obj.get("name") + " - Server Info", "https://minehut.com/s/" + obj.get("name"), minehutLogo)
-                                        .setDescription("`" + String.valueOf(obj.get("motd")) + "`");
+                                embed.clearFields().setDescription("`" + String.valueOf(obj.get("motd")) + "`");
 
                                 try {
                                     JSONArray json = URLJson.readJsonArrayFromUrl("https://api.mojang.com/user/profiles/" + obj.getString("owner").replaceAll("-", "") + "/names");
                                     String name = json.getJSONObject(json.length() - 1).getString("name");
 
-                                    embed.addField("Owner", "[`" + name + "`](https://minehut.com/" + name + ")", true);
+                                    embed.setAuthor(obj.get("name") + " - Server Info", "https://minehut.com/" + name, minehutLogo)
+                                            .addField("Owner", "[`" + name + "`](https://minehut.com/" + name + ")", true);
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
@@ -135,36 +135,32 @@ public class InfoCommand implements Command {
                     }
 
                     // Offline?
-                    /*
-                    JSONObject server;
-
                     try {
-                        server = URLJson.readJsonObjectFromUrl("http://mctoolbox.me/minehut/serverowner/?server=" + args[1]);
+                        JSONObject server = URLJson.readJsonObjectFromUrl("http://mctoolbox.me/minehut/serverowner/?server=" + args[1]);
 
-                        embed.clearFields()
-                                .setAuthor(args[1] + " - User Info", "https://minehut.com/" + args[1], minehutLogo)
+                        embed.clearFields().setAuthor(server.getJSONObject("server").optString("name") + " - Server Info",
+                                "https://minehut.com/" + server.getString("name"), minehutLogo)
 
-                                .addField("Profile:", "[`" + args[1] + "`](https://minehut.com/" + args[1] + ")", true)
-                                .addField("First Joined:", getJoinDate(server), true)
-                                .addField("Friend Count:", getUserFriendCount(server), true)
-                                .addField("Total Online Time:", getUserOnlineTime(server).replace(" of online time.", ""), true)
-                                .setThumbnail("https://mc-heads.net/avatar/" + args[1] + "/100.png");
+                                .addField("Owner", "[`" + server.getString("name") + "`](https://minehut.com/" + server.getString("name") + ")", true)
+                                .addField("Total Joins", String.valueOf(server.getJSONObject("server").getString("total")), true)
+                                .addField("Unique Joins", String.valueOf(server.getJSONObject("server").getString("unique")), true);
 
-                        if (!isOnline(server)) {
-                            embed.addField("Last Online:", getLastOnline(server), true);
-                        }
+                        Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
+                                .setColor(Chat.CUSTOM_RED), mainMessage, 30);
+                    } catch (JSONException e) {
+                        Chat.editMessage("", embed.clearFields()
+                                .addField("Whoops! :banana: :monkey:", "The server `" + args[1] + "` was not found. Please try again with a different name!", true)
+                                .setColor(Chat.CUSTOM_RED), mainMessage, 15);
+                        return;
                     } catch (IOException e) {
                         e.printStackTrace();
-                        embed.clearFields().setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
+                        embed.setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
 
-                        Chat.editMessage("", embed.setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
+                        Chat.editMessage("", embed.clearFields().setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
                                 .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                         return;
                     }
-                    */
 
-
-                    Chat.editMessage("", embed.clearFields().addField("Whoops! :banana: :monkey:", "The server `" + args[1] + "` is offline or not found. Please try again with a different name!", true).setColor(Chat.CUSTOM_RED), mainMessage, 15);
                     break;
                 case "user":
                     if (args.length == 1) {
@@ -186,10 +182,10 @@ public class InfoCommand implements Command {
                                 embed.setDescription("```" + about + "```");
                             }
 
-                                    embed.addField("Profile", "[`" + args[1] + "`](https://minehut.com/" + args[1] + ")", true)
+                            embed.addField("Profile", "[`" + args[1] + "`](https://minehut.com/" + args[1] + ")", true)
                                     .addField("Friend Count", user.getJSONObject("friends").getString("total"), true)
                                     .addField("Total Online Time", user.getJSONObject("stats").getString("time_online").replace(" of online time.", ""), true)
-                                    .addField("Server", "`" + user.getJSONObject("server").getString("name") + "`", true) //TODO null will break this. Need to fix that......
+                                    .addField("Server", "`" + user.getJSONObject("server").optString("name", "Not created yet") + "`", true)
                                     .addField("Rank", user.getString("rank").replace("\u00e2\u009d\u00a4", ":heart:"), true)
                                     .setImage(user.getJSONObject("icons").getString("body"))
                                     .setThumbnail(user.getJSONObject("icons").getString("face"));
