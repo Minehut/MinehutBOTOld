@@ -137,13 +137,20 @@ public class ChatEvents extends ListenerAdapter {
             //}
         }
 
-        for (String id : Core.getConfig().getBlockedUsers()) {
-            if (sender.getId().equals(id) && !Bot.isTrusted(sender)) {
                 return;
             }
+            */
         }
 
         if (message.getRawContent() != null && message.getContent().startsWith(Command.getPrefix())) {
+
+            for (String id : Core.getConfig().getBlockedUsers()) {
+                if (sender.getId().equals(id) && !Bot.isTrusted(sender)) {
+                    Chat.removeMessage(message);
+                    Chat.sendMessage(sender.getAsMention() + " You are blacklisted from using bot commands. If you believe this is an error, please contact MatrixTunnel.", channel, 10);
+                    return;
+                }
+            }
 
             String msg = event.getMessage().getRawContent();
             String command = msg.substring(1);
