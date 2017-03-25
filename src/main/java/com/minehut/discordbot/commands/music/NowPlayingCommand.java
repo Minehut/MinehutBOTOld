@@ -21,7 +21,7 @@ public class NowPlayingCommand implements Command {
 
     @Override
     public String[] getAliases() {
-        return new String[]{"nowplaying", "current", "song"};
+        return new String[]{"nowplaying", "current", "song", "playing"};
     }
 
     @Override
