@@ -68,7 +68,7 @@ public class SkipCommand implements Command {
             if (voiceChannel.getMembers().size() > 2) {
                 maxSkips = (int) ((voiceChannel.getMembers().size() - 1) * 2 / 3.0 + 0.5);
                 for (Member mem : voiceChannel.getMembers()) {
-                    if (mem.getVoiceState().isSelfDeafened()) {
+                    if (mem.getVoiceState().isSelfDeafened() && !mem.getUser().equals(Core.getClient().getSelfUser())) {
                         maxSkips = maxSkips - 1;
                     }
                 }
