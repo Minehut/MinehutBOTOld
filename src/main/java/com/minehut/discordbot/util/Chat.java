@@ -23,6 +23,7 @@ public class Chat {
     public static final Color CUSTOM_ORANGE = new Color(236, 150, 43);
     public static final Color CUSTOM_DARK_ORANGE = new Color(255, 111, 0);
     public static final Color CUSTOM_GREEN = new Color(64, 192, 61);
+    public static final Color CUSTOM_DARK_GREEN = new Color(56, 128, 53);
     public static final Color CUSTOM_GRAY = new Color(98, 98, 98);
     public static final Color CUSTOM_PURPLE = new Color(151, 74, 191);
 
