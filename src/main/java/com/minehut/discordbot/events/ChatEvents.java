@@ -6,11 +6,8 @@ import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageDeleteEvent;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageUpdateEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.util.Arrays;
@@ -22,48 +19,47 @@ import java.util.HashMap;
  */
 public class ChatEvents extends ListenerAdapter {
 
-    private HashMap<String, String> messages = new HashMap<>();
-    private HashMap<String, Integer> amount = new HashMap<>();
+    public static HashMap<String, String> messages;
+    public static HashMap<String, Integer> amount;
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
         Message message = event.getMessage();
         Guild guild = event.getGuild();
-        Member member = event.getMember();
-        User sender = message.getAuthor();
+        Member sender = event.getMember();
+        User user = message.getAuthor();
         TextChannel channel = event.getChannel();
-        JDA jda = event.getJDA();
 
-        if (guild == null || !Core.getDiscord().isReady() || sender.equals(Core.getClient().getSelfUser()) || sender.isBot() || sender.isFake()) {
+        if (guild == null || !Core.getDiscord().isReady() || user.equals(Core.getClient().getSelfUser()) || user.isBot() || user.isFake()) {
             return;
         }
 
         if (guild == Bot.getMainGuild()) {
-            if (guild.getMember(sender).getNickname() == null) {
-                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(sender) + ": " + message.getContent());
+            if (guild.getMember(user).getNickname() == null) {
+                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(user) + ": " + message.getContent());
             } else {
-                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(sender) + " (" + guild.getMember(sender).getNickname() + "): " + message.getContent());
+                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(user) + " (" + guild.getMember(user).getNickname() + "): " + message.getContent());
             }
 
-            if (!Bot.isTrusted(sender) && !message.getContent().startsWith(Command.getPrefix())) {
-                if (message.getRawContent().equalsIgnoreCase(messages.get(sender.getId()))) {
-                    amount.put(sender.getId(), (amount.get(sender.getId()) + 1));
+            if (!Bot.isTrusted(user) && !message.getContent().startsWith(Command.getPrefix())) {
+                if (message.getRawContent().equalsIgnoreCase(messages.get(user.getId()))) {
+                    amount.put(user.getId(), (amount.get(user.getId()) + 1));
                 } else {
-                    messages.put(sender.getId(), message.getRawContent());
-                    amount.put(sender.getId(), 0);
+                    messages.put(user.getId(), message.getRawContent());
+                    amount.put(user.getId(), 0);
                 }
 
-                if (amount.get(sender.getId()) != null && ((amount.get(sender.getId()) + 1) == 3 || (amount.get(sender.getId()) + 1) == 4)) {
+                if (amount.get(user.getId()) != null && ((amount.get(user.getId()) + 1) == 3 || (amount.get(user.getId()) + 1) == 4)) {
                     Chat.removeMessage(event.getMessage());
-                    Chat.sendMessage(sender.getAsMention() + ", please do not repeat the same message!", channel);
+                    channel.sendMessage(user.getAsMention() + ", please do not repeat the same message!").queue();
                     return;
-                } else if ((amount.get(sender.getId()) + 1) >= 5) {
+                } else if ((amount.get(user.getId()) + 1) >= 5) {
                     Chat.removeMessage(event.getMessage());
 
-                    guild.getController().addRolesToMember(member, Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID())).queue();
-                    Chat.sendMessage(sender.getAsMention() + " has been auto muted for spam", channel);
+                    guild.getController().addRolesToMember(sender, Core.getClient().getRoleById(Core.getConfig().getMutedRoleID())).queue();
+                    channel.sendMessage(user.getAsMention() + " has been auto muted for spam").queue();
 
-                    EmbedBuilder builder = Chat.getEmbed().setDescription(":no_bell:  " + sender.getAsMention() + " | " + Chat.getFullName(sender) + " was auto muted for spam!")
+                    EmbedBuilder builder = Chat.getEmbed().setDescription(":no_bell:  " + user.getAsMention() + " | " + Chat.getFullName(user) + " was auto muted for spam!")
                             .addField("Channel", channel.getAsMention(), true);
                     if (event.getMessage().getContent().length() >= 1024) {
                         builder.addField("Message", "```" + event.getMessage().getContent().substring(0, 1014) + "...```", false);
@@ -71,15 +67,15 @@ public class ChatEvents extends ListenerAdapter {
                         builder.addField("Message", "```" + event.getMessage().getContent() + "```", false);
                     }
 
-                    Chat.sendMessage(builder.setFooter("System time | " + Bot.getBotTime(), null)
-                            .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
+                    Bot.getLogChannel().sendMessage(builder.setFooter("System time | " + Bot.getBotTime(), null)
+                            .setColor(Chat.CUSTOM_PURPLE).build());
                     return;
                 }
             }
 
             if (message.getContent().length() >= Core.getConfig().getMaxMessageLength()) {
-                EmbedBuilder builder = Chat.getEmbed().setDescription(":exclamation: Possible message spam - **" + Chat.getFullName(sender) + "**")
-                        .addField("User", sender.getAsMention(), true)
+                EmbedBuilder builder = Chat.getEmbed().setDescription(":exclamation: Possible message spam - **" + Chat.getFullName(user) + "**")
+                        .addField("User", user.getAsMention(), true)
                         .addField("Length", String.valueOf(message.getContent().length()), true)
                         .addField("Channel", channel.getAsMention(), true);
                 if (event.getMessage().getContent().length() >= 1024) {
@@ -88,16 +84,16 @@ public class ChatEvents extends ListenerAdapter {
                     builder.addField("Message", "```" + event.getMessage().getContent() + "```", false);
                 }
 
-                Chat.sendMessage(builder.setFooter("System time | " + Bot.getBotTime(), null)
-                        .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
+                Bot.getLogChannel().sendMessage(builder.setFooter("System time | " + Bot.getBotTime(), null)
+                        .setColor(Chat.CUSTOM_PURPLE).build());
             }
 
-            if (Bot.hasInvite(message) && !Bot.isTrusted(sender)) {
+            if (Bot.hasInvite(message) && !Bot.isTrusted(user)) {
                 Chat.removeMessage(message);
 
-                Chat.sendMessage(sender.getAsMention() + ", please do not advertise Discord servers. Thanks!", channel);
-                EmbedBuilder builder = Chat.getEmbed().setDescription(":exclamation: Discord server advertisement - **" + Chat.getFullName(sender) + "**")
-                        .addField("User", sender.getAsMention(), true)
+                channel.sendMessage(user.getAsMention() + ", please do not advertise Discord servers. Thanks!");
+                EmbedBuilder builder = Chat.getEmbed().setDescription(":exclamation: Discord server advertisement - **" + Chat.getFullName(user) + "**")
+                        .addField("User", user.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true);
                 if (event.getMessage().getContent().length() >= 1024) {
                     builder.addField("Message", "```" + event.getMessage().getContent().substring(0, 1014) + "...```", false);
@@ -105,16 +101,15 @@ public class ChatEvents extends ListenerAdapter {
                     builder.addField("Message", "```" + event.getMessage().getContent() + "```", false);
                 }
 
-                Chat.sendMessage(builder.setFooter(Bot.getBotTime(), null)
-                        .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
+                Bot.getLogChannel().sendMessage(builder.setFooter(Bot.getBotTime(), null)
+                        .setColor(Chat.CUSTOM_PURPLE).build());
                 return;
             }
 
-            if (!channel.getName().contains("meme") && message.getRawContent().contains(
-                    "▔╲▂▂▂▂╱▔╲▂")) {
+            if (!channel.getName().contains("meme") && message.getRawContent().contains("▔╲▂▂▂▂╱▔╲▂")) {
 
                 Chat.removeMessage(message);
-                Chat.sendMessage(sender.getAsMention() + ", please do not post cooldog in this channel.", channel);
+                Chat.sendMessage(user.getAsMention() + ", please do not post cooldog in this channel.", channel, 30);
                 return;
             }
 
@@ -145,9 +140,9 @@ public class ChatEvents extends ListenerAdapter {
         if (message.getRawContent() != null && message.getContent().startsWith(Command.getPrefix())) {
 
             for (String id : Core.getConfig().getBlockedUsers()) {
-                if (sender.getId().equals(id) && !Bot.isTrusted(sender)) {
+                if (user.getId().equals(id) && !Bot.isTrusted(user)) {
                     Chat.removeMessage(message);
-                    Chat.sendMessage(sender.getAsMention() + " You are blacklisted from using bot commands. If you believe this is an error, please contact MatrixTunnel.", channel, 10);
+                    Chat.sendMessage(user.getAsMention() + " You are blacklisted from using bot commands. If you believe this is an error, please contact MatrixTunnel.", channel, 10);
                     return;
                 }
             }
@@ -162,11 +157,11 @@ public class ChatEvents extends ListenerAdapter {
 
             for (Command cmd : Core.getCommands()) {
                 if (cmd.getCommand().equalsIgnoreCase(command)) {
-                    if (cmd.getType() == CommandType.MASTER && !sender.getId().equals("118088732753526784")) {
+                    if (cmd.getType() == CommandType.MASTER && !user.getId().equals("118088732753526784")) {
                         return;
                     }
 
-                    if (cmd.getType() == CommandType.ADMINISTRATIVE && !Bot.isTrusted(sender)) {
+                    if (cmd.getType() == CommandType.TRUSTED && !Bot.isTrusted(user)) {
                         return;
                     }
 
@@ -176,22 +171,22 @@ public class ChatEvents extends ListenerAdapter {
                     }
 
                     try {
-                        cmd.onCommand(jda, guild, channel, member, sender, message, args);
+                        cmd.onCommand(guild, channel, sender, message, args);
                     } catch (Exception ex) {
                         Core.log.error("Exception in guild " + "!\n" + '\'' + cmd.getCommand() + "' "
                                 + Arrays.toString(args) + " in " + channel + "! Sender: " +
-                                sender.getName() + '#' + sender.getDiscriminator(), ex);
+                                user.getName() + '#' + user.getDiscriminator(), ex);
                         ex.printStackTrace();
                     }
                     return;
                 } else {
                     for (String alias : cmd.getAliases()) {
                         if (alias.equalsIgnoreCase(command)) {
-                            if (cmd.getType() == CommandType.MASTER && !sender.getId().equals("118088732753526784")) {
+                            if (cmd.getType() == CommandType.MASTER && !user.getId().equals("118088732753526784")) {
                                 return;
                             }
 
-                            if (cmd.getType() == CommandType.ADMINISTRATIVE && !Bot.isTrusted(sender)) {
+                            if (cmd.getType() == CommandType.TRUSTED && !Bot.isTrusted(user)) {
                                 return;
                             }
 
@@ -201,72 +196,22 @@ public class ChatEvents extends ListenerAdapter {
                             }
 
                             try {
-                                cmd.onCommand(jda, guild, channel, member, sender, message, args);
+                                cmd.onCommand(guild, channel, sender, message, args);
                             } catch (Exception ex) {
                                 Core.log.error("Exception in guild " + "!\n" + '\'' + cmd.getCommand() + "' "
                                         + Arrays.toString(args) + " in " + channel + "! Sender: " +
-                                        sender.getName() + '#' + sender.getDiscriminator(), ex);
+                                        user.getName() + '#' + user.getDiscriminator(), ex);
                                 ex.printStackTrace();
                             }
                             return;
                         } else {
                             //not a valid command
-                            Chat.setAutoDelete(message, 120);
+                            Chat.removeMessage(message, 120);
                         }
                     }
                 }
             }
         }
-    }
-
-    @Override
-    public void onGuildMessageUpdate(GuildMessageUpdateEvent event) {
-        if (event.getGuild() != Bot.getMainGuild()) return;
-        Message message = event.getMessage();
-        User sender = message.getAuthor();
-        Channel channel = event.getChannel();
-
-        /*
-        if (!sender.equals(Core.getDiscord().getOurUser())) {
-            if (newMessage.getContent() == null || newMessage.getContent().equals("")) {
-                return;
-            }
-
-            if (newMessage.getContent().startsWith(Command.getPrefix())) return;
-            if (!Chat.logRemove) return;
-
-            if (sender.getName().equals(sender.getDisplayName(oldMessage.getGuild()))) {
-                Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(oldMessage.getGuild()) + " updated message \"" +
-                        Chat.fixDiscordMentions(oldMessage) + "\" -> \"" + Chat.fixDiscordMentions(newMessage) + "\"");
-            } else {
-                Core.log.info(Chat.getChannelName(channel) + sender.getDisplayName(oldMessage.getGuild()) + " (" +
-                        sender.getName() + ") updated message \"" +
-                        Chat.fixDiscordMentions(oldMessage) + "\" -> \"" + Chat.fixDiscordMentions(newMessage) + "\"");
-            }
-        }
-        */
-    }
-
-    @Override
-    public void onGuildMessageDelete(GuildMessageDeleteEvent event) {
-        if (event.getMessage() == null || event.getGuild() != Bot.getMainGuild()) return;
-        Message message = event.getMessage();
-        User sender = message.getAuthor();
-        Channel channel = event.getChannel();
-        Guild guild = event.getGuild();
-
-        if (guild == null || !Core.getDiscord().isReady() || sender.isBot() || sender.isFake()) {
-            return;
-        }
-
-        if (!sender.equals(Core.getClient().getSelfUser()) && message.getContent().startsWith(Command.getPrefix())) {
-            if (guild.getMember(sender).getNickname() == null) {
-                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(sender) + " removed message \"\"\"" + message.getContent() + "\"\"\"");
-            } else {
-                Core.log.info(Chat.getChannelName(channel) + Chat.getFullName(sender) + " (" + guild.getMember(sender).getNickname() + ") removed message \"\"\"" + message.getContent() + "\"\"\"");
-            }
-        }
-
     }
 
 }

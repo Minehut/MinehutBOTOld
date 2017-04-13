@@ -1,8 +1,10 @@
 package com.minehut.discordbot.events;
 
 import com.minehut.discordbot.Core;
+import com.minehut.discordbot.commands.music.SkipCommand;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.tasks.running.PunishmentChecker;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
 import net.dv8tion.jda.core.entities.Role;
@@ -19,6 +21,8 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 import java.awt.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by MatrixTunnel on 11/28/2016.
@@ -35,17 +39,20 @@ public class ServerEvents extends ListenerAdapter {
             Core.log.info("Name: \"" + role.getName() + "\" ID: \"" + role.getId() + "\" - " + role.getPermissions());
         }
 
+        Bot.nowPlaying = new ArrayList<>();
+        SkipCommand.votes = new ArrayList<>();
+        ChatEvents.messages = new HashMap<>();
+        ChatEvents.amount = new HashMap<>();
+        Core.log.info("Trackers set.");
+
         for (String id : Core.getConfig().getMusicVoiceChannels()) {
-            VoiceChannel channel = Core.getDiscord().getVoiceChannelByID(id);
+            VoiceChannel channel = Core.getClient().getVoiceChannelById(id);
             if (channel != null) {
                 channel.getGuild().getAudioManager().openAudioConnection(channel);
                 if (Core.getClient().getGuilds().contains(Bot.getMainGuild())) break; //Only join main guild else everything else
             }
         }
 
-        //for (Guild guild : Core.getClient().getGuilds()) {
-        //    Core.getMusicManager().getPlayer(guild.getId()).setVolume(25);
-        //}
 
         Core.enabled = true;
         Core.log.info("Bot ready.");
@@ -64,36 +71,29 @@ public class ServerEvents extends ListenerAdapter {
         User user = event.getMember().getUser();
         Bot.updateUsers();
 
-        Chat.sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
+        Bot.getLogChannel().sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
                 .setDescription("*" + user.getAsMention() + " joined the server.*" +
                 "\n\n**Account Creation:** " + Bot.formatTime(LocalDateTime.from(user.getCreationTime())) +
                 "\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 .setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_GREEN), Bot.getLogChannel());
+                .setColor(Chat.CUSTOM_GREEN).build());
 
         Core.log.info(Chat.getFullName(user) + " joined the Discord server.");
-
-        /*
-        if (event.getGuild().getUsers().size() == 2000) {
-            Chat.sendMessage(event.getUser().toString() + " is the 2000th Discord member! Be sure and give them a big warm welcome and maybe even buy him Legend! :D",
-                    guild.getChannelByID("239599059415859200"));
-        }
-        */
     }
 
     @Override
     public void onGuildMemberLeave(GuildMemberLeaveEvent event) {
         if (event.getGuild() != Bot.getMainGuild()) return;
         User user = event.getMember().getUser();
+        Bot.updateUsers();
 
-        Chat.sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
+        Bot.getLogChannel().sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setThumbnail(user.getEffectiveAvatarUrl()) // https://discordapp.com/assets/dd4dbc0016779df1378e7812eabaa04d.png
                 .setDescription("*" + user.getAsMention() + " left the server.*" +
                 "\n\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 .setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_RED), Bot.getLogChannel());
+                .setColor(Chat.CUSTOM_RED).build());
 
         Core.log.info(Chat.getFullName(user) + " left the Discord server.");
-        Bot.updateUsers();
     }
 
     @Override
@@ -101,9 +101,9 @@ public class ServerEvents extends ListenerAdapter {
         if (event.getGuild() != Bot.getMainGuild()) return;
         User user = event.getUser();
 
-        Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://minehut.com/" + user.getName(), null).setDescription("*was banned from the server.*")
+        Bot.getLogChannel().sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setDescription("*was banned from the server.*")
                 .setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Color.RED), Bot.getLogChannel());
+                .setColor(Color.RED).build());
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " **was banned from Discord.**");
         Core.log.info(Chat.getFullName(user) + " was banned from Discord.");
@@ -115,9 +115,9 @@ public class ServerEvents extends ListenerAdapter {
         if (event.getGuild() != Bot.getMainGuild()) return;
         User user = event.getUser();
 
-        Chat.sendMessage(Chat.getEmbed().setAuthor(Chat.getFullName(user), "https://minehut.com/" + user.getName(), null).setDescription("*was unbanned from the server.*")
+        Bot.getLogChannel().sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setDescription("*was unbanned from the server.*")
                 .setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Color.PINK), Bot.getLogChannel());
+                .setColor(Color.PINK).build());
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " **was banned from Discord.**");
         Core.log.info(Chat.getFullName(user) + " was unbanned from Discord.");
@@ -129,7 +129,7 @@ public class ServerEvents extends ListenerAdapter {
         if (event.getGuild() != Bot.getMainGuild()) return;
         EmbedBuilder embed = Chat.getEmbed();
 
-        if (event.getRoles().contains(Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID()))) return;
+        if (event.getRoles().contains(Core.getClient().getRoleById(Core.getConfig().getMutedRoleID()))) return;
 
         if (event.getRoles().size() == 1) {
             embed.setDescription(event.getMember().getAsMention() + " gained the role:\n");
@@ -142,8 +142,8 @@ public class ServerEvents extends ListenerAdapter {
             }
         }
 
-        Chat.sendMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_ORANGE), Bot.getLogChannel());
+        Bot.getLogChannel().sendMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
+                .setColor(Chat.CUSTOM_ORANGE).build());
     }
 
     @Override
@@ -151,7 +151,7 @@ public class ServerEvents extends ListenerAdapter {
         if (event.getGuild() != Bot.getMainGuild()) return;
         EmbedBuilder embed = Chat.getEmbed();
 
-        if (event.getRoles().contains(Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID()))) return;
+        if (event.getRoles().contains(Core.getClient().getRoleById(Core.getConfig().getMutedRoleID()))) return;
 
         if (event.getRoles().size() == 1) {
             embed.setDescription(event.getMember().getAsMention() + " lost the role:\n");
@@ -164,8 +164,8 @@ public class ServerEvents extends ListenerAdapter {
             }
         }
 
-        Chat.sendMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_ORANGE), Bot.getLogChannel());
+        Bot.getLogChannel().sendMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
+                .setColor(Chat.CUSTOM_ORANGE).build());
     }
 
     @Override
@@ -174,22 +174,22 @@ public class ServerEvents extends ListenerAdapter {
         User user = event.getMember().getUser();
 
         if (event.getPrevNick() == null) {
-            Chat.sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " changed their name from `" +
+            Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " changed their name from `" +
                     user.getName() + "` to `" + event.getNewNick() + "`")
-                    .setColor(Color.ORANGE), Bot.getLogChannel());
+                    .setColor(Color.ORANGE).build());
             return;
         }
 
         if (event.getNewNick() == null) {
-            Chat.sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " reset their name to `" + user.getName() + "`")
-                    .setColor(Color.ORANGE), Bot.getLogChannel());
+            Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " reset their name to `" + user.getName() + "`")
+                    .setColor(Color.ORANGE).build());
             return;
         }
 
         if (!event.getNewNick().equals(user.getName())) {
-            Chat.sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " changed their name from `" +
+            Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " changed their name from `" +
                     event.getPrevNick() + "` to `" + event.getNewNick() + "`")
-                    .setColor(Color.ORANGE), Bot.getLogChannel());
+                    .setColor(Color.ORANGE).build());
         }
 
         Core.log.info("\"" + event.getPrevNick() + "\" is now known as \"" + event.getNewNick() + "\"");
@@ -197,14 +197,12 @@ public class ServerEvents extends ListenerAdapter {
 
     @Override
     public void onReconnect(ReconnectedEvent event) {
-        //Bot.updateUsers(); <--- Causing bad stuff to happen
-        //Core.broadcast("Connection to Discord has been reestablished! Disconnect reason: " + disconnectReason);
         Core.log.info("Connection to Discord has been reestablished!");
     }
 
     @Override
     public void onDisconnect(DisconnectEvent event) {
-        Core.log.error("Disconnected from Discord.");
+        Core.log.warn("Disconnected from Discord.");
     }
 
 }

@@ -18,13 +18,6 @@ public class IDiscordClient {
         return Core.getClient().getStatus().equals(JDA.Status.CONNECTED);
     }
 
-    public VoiceChannel getVoiceChannelByID(String id) {
-        return Core.getClient().getGuilds().stream()
-                .map(g -> g.getVoiceChannelById(id))
-                .filter(Objects::nonNull)
-                .findFirst().orElse(null);
-    }
-
     public List<VoiceChannel> getConnectedVoiceChannels() {
         return Core.getClient().getGuilds().stream()
                 .map(c -> c.getAudioManager().getConnectedChannel())
@@ -46,51 +39,12 @@ public class IDiscordClient {
         return Core.getClient().getGuilds().stream().filter(g -> g.getRoles().equals(guild)).collect(Collectors.toList());
     }
 
-    public Role getRoleByID(String id) {
-        for (Guild guild : Core.getClient().getGuilds()) {
-            for (Role role : guild.getRoles()) {
-                if (role.getId().equals(id)) {
-                    return role;
-                }
-            }
-        }
-        return null;
+
+    public boolean userHasRoleId(Guild guild, User user, String id) {
+        return guild.getMember(user).getRoles().contains(Core.getClient().getRoleById(id));
     }
-
-    public TextChannel getChannelByID(String id) {
-        for (Guild guild : Core.getClient().getGuilds()) {
-            for (TextChannel channel : guild.getTextChannels()) {
-                if (channel.getId().equals(id)) {
-                    return channel;
-                }
-            }
-        }
-        return null;
-    }
-
-    public User getUserByID(String id) {
-        for (Guild guild : Core.getClient().getGuilds()) {
-            for (Member member : guild.getMembers()) {
-                if (member.getUser().getId().equals(id)) {
-                    return member.getUser();
-                }
-            }
-        }
-        return null;
-    }
-
-
-    public boolean userHasRoleId(Guild guild, User user, String id) { //TODO Check if this is working??
-        return guild.getMember(user).getRoles().contains(Core.getDiscord().getRoleByID(id));
-
-        //return Arrays.stream(Core.getClients()).map(jda -> jda.getGuildById(guild.getId()).getMember(user).getRoles()
-        //        .contains(Core.getDiscord().getGuildByID(guild.getId()).getRoleById(id))).filter(Objects::nonNull)
-        //        .findFirst().orElse(null);
-    }
-
 
     public void streaming(String status, String url) {
         Core.getClient().getPresence().setGame(Game.of(status, url));
     }
-
 }

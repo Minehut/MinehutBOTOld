@@ -12,7 +12,10 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 import net.dv8tion.jda.core.entities.User;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Made by the FlareBot developers
@@ -37,7 +40,8 @@ public class VideoThread extends Thread {
 
     @Override
     public void run() {
-        Message message = Chat.sendMessage("Processing...", channel, 120);
+        Message message = channel.sendMessage("Processing...").complete();
+        Chat.removeMessage(message, 120);
         try {
             if (extractor == null)
                 for (Class<? extends Extractor> clazz : extractors) {
@@ -48,7 +52,7 @@ public class VideoThread extends Thread {
                     break;
                 }
             if (extractor == null) {
-                Chat.editMessage("Could not find a way to process that..", message, 30);
+                message.editMessage("Could not find a way to process that..").queue(msg -> Chat.removeMessage(msg, 30));
                 return;
             }
             if (managers.add(extractor.getSourceManagerClass()))
@@ -56,7 +60,8 @@ public class VideoThread extends Thread {
             extractor.process(url, manager.getPlayer(channel.getGuild().getId()), message, user);
         } catch (Exception e) {
             Core.log.error("Could not init extractor for '{}'".replace("{}", url), e);
-            Chat.editMessage("Something went wrong! Issue logged", message, 30);
+            message.editMessage("Something went wrong! Issue logged").queue();
+            Chat.removeMessage(message, 30); //TODO Fix like above if you can
         }
     }
 

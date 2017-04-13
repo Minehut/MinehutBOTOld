@@ -39,13 +39,13 @@ public class YouTubeExtractor implements Extractor {
         try {
             item = player.resolve(input);
             if (item == null) {
-                Chat.editMessage("", Chat.getEmbed()
+                Chat.editMessage(Chat.getEmbed()
                         .setDescription("Could not get that video/playlist! Make sure the URL is correct!")
                         .setColor(Chat.CUSTOM_RED), message, 15);
                 return;
             }
         } catch (RuntimeException e) {
-            Chat.editMessage("", Chat.getEmbed()
+            Chat.editMessage(Chat.getEmbed()
                     .setDescription("Could not get that video/playlist!")
                     .setColor(Chat.CUSTOM_RED).addField("YouTube said: ", e.getMessage(), true), message, 15);
             return;
@@ -59,19 +59,19 @@ public class YouTubeExtractor implements Extractor {
                 name = audioPlaylist.getName();
             } else {
                 EmbedBuilder builder = Chat.getEmbed().setColor(Chat.CUSTOM_RED).setDescription("That playlist could not be queued! If you want this queued, please ask a staff member");
-                Chat.editMessage("", builder, message, 15);
+                Chat.editMessage(builder, message, 15);
                 return;
             }
         } else {
             AudioTrack track = (AudioTrack) item;
             if (track.getInfo().length >= 900000 && !Bot.isTrusted(user)) {
                 EmbedBuilder builder = Chat.getEmbed().setColor(Chat.CUSTOM_RED).setDescription("That track could not be queued! The video length is too long");
-                Chat.editMessage("", builder, message, 15);
+                Chat.editMessage(builder, message, 15);
                 return;
             }
             if (track.getInfo().length == 0 || track.getInfo().isStream) {
                 EmbedBuilder builder = Chat.getEmbed().setColor(Chat.CUSTOM_RED).setDescription("Livestreams cannot be queued!");
-                Chat.editMessage("", builder, message, 15);
+                Chat.editMessage(builder, message, 15);
                 return;
             }
             audioTracks.add(track);
@@ -93,7 +93,7 @@ public class YouTubeExtractor implements Extractor {
             builder.setDescription(String.format("%s queued the %s [`%s`](%s)", user.getAsMention(), tracks.size() == 1 ? "song" : "playlist", name, input));
             if (audioTracks.size() > 1)
                 builder.addField("Song count:", String.valueOf(tracks.size()), true);
-            Chat.editMessage("", builder, message, 20);
+            Chat.editMessage(builder, message, 20);
         }
     }
 

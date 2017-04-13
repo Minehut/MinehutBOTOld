@@ -6,10 +6,8 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,12 +26,12 @@ public class SkipCommand implements Command {
         return new String[]{"next", "stopplayingthissongplease"};
     }
 
-    public static List<String> votes = new ArrayList<>();
+    public static List<String> votes;
     private static int maxSkips = 0;
 
     @Override
-    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
-        Chat.setAutoDelete(message, 5);
+    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+        Chat.removeMessage(message, 5);
 
         Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
         VoiceChannel voiceChannel = guild.getSelfMember().getVoiceState().getChannel();
@@ -43,7 +41,7 @@ public class SkipCommand implements Command {
             Chat.sendMessage("The player is not playing!", channel, 15);
             return;
         }
-        if (args.length == 1 && args[0].equals("force") && Bot.isTrusted(sender)) {
+        if (args.length == 1 && args[0].equals("force") && Bot.isTrusted(sender.getUser())) {
             votes.clear();
             Chat.sendMessage(sender.getAsMention() + " Force skipped **" + player.getPlayingTrack().getTrack().getInfo().title + "**", channel, 15);
             player.skip();
@@ -53,25 +51,20 @@ public class SkipCommand implements Command {
             Chat.sendMessage(sender.getAsMention() + " The bot is not in a voice channel!", channel, 10);
             return;
         }
-        if (!guild.getSelfMember().getVoiceState().getChannel().equals(member.getVoiceState().getChannel())) {
+        if (!guild.getSelfMember().getVoiceState().getChannel().equals(sender.getVoiceState().getChannel())) {
             Chat.sendMessage(sender.getAsMention() + " you must be in the channel in order to skip songs!", channel, 10);
             return;
         }
         //TODO Let owner force skip
-        if (votes.contains(sender.getId())) {
+        if (votes.contains(sender.getUser().getId())) {
             Chat.sendMessage(sender.getAsMention() + " you have already voted to skip this song!", channel, 10);
             return;
         }
-        votes.add(sender.getId());
+        votes.add(sender.getUser().getId());
 
         if (voiceChannel != null && maxSkips != -1) {
             if (voiceChannel.getMembers().size() > 2) {
                 maxSkips = (int) ((voiceChannel.getMembers().size() - 1) * 2 / 3.0 + 0.5);
-                for (Member mem : voiceChannel.getMembers()) {
-                    if (mem.getVoiceState().isSelfDeafened() && !mem.getUser().equals(Core.getClient().getSelfUser())) {
-                        maxSkips = maxSkips - 1;
-                    }
-                }
             } else {
                 maxSkips = 1;
             }
@@ -85,11 +78,6 @@ public class SkipCommand implements Command {
                         (maxSkips - votes.size()) + "** more votes are required to skip the current song.", channel, 20);
             }
         }
-    }
-
-    @Override
-    public String getArgs() {
-        return "";
     }
 
     @Override

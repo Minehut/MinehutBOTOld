@@ -4,8 +4,10 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.tasks.BotTask;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 /**
  * Created by MatrixTunnel on 1/14/2017.
@@ -18,25 +20,20 @@ public class ReconnectVoiceCommand implements Command {
     }
 
     @Override
-    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
+    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
         guild.getAudioManager().closeAudioConnection();
-        new BotTask("Reconnect Voice Channel") {
+        new BotTask("ReconnectVoiceChannel") {
             @Override
             public void run() {
-                guild.getAudioManager().openAudioConnection(member.getVoiceState().getChannel());
+                guild.getAudioManager().openAudioConnection(sender.getVoiceState().getChannel());
             }
         }.delay(2000);
     }
 
     @Override
-    public String getArgs() {
-        return "";
-    }
-
-    @Override
     public CommandType getType() {
-        return CommandType.ADMINISTRATIVE;
+        return CommandType.TRUSTED;
     }
 }

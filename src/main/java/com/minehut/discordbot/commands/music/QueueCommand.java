@@ -10,8 +10,10 @@ import com.minehut.discordbot.util.Chat;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -35,13 +37,13 @@ public class QueueCommand implements Command {
     }
 
     @Override
-    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
-        Chat.setAutoDelete(message, 5);
+    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+        Chat.removeMessage(message, 5);
 
         Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
 
         if (!player.getPlaylist().isEmpty()) {
-            if (Bot.isTrusted(sender)) {
+            if (Bot.isTrusted(sender.getUser())) {
                 if (args.length == 1 && args[0].equals("clear")) {
                     Chat.sendMessage(sender.getAsMention() + " Cleared the current playlist.", channel, 15);
                     player.getPlaylist().clear();
@@ -109,15 +111,10 @@ public class QueueCommand implements Command {
             }
             Chat.sendMessage(builder.addField("Total songs", String.valueOf(player.getPlaylist().size()), true)
                     .addField("Total Playlist Time", Bot.millisToTime(totalTime, true), true)
-                    .addField("Paused", player.getPaused() ? ":white_check_mark:" : ":x:", true), channel, 25);
+                    .addField("Paused", player.getPaused() ? ":white_check_mark:" : ":x:", true).build(), channel, 25);
         } else {
-            Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs in the queue!").setColor(Chat.CUSTOM_RED), channel, 15);
+            Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs in the queue!").setColor(Chat.CUSTOM_RED).build(), channel, 15);
         }
-    }
-
-    @Override
-    public String getArgs() {
-        return "";
     }
 
     @Override

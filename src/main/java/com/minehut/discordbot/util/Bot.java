@@ -10,7 +10,7 @@ import org.json.JSONArray;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  */
 public class Bot {
 
-    public static List<Message> nowPlaying = new ArrayList<>();
+    public static List<Message> nowPlaying;
 
     public static void updateUsers() {
         if (Core.getClient().getGuilds().contains(Core.getClient().getGuildById("239599059415859200"))) { //Minehut
@@ -36,7 +36,7 @@ public class Bot {
     }
 
     public static TextChannel getLogChannel() {
-        return Core.getDiscord().getChannelByID(Core.getConfig().getLogChannelID());
+        return Core.getClient().getTextChannelById(Core.getConfig().getLogChannelID());
     }
 
     public static boolean isTrusted(User user) {
@@ -114,6 +114,12 @@ public class Bot {
         sb.append(format ? "s" : "");
 
         return (sb.toString());
+    }
+
+    public static JSONArray reverseJsonArray(JSONArray array) {
+        List<Object> reverse = array.toList();
+        Collections.reverse(reverse);
+        return new JSONArray(reverse);
     }
 
 }

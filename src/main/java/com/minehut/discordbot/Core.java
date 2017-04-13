@@ -5,10 +5,12 @@ import com.arsenarsen.lavaplayerbridge.libraries.LibraryFactory;
 import com.arsenarsen.lavaplayerbridge.libraries.UnknownBindingException;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.commands.general.CheckNameCommand;
 import com.minehut.discordbot.commands.general.HelpCommand;
 import com.minehut.discordbot.commands.general.InfoCommand;
 import com.minehut.discordbot.commands.management.*;
 import com.minehut.discordbot.commands.master.SayCommand;
+import com.minehut.discordbot.commands.master.ShutdownCommand;
 import com.minehut.discordbot.commands.music.*;
 import com.minehut.discordbot.events.ChatEvents;
 import com.minehut.discordbot.events.ServerEvents;
@@ -54,8 +56,8 @@ public class Core {
     private static List<Command> commands;
     private static PlayerManager musicManager;
 
-    private static final Map<String, Logger> LOGGERS = new ConcurrentHashMap<>();
-    public static final Logger log = getLog(Core.class);
+    private static final Map<String, Logger> LOGGERS;
+    public static final Logger log;
     private static Logger getLog(String name) {
         return LOGGERS.computeIfAbsent(name, LoggerFactory::getLogger);
     }
@@ -68,8 +70,12 @@ public class Core {
     }
     public static CountDownLatch latch;
 
+    static {
+        LOGGERS = new ConcurrentHashMap<>();
+        log = getLog(Core.class);
+    }
+
     public static void main(String[] args) throws InterruptedException, UnknownBindingException {
-        RestAction.DEFAULT_FAILURE = t -> log.error("RestAction failed!", t);
         SimpleLog.LEVEL = SimpleLog.Level.OFF;
         SimpleLog.addListener(new SimpleLog.LogListener() {
             @Override
@@ -127,7 +133,6 @@ public class Core {
             } catch (NoSuchElementException ignored) {
             }
         } while (enabled);
-
     }
 
     public static void shutdown(boolean restart) {
@@ -164,7 +169,7 @@ public class Core {
                 log.info("Cleaning things up...");
             }
 
-            Thread.sleep(1000);
+            Thread.sleep(2000);
 
             client.shutdown();
             log.info("Client shutdown");
@@ -202,7 +207,7 @@ public class Core {
                         TextChannel channel = client.getTextChannelById(id);
                         if (channel != null) {
                             AudioPlayer song = getMusicManager().getPlayer(channel.getGuild().getId()).getPlayer();
-                            User user = Core.getDiscord().getUserByID(player.getPlayingTrack().getMeta().get("requester").toString());
+                            User user = Core.getClient().getUserById(player.getPlayingTrack().getMeta().get("requester").toString());
 
                             if (song == aplayer || song.getPlayingTrack() == atrack) {
 
@@ -228,7 +233,7 @@ public class Core {
                                             .setColor(Chat.CUSTOM_GREEN);
                                 }
 
-                                Message msg = Chat.sendMessage(embed, channel);
+                                Message msg = channel.sendMessage(new MessageBuilder().setEmbed(embed.build()).build()).complete();
 
                                 SkipCommand.votes.clear();
                                 Bot.nowPlaying.add(msg);
@@ -263,6 +268,7 @@ public class Core {
     }
 
     private static void registerCommands() {
+        registerCommand(new CheckNameCommand());
         registerCommand(new HelpCommand());
         registerCommand(new InfoCommand());
 
@@ -289,13 +295,15 @@ public class Core {
     }
 
     private void init() throws InterruptedException, UnknownBindingException {
+        RestAction.DEFAULT_FAILURE = t -> {};
+
         discord = new IDiscordClient();
         latch = new CountDownLatch(1);
 
         try {
             try {
                 client = new JDABuilder(AccountType.BOT)
-                        .addListener(new ChatEvents(), new ServerEvents())
+                        .addEventListener(new ChatEvents(), new ServerEvents())
                         .setToken(config.getDiscordToken())
                         .setAudioSendFactory(new NativeAudioSendFactory())
                         .setGame(Game.of("loading..."))

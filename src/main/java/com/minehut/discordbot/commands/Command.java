@@ -1,8 +1,10 @@
 package com.minehut.discordbot.commands;
 
 import com.minehut.discordbot.Core;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 /**
  * Made by the developers of FlareBot.
@@ -12,9 +14,7 @@ public interface Command {
 
     String getCommand();
 
-    void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args);
-
-    String getArgs();
+    void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args);
 
     CommandType getType();
 

@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.minehut</groupId>
     <artifactId>discordbot</artifactId>
-    <version>3.2.0</version>
+    <version>3.3.0</version>
 
     <name>MinehutBOT</name>
     <description>Discord bot for Minehut</description>
@@ -89,30 +89,36 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.DV8FromTheWorld</groupId>
+            <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>8de5129</version>
+            <version>3.0.0_175</version>
         </dependency>
         <dependency>
             <groupId>com.arsenarsen.lavaplayer-bridge</groupId>
             <artifactId>jda-impl</artifactId>
-            <version>1.14-SNAPSHOT</version>
+            <version>1.15-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
-                    <groupId>net.dv8tion</groupId>
                     <artifactId>JDA</artifactId>
+                    <groupId>net.dv8tion</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
             <artifactId>lavaplayer</artifactId>
-            <version>1.2.32</version>
+            <version>1.2.36</version>
         </dependency>
         <dependency>
             <groupId>com.sedmelluq</groupId>
             <artifactId>jda-nas</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>JDA</artifactId>
+                    <groupId>net.dv8tion</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.monkeylearn</groupId>

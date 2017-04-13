@@ -2,8 +2,10 @@ package com.minehut.discordbot.commands.management;
 
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 /**
  * Made by the developers of FlareBot.
@@ -22,7 +24,7 @@ public class PurgeCommand implements Command {
     }
 
     @Override
-    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
+    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         /*if (args.length == 1 && args[0].matches("\\d+")) {
             int count = Integer.parseInt(args[0]) + 1;
             if (count < 2 || count > 200) {
@@ -57,19 +59,14 @@ public class PurgeCommand implements Command {
                 Chat.logRemove = true;
             });
         } else {
-            Chat.sendMessage(Chat.getEmbed().withDesc("Usage: `" + Command.getPrefix() + getCommand() + getArgs() + "`").withColor(Chat.CUSTOM_GREEN), channel, 5);
+            Chat.sendMessage(Chat.getEmbed().withDesc("Usage: `" + Command.getPrefix() + getCommand() + " <message count>`").withColor(Chat.CUSTOM_GREEN), channel, 5);
             //Chat.sendMessage(Chat.getEmbed().withDesc("Bad arguments!\n" + getDescription()), channel, 5); //TODO Make reaction
         }
         */
     }
 
     @Override
-    public String getArgs() {
-        return " <message count>";
-    }
-
-    @Override
     public CommandType getType() {
-        return CommandType.ADMINISTRATIVE;
+        return CommandType.TRUSTED;
     }
 }

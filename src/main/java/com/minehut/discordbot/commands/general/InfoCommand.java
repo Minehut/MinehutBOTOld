@@ -10,9 +10,12 @@ import com.minehut.discordbot.util.music.VideoThread;
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import com.sun.management.OperatingSystemMXBean;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDAInfo;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,16 +46,17 @@ public class InfoCommand implements Command {
     }
 
     @Override
-    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
-        Chat.setAutoDelete(message, 5);
+    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+        Chat.removeMessage(message, 5);
 
         EmbedBuilder embed = Chat.getEmbed();
 
         if (args.length == 0) {
-            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + Command.getPrefix() + getCommand() + getArgs() + "```", channel, 15);
+            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + Command.getPrefix() + getCommand() +  "<server|network|user|bot> [term]```", channel, 15);
         } else if (args.length >= 1) {
-            Message mainMessage = Chat.sendMessage(embed.addField("Gathering Information...", "This may take a few moments", true)
-                    .setColor(Chat.CUSTOM_ORANGE), channel, 120);
+            Message mainMessage = channel.sendMessage(new MessageBuilder().setEmbed(embed.addField("Gathering Information...", "This may take a few moments", true)
+                    .setColor(Chat.CUSTOM_ORANGE).build()).build()).complete();
+            //TODO Make auto remove if nothing found
 
             switch (args[0]) {
                 case "network":
@@ -79,18 +83,18 @@ public class InfoCommand implements Command {
                         e.printStackTrace();
                         embed.clearFields().setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
 
-                        Chat.editMessage("", embed.setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
+                        Chat.editMessage(embed.setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
                                 .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                         return;
                     }
 
-                    Chat.editMessage("", embed.setDescription("`" + motd + "`")
+                    Chat.editMessage(embed.setDescription("`" + motd + "`")
                             .setFooter("System time | " + Bot.getBotTime(), null)
                             .setColor(Chat.CUSTOM_GREEN), mainMessage, 30);
                     break;
                 case "server":
-                    if (args.length == 1) {
-                        Chat.editMessage(sender.getAsMention(), embed.clearFields().setDescription("Usage: `" + Command.getPrefix() + getCommand() + " <server> <name>`")
+                    if (args.length == 1) { //TODO
+                        Chat.editMessage(embed.clearFields().setDescription("Usage: `" + Command.getPrefix() + getCommand() + " <server> <name>`")
                                 .setColor(Chat.CUSTOM_BLUE), mainMessage, 15);
                         return;
                     }
@@ -120,7 +124,7 @@ public class InfoCommand implements Command {
                                         .addField("Total Server Starts", String.valueOf(obj.getInt("starts")), true)
                                         .addField("Server Host", String.valueOf(obj.get("host")), true);
 
-                                Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
+                                Chat.editMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
                                         .setColor(Chat.CUSTOM_GREEN), mainMessage, 30);
                                 return;
                             }
@@ -129,7 +133,7 @@ public class InfoCommand implements Command {
                         e.printStackTrace();
                         embed.clearFields().setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
 
-                        Chat.editMessage("", embed.setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
+                        Chat.editMessage(embed.setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
                                 .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                         return;
                     }
@@ -145,10 +149,10 @@ public class InfoCommand implements Command {
                                 .addField("Total Joins", String.valueOf(server.getJSONObject("server").getString("total")), true)
                                 .addField("Unique Joins", String.valueOf(server.getJSONObject("server").getString("unique")), true);
 
-                        Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
+                        Chat.editMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
                                 .setColor(Chat.CUSTOM_RED), mainMessage, 30);
                     } catch (JSONException e) {
-                        Chat.editMessage("", embed.clearFields()
+                        Chat.editMessage(embed.clearFields()
                                 .addField("Whoops! :banana: :monkey:", "The server `" + args[1] + "` was not found. Please try again with a different name!", true)
                                 .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                         return;
@@ -156,15 +160,15 @@ public class InfoCommand implements Command {
                         e.printStackTrace();
                         embed.setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
 
-                        Chat.editMessage("", embed.clearFields().setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
+                        Chat.editMessage(embed.clearFields().setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
                                 .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                         return;
                     }
 
                     break;
                 case "user":
-                    if (args.length == 1) {
-                        Chat.editMessage(sender.getAsMention(), embed.clearFields().setDescription("Usage: `" + Command.getPrefix() + getCommand() + " <user> <name>`")
+                    if (args.length == 1) { //TODO
+                        Chat.editMessage(embed.clearFields().setDescription("Usage: `" + Command.getPrefix() + getCommand() + " <user> <name>`")
                                 .setColor(Chat.CUSTOM_BLUE), mainMessage, 15);
                         return;
                     } else if (args.length >= 2) {
@@ -197,7 +201,7 @@ public class InfoCommand implements Command {
 
                             embed.addField("First Joined", user.getJSONObject("stats").getString("date_joined"), false);
                         } catch (JSONException e) {
-                            Chat.editMessage("", embed.setAuthor(null, null, null).setDescription(null).setThumbnail(null).setImage(null)
+                            Chat.editMessage(embed.setAuthor(null, null, null).setDescription(null).setThumbnail(null).setImage(null)
                                     .clearFields().addField("Whoops! :banana: :monkey:", "The user `" + args[1] + "` was not found. Please try again with a different name!", true)
                                     .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                             return;
@@ -205,20 +209,20 @@ public class InfoCommand implements Command {
                             e.printStackTrace();
                             embed.setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
 
-                            Chat.editMessage("", embed.clearFields().setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
+                            Chat.editMessage(embed.clearFields().setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
                                     .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                             return;
                         }
 
-                        Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
+                        Chat.editMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
                                 .setColor(isOnlineColor(user)), mainMessage, 30);
                         return;
                     }
 
                     break;
                 case "hosts":
-                    if (!sender.getId().equals("118088732753526784")) {
-                        Chat.editMessage("", embed.clearFields().setDescription("Usage: `" + Command.getPrefix() + getCommand() + getArgs() + "`")
+                    if (!sender.getUser().getId().equals("118088732753526784")) {
+                        Chat.editMessage(embed.clearFields().setDescription("Usage: `" + Command.getPrefix() + getCommand() + "<server|network|user|bot> [term]`")
                                 .setColor(Chat.CUSTOM_BLUE), mainMessage, 15);
                         return;
                     }
@@ -251,18 +255,18 @@ public class InfoCommand implements Command {
                         e.printStackTrace();
                         embed.setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
 
-                        Chat.editMessage("", embed.clearFields().setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
+                        Chat.editMessage(embed.clearFields().setDescription("\n**Either something went wrong or the network is down at this time. Please try again later**\n")
                                 .setColor(Chat.CUSTOM_RED), mainMessage, 15);
                         return;
                     }
 
                     embed.setAuthor("Minehut Network Status", "https://minehut.com", minehutLogo);
-                    Chat.editMessage("", embed.setFooter("System time | " + Bot.getBotTime(), null)
+                    Chat.editMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
                             .setColor(Chat.CUSTOM_GREEN), mainMessage, 40);
                     break;
                 case "bot":
-                    Chat.editMessage("", Chat.getEmbed().clearFields()
-                            .setAuthor(jda.getSelfUser().getName() + " - Info", "https://minehut.com", jda.getSelfUser().getAvatarUrl())
+                    Chat.editMessage(Chat.getEmbed().clearFields()
+                            .setAuthor(Core.getClient().getSelfUser().getName() + " - Info", "https://minehut.com", Core.getClient().getSelfUser().getAvatarUrl())
                             .addField("Memory Usage", getMb(runtime.totalMemory() - runtime.freeMemory()), true)
                             .addField("Memory Free", getMb(runtime.freeMemory()), true)
                             .addField("Total Memory", getMb(runtime.totalMemory()), true)
@@ -275,7 +279,7 @@ public class InfoCommand implements Command {
                             .setColor(Chat.CUSTOM_GREEN).setFooter("System time | " + Bot.getBotTime(), null), mainMessage, 30);
                     break;
                 default:
-                    Chat.editMessage("", embed.clearFields().setDescription("Usage: `" + Command.getPrefix() + getCommand() + getArgs() + "`")
+                    Chat.editMessage(embed.clearFields().setDescription("Usage: `" + Command.getPrefix() + getCommand() +  "<server|network|user|bot> [term]`")
                             .setColor(Chat.CUSTOM_BLUE), mainMessage, 15);
                     break;
             }
@@ -303,11 +307,6 @@ public class InfoCommand implements Command {
 
     private Color isOnlineColor(JSONObject json) {
         return isOnline(json) ? Chat.CUSTOM_GREEN : Chat.CUSTOM_RED;
-    }
-
-    @Override
-    public String getArgs() {
-        return " <server|network|user|bot> [term]";
     }
 
     @Override

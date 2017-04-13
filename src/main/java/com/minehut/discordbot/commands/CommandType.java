@@ -11,7 +11,7 @@ import java.util.List;
 public enum CommandType {
 
     GENERAL,
-    ADMINISTRATIVE,
+    TRUSTED,
     MUSIC,
     MASTER;
 
@@ -20,7 +20,7 @@ public enum CommandType {
     }
 
     public static CommandType[] getTypes() {
-        return new CommandType[]{GENERAL, ADMINISTRATIVE, MUSIC, MASTER};
+        return new CommandType[]{GENERAL, TRUSTED, MUSIC, MASTER};
     }
 
     public List<Command> getCommands() {

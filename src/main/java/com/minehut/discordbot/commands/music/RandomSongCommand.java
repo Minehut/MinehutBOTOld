@@ -6,8 +6,11 @@ import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.URLJson;
 import com.minehut.discordbot.util.music.VideoThread;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.JDA;
-import net.dv8tion.jda.core.entities.*;
+import net.dv8tion.jda.core.MessageBuilder;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,14 +34,14 @@ public class RandomSongCommand implements Command {
     }
 
     @Override
-    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
-        Chat.setAutoDelete(message, 5);
+    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+        Chat.removeMessage(message, 5);
 
         if (guild.getSelfMember().getVoiceState().getChannel() == null) {
             Chat.sendMessage(sender.getAsMention() + " The bot is not in a voice channel!", channel, 10);
             return;
         }
-        if (!guild.getSelfMember().getVoiceState().getChannel().equals(member.getVoiceState().getChannel())) {
+        if (!guild.getSelfMember().getVoiceState().getChannel().equals(sender.getVoiceState().getChannel())) {
             Chat.sendMessage(sender.getAsMention() + " You must be in the music channel in order to play songs!", channel, 10);
             return;
         }
@@ -61,10 +64,11 @@ public class RandomSongCommand implements Command {
                             "[`Purely Pop`](https://temp.discord.fm/libraries/purely-pop)\n" +
                             "[`Rock n Roll`](https://temp.discord.fm/libraries/rock-n-roll)\n" +
                             "[`Coffee house Jazz`](https://temp.discord.fm/libraries/coffee-house-jazz)");
-            Chat.sendMessage(embed, channel, 25);
+            Chat.sendMessage(embed.build(), channel, 25);
         } else if (args.length >= 1) {
-            Message mainMessage = Chat.sendMessage(embed.addField("Processing...", "This may take a few moments", true)
-                    .setColor(Chat.CUSTOM_ORANGE), channel, 120);
+            Message mainMessage = channel.sendMessage(new MessageBuilder().setEmbed(embed.addField("Processing...", "This may take a few moments", true)
+                    .setColor(Chat.CUSTOM_ORANGE).build()).build()).complete();
+            //TODO Make auto remove if nothing found
 
             StringBuilder term = new StringBuilder();
             for (String s : args) {
@@ -76,9 +80,9 @@ public class RandomSongCommand implements Command {
                 JSONObject obj = array.getJSONObject(new Random().nextInt(array.length()) + 1); // .nextInt(max) + min
 
                 if (obj.getString("service").equals("YouTubeVideo")) {
-                    VideoThread.getThread("https://youtu.be/" + obj.getString("identifier"), channel, sender).start();
+                    VideoThread.getThread("https://youtu.be/" + obj.getString("identifier"), channel, sender.getUser()).start();
                 } else {
-                    VideoThread.getThread(obj.getString("url"), channel, sender).start(); //Might break if new SoundCloud tracks don't have a url :(
+                    VideoThread.getThread(obj.getString("url"), channel, sender.getUser()).start(); //Might break if new SoundCloud tracks don't have a url :(
                 }
 
 
@@ -92,11 +96,6 @@ public class RandomSongCommand implements Command {
 
             Chat.removeMessage(mainMessage);
         }
-    }
-
-    @Override
-    public String getArgs() {
-        return "";
     }
 
     @Override

@@ -39,7 +39,7 @@ public class YouTubeSearchExtractor extends YouTubeExtractor {
             }
         }
         if (link == null) {
-            Chat.editMessage(user.getAsMention(), Chat.getEmbed()
+            Chat.editMessage(Chat.getEmbed()
                     .setDescription(String.format("No results for `%s` could be found! Please try again with a different search term", input))
                     .setColor(Chat.CUSTOM_RED), message, 15);
             return;

@@ -5,7 +5,6 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.*;
 
 /**
@@ -19,55 +18,48 @@ public class MuteCommand implements Command {
     }
 
     @Override
-    public void onCommand(JDA jda, Guild guild, TextChannel channel, Member member, User sender, Message message, String[] args) {
+    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
         if (args.length == 1) {
-            User muteUser = Core.getDiscord().getUserByID(args[0].replace("<@", "").replace("!", "").replace(">", ""));
-            Role muteRole = Core.getDiscord().getRoleByID(Core.getConfig().getMutedRoleID());
+            User muteUser = Core.getClient().getUserById(args[0].replace("<@", "").replace("!", "").replace(">", ""));
+            Role muteRole = Core.getClient().getRoleById(Core.getConfig().getMutedRoleID());
 
             if (muteUser == null) {
-                Chat.sendMessage(Chat.getEmbed().setDescription("Not a valid user!").setColor(Chat.CUSTOM_RED), channel, 5);
+                Chat.sendMessage(Chat.getEmbed().setDescription("Not a valid user!").setColor(Chat.CUSTOM_RED).build(), channel, 5);
                 return;
             }
 
             if (guild.getMember(muteUser).getRoles().contains(muteRole)) {
                 guild.getController().removeRolesFromMember(guild.getMember(muteUser), muteRole).queue();
-                Chat.sendMessage("User " + muteUser.getAsMention() + " has been unmuted by " + sender.getAsMention() + ".", channel);
+                channel.sendMessage("User " + muteUser.getAsMention() + " has been unmuted by " + sender.getAsMention() + ".");
 
-                Chat.sendMessage(Chat.getEmbed().setDescription(":loud_sound:  " + muteUser.getAsMention() + " | " + Chat.getFullName(muteUser) + " was unmuted.")
+                Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(":loud_sound:  " + muteUser.getAsMention() + " | " + Chat.getFullName(muteUser) + " was unmuted.")
                         .addField("Staff Member", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true) //TODO reason if args > 2
                         .setFooter("System time | " + Bot.getBotTime(), null)
-                        .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
+                        .setColor(Chat.CUSTOM_PURPLE).build());
 
-                Core.log.info(Chat.getFullName(muteUser) + " was unmuted by " + Chat.getFullName(sender) + ".");
+                Core.log.info(Chat.getFullName(muteUser) + " was unmuted by " + Chat.getFullName(sender.getUser()) + ".");
             } else {
                 guild.getController().addRolesToMember(guild.getMember(muteUser), muteRole).queue();
-                Chat.sendMessage("User " + muteUser.getAsMention() + " has been muted by " + sender.getAsMention() + ".", channel);
+                channel.sendMessage("User " + muteUser.getAsMention() + " has been muted by " + sender.getAsMention() + ".");
 
-                Chat.sendMessage(Chat.getEmbed().setDescription(":no_bell:  " + muteUser.getAsMention() + " | " + Chat.getFullName(muteUser) + " was muted.")
+                Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(":no_bell:  " + muteUser.getAsMention() + " | " + Chat.getFullName(muteUser) + " was muted.")
                         .addField("Staff Member", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true) //TODO reason if args > 2
                         .setFooter("System time | " + Bot.getBotTime(), null)
-                        .setColor(Chat.CUSTOM_PURPLE), Bot.getLogChannel());
+                        .setColor(Chat.CUSTOM_PURPLE).build());
 
-                Core.log.info(Chat.getFullName(muteUser) + " was muted by " + Chat.getFullName(sender) + ".");
+                Core.log.info(Chat.getFullName(muteUser) + " was muted by " + Chat.getFullName(sender.getUser()) + ".");
             }
         } else {
-            Chat.sendMessage(Chat.getEmbed().setDescription("Usage: `" + Command.getPrefix() + getCommand() + getArgs() + "`").setColor(Chat.CUSTOM_BLUE), channel, 5);
-            //Chat.sendMessage(Chat.getEmbed().withDesc("Bad arguments!\n" + getDescription()), channel, 5); //TODO Make reaction
-
+            Chat.sendMessage(Chat.getEmbed().setDescription("Usage: `" + Command.getPrefix() + getCommand() + " <user id|user mention>`").setColor(Chat.CUSTOM_BLUE).build(), channel, 5);
         }
     }
 
     @Override
-    public String getArgs() {
-        return " <user id|user mention>";
-    }
-
-    @Override
     public CommandType getType() {
-        return CommandType.ADMINISTRATIVE;
+        return CommandType.TRUSTED;
     }
 }
