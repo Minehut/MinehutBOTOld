@@ -23,6 +23,14 @@ public class Bot {
 
     public static List<Message> nowPlaying;
 
+    public static String getLogo() {
+        return Core.getClient().getSelfUser().getAvatarUrl();
+    }
+
+    public static String getMb(long bytes) {
+        return (bytes / 1024 / 1024) + " MB";
+    }
+
     public static void updateUsers() {
         if (Core.getClient().getGuilds().contains(Core.getClient().getGuildById("239599059415859200"))) { //Minehut
             Core.getDiscord().streaming(getMainGuild().getMembers().size() + " Discord users!", "https://minehut.com");

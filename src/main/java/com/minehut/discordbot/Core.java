@@ -5,9 +5,11 @@ import com.arsenarsen.lavaplayerbridge.libraries.LibraryFactory;
 import com.arsenarsen.lavaplayerbridge.libraries.UnknownBindingException;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.commands.general.CheckNameCommand;
 import com.minehut.discordbot.commands.general.HelpCommand;
 import com.minehut.discordbot.commands.general.InfoCommand;
+import com.minehut.discordbot.commands.general.minehut.ServerCommand;
+import com.minehut.discordbot.commands.general.minehut.StatusCommand;
+import com.minehut.discordbot.commands.general.minehut.UserCommand;
 import com.minehut.discordbot.commands.management.*;
 import com.minehut.discordbot.commands.master.SayCommand;
 import com.minehut.discordbot.commands.master.ShutdownCommand;
@@ -169,7 +171,7 @@ public class Core {
                 log.info("Cleaning things up...");
             }
 
-            Thread.sleep(2000);
+            Thread.sleep(1500);
 
             client.shutdown();
             log.info("Client shutdown");
@@ -268,7 +270,10 @@ public class Core {
     }
 
     private static void registerCommands() {
-        registerCommand(new CheckNameCommand());
+        registerCommand(new ServerCommand());
+        registerCommand(new StatusCommand());
+        registerCommand(new UserCommand());
+
         registerCommand(new HelpCommand());
         registerCommand(new InfoCommand());
 

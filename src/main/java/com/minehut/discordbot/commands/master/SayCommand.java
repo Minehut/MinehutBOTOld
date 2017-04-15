@@ -21,12 +21,18 @@ public class SayCommand implements Command {
         Chat.removeMessage(message);
 
         if (args.length >= 2) {
-            MessageChannel textChannel = Core.getClient().getTextChannelById(args[0].replace("-r", ""));
-
             StringBuilder msg = new StringBuilder();
             for (String s : args) {
                 msg.append(s).append(" ");
             }
+
+            if (args[0].equals("here")) {
+                Core.log.info(msg.toString().replace(args[0], "[BOT]"));
+                channel.sendMessage(msg.toString().replace(args[0], "")).queue();
+                return;
+            }
+
+            MessageChannel textChannel = Core.getClient().getTextChannelById(args[0].replace("-r", ""));
 
             if (args[0].contains("-r")) {
                 Core.log.info(msg.toString().replace(args[0], "[BOT]"));

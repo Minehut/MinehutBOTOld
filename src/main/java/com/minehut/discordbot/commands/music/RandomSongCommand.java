@@ -90,7 +90,7 @@ public class RandomSongCommand implements Command {
                 e.printStackTrace();
                 Chat.editMessage(embed.clearFields().addField("Whoops! :banana: :monkey:",
                         "The category `" + term.toString().replace("-", " ").substring(0, term.length() - 1) + "` was not found. Please try again with a different term!", true)
-                        .setColor(Chat.CUSTOM_RED), mainMessage, 15);
+                        .setColor(Chat.CUSTOM_RED).build(), mainMessage, 15);
                 return;
             }
 

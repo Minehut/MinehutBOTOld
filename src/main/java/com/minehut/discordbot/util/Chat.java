@@ -48,20 +48,20 @@ public class Chat {
         if (message != null) message.editMessage(content).queue();
     }
 
-    public static void editMessage(String content, Message message, long time) {
-        if (message != null) message.editMessage(content).queue(m -> removeMessage(m, time));
+    public static void editMessage(CharSequence string, Message message, long time) {
+        if (message != null) editMessage(new MessageBuilder().append(string.toString()).build(), message, time);
     }
 
-    public static void editMessage(EmbedBuilder builder, Message message) {
-        if (message != null) message.editMessage(builder.build()).queue();
+    public static void editMessage(MessageEmbed embed, Message message, long time) {
+        if (message != null) editMessage(new MessageBuilder().setEmbed(embed).build(), message, time);
     }
 
-    public static void editMessage(EmbedBuilder builder, Message message, long time) {
-        if (message != null) message.editMessage(builder.build()).queue(m -> removeMessage(m, time));
+    public static void editMessage(Message msg, Message message, long time) {
+        if (message != null) message.editMessage(msg).queue(m -> removeMessage(m, time));
     }
 
-    public static void sendMessage(CharSequence message, MessageChannel channel, long time) {
-        sendMessage(new MessageBuilder().append(message.toString()).build(), channel, time);
+    public static void sendMessage(CharSequence string, MessageChannel channel, long time) {
+        sendMessage(new MessageBuilder().append(string.toString()).build(), channel, time);
     }
 
     public static void sendMessage(MessageEmbed embed, MessageChannel channel, long time) {

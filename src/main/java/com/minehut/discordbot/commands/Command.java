@@ -18,6 +18,10 @@ public interface Command {
 
     CommandType getType();
 
+    default String getCommandUsage() {
+        return Command.getPrefix() + getCommand();
+    }
+
     default String[] getAliases() {
         return new String[]{};
     }
