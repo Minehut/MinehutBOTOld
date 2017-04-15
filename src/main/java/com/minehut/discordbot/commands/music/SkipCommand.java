@@ -55,7 +55,12 @@ public class SkipCommand implements Command {
             Chat.sendMessage(sender.getAsMention() + " you must be in the channel in order to skip songs!", channel, 10);
             return;
         }
-        //TODO Let owner force skip
+        if (sender.getUser() == Core.getClient().getUserById(player.getPlayingTrack().getMeta().get("requester").toString())) {
+            votes.clear();
+            Chat.sendMessage("Skipped **" + player.getPlayingTrack().getTrack().getInfo().title + "**", channel, 20);
+            player.skip();
+            return;
+        }
         if (votes.contains(sender.getUser().getId())) {
             Chat.sendMessage(sender.getAsMention() + " you have already voted to skip this song!", channel, 10);
             return;
