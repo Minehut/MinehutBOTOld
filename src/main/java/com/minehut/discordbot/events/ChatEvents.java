@@ -91,7 +91,7 @@ public class ChatEvents extends ListenerAdapter {
             if (Bot.hasInvite(message) && !Bot.isTrusted(user)) {
                 Chat.removeMessage(message);
 
-                channel.sendMessage(user.getAsMention() + ", please do not advertise Discord servers. Thanks!");
+                channel.sendMessage(user.getAsMention() + ", please do not advertise Discord servers. Thanks!").queue();
                 EmbedBuilder builder = Chat.getEmbed().setDescription(":exclamation: Discord server advertisement - **" + Chat.getFullName(user) + "**")
                         .addField("User", user.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true);
