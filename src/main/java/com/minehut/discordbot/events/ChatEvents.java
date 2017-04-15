@@ -68,7 +68,7 @@ public class ChatEvents extends ListenerAdapter {
                     }
 
                     Bot.getLogChannel().sendMessage(builder.setFooter("System time | " + Bot.getBotTime(), null)
-                            .setColor(Chat.CUSTOM_PURPLE).build());
+                            .setColor(Chat.CUSTOM_PURPLE).build()).queue();
                     return;
                 }
             }
@@ -85,7 +85,7 @@ public class ChatEvents extends ListenerAdapter {
                 }
 
                 Bot.getLogChannel().sendMessage(builder.setFooter("System time | " + Bot.getBotTime(), null)
-                        .setColor(Chat.CUSTOM_PURPLE).build());
+                        .setColor(Chat.CUSTOM_PURPLE).build()).queue();
             }
 
             if (Bot.hasInvite(message) && !Bot.isTrusted(user)) {
@@ -102,7 +102,7 @@ public class ChatEvents extends ListenerAdapter {
                 }
 
                 Bot.getLogChannel().sendMessage(builder.setFooter(Bot.getBotTime(), null)
-                        .setColor(Chat.CUSTOM_PURPLE).build());
+                        .setColor(Chat.CUSTOM_PURPLE).build()).queue();
                 return;
             }
 
