@@ -53,6 +53,7 @@ public class ServerEvents extends ListenerAdapter {
             }
         }
 
+        PunishmentChecker.checkPuns();
 
         Core.enabled = true;
         Core.log.info("Bot ready.");
@@ -76,7 +77,7 @@ public class ServerEvents extends ListenerAdapter {
                 "\n\n**Account Creation:** " + Bot.formatTime(LocalDateTime.from(user.getCreationTime())) +
                 "\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 .setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_GREEN).build());
+                .setColor(Chat.CUSTOM_GREEN).build()).queue();
 
         Core.log.info(Chat.getFullName(user) + " joined the Discord server.");
     }
@@ -91,7 +92,7 @@ public class ServerEvents extends ListenerAdapter {
                 .setDescription("*" + user.getAsMention() + " left the server.*" +
                 "\n\n**Forums:** [`" + user.getName() + "`](https://minehut.com/" + user.getName().replace(" ", "") + ")")
                 .setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_RED).build());
+                .setColor(Chat.CUSTOM_RED).build()).queue();
 
         Core.log.info(Chat.getFullName(user) + " left the Discord server.");
     }
@@ -103,7 +104,7 @@ public class ServerEvents extends ListenerAdapter {
 
         Bot.getLogChannel().sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setDescription("*was banned from the server.*")
                 .setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Color.RED).build());
+                .setColor(Color.RED).build()).queue();
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " **was banned from Discord.**");
         Core.log.info(Chat.getFullName(user) + " was banned from Discord.");
@@ -117,7 +118,7 @@ public class ServerEvents extends ListenerAdapter {
 
         Bot.getLogChannel().sendMessage(Chat.getEmbed().setTitle(Chat.getFullName(user), null).setDescription("*was unbanned from the server.*")
                 .setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Color.PINK).build());
+                .setColor(Color.PINK).build()).queue();
 
         //Chat.sendDiscordMessage(event.getUser().mention() + " **was banned from Discord.**");
         Core.log.info(Chat.getFullName(user) + " was unbanned from Discord.");
@@ -143,7 +144,7 @@ public class ServerEvents extends ListenerAdapter {
         }
 
         Bot.getLogChannel().sendMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_ORANGE).build());
+                .setColor(Chat.CUSTOM_ORANGE).build()).queue();
     }
 
     @Override
@@ -165,7 +166,7 @@ public class ServerEvents extends ListenerAdapter {
         }
 
         Bot.getLogChannel().sendMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_ORANGE).build());
+                .setColor(Chat.CUSTOM_ORANGE).build()).queue();
     }
 
     @Override
@@ -176,20 +177,20 @@ public class ServerEvents extends ListenerAdapter {
         if (event.getPrevNick() == null) {
             Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " changed their name from `" +
                     user.getName() + "` to `" + event.getNewNick() + "`")
-                    .setColor(Color.ORANGE).build());
+                    .setColor(Color.ORANGE).build()).queue();
             return;
         }
 
         if (event.getNewNick() == null) {
             Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " reset their name to `" + user.getName() + "`")
-                    .setColor(Color.ORANGE).build());
+                    .setColor(Color.ORANGE).build()).queue();
             return;
         }
 
         if (!event.getNewNick().equals(user.getName())) {
             Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(user.getAsMention() + " changed their name from `" +
                     event.getPrevNick() + "` to `" + event.getNewNick() + "`")
-                    .setColor(Color.ORANGE).build());
+                    .setColor(Color.ORANGE).build()).queue();
         }
 
         Core.log.info("\"" + event.getPrevNick() + "\" is now known as \"" + event.getNewNick() + "\"");
