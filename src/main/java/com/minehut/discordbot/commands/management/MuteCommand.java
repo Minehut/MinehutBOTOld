@@ -32,24 +32,24 @@ public class MuteCommand implements Command {
 
             if (guild.getMember(muteUser).getRoles().contains(muteRole)) {
                 guild.getController().removeRolesFromMember(guild.getMember(muteUser), muteRole).queue();
-                channel.sendMessage("User " + muteUser.getAsMention() + " has been unmuted by " + sender.getAsMention() + ".");
+                channel.sendMessage("User " + muteUser.getAsMention() + " has been unmuted by " + sender.getAsMention() + ".").queue();
 
                 Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(":loud_sound:  " + muteUser.getAsMention() + " | " + Chat.getFullName(muteUser) + " was unmuted.")
                         .addField("Staff Member", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true) //TODO reason if args > 2
                         .setFooter("System time | " + Bot.getBotTime(), null)
-                        .setColor(Chat.CUSTOM_PURPLE).build());
+                        .setColor(Chat.CUSTOM_PURPLE).build()).queue();
 
                 Core.log.info(Chat.getFullName(muteUser) + " was unmuted by " + Chat.getFullName(sender.getUser()) + ".");
             } else {
                 guild.getController().addRolesToMember(guild.getMember(muteUser), muteRole).queue();
-                channel.sendMessage("User " + muteUser.getAsMention() + " has been muted by " + sender.getAsMention() + ".");
+                channel.sendMessage("User " + muteUser.getAsMention() + " has been muted by " + sender.getAsMention() + ".").queue();
 
                 Bot.getLogChannel().sendMessage(Chat.getEmbed().setDescription(":no_bell:  " + muteUser.getAsMention() + " | " + Chat.getFullName(muteUser) + " was muted.")
                         .addField("Staff Member", sender.getAsMention(), true)
                         .addField("Channel", channel.getAsMention(), true) //TODO reason if args > 2
                         .setFooter("System time | " + Bot.getBotTime(), null)
-                        .setColor(Chat.CUSTOM_PURPLE).build());
+                        .setColor(Chat.CUSTOM_PURPLE).build()).queue();
 
                 Core.log.info(Chat.getFullName(muteUser) + " was muted by " + Chat.getFullName(sender.getUser()) + ".");
             }
