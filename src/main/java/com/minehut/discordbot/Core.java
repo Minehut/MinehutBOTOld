@@ -16,10 +16,7 @@ import com.minehut.discordbot.commands.master.ShutdownCommand;
 import com.minehut.discordbot.commands.music.*;
 import com.minehut.discordbot.events.ChatEvents;
 import com.minehut.discordbot.events.ServerEvents;
-import com.minehut.discordbot.util.Bot;
-import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.Config;
-import com.minehut.discordbot.util.IDiscordClient;
+import com.minehut.discordbot.util.*;
 import com.sedmelluq.discord.lavaplayer.jdaudp.NativeAudioSendFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
@@ -31,7 +28,6 @@ import net.dv8tion.jda.core.*;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.exceptions.RateLimitedException;
 import net.dv8tion.jda.core.requests.RestAction;
-import net.dv8tion.jda.core.utils.SimpleLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +35,10 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
@@ -58,60 +56,14 @@ public class Core {
     private static List<Command> commands;
     private static PlayerManager musicManager;
 
-    private static final Map<String, Logger> LOGGERS;
-    public static final Logger log;
-    private static Logger getLog(String name) {
-        return LOGGERS.computeIfAbsent(name, LoggerFactory::getLogger);
-    }
-    private static Logger getLog(Class<?> clazz) {
-        return getLog(clazz.getName());
-    }
-
     public static JDA getClient() {
         return client;
     }
     public static CountDownLatch latch;
-
-    static {
-        LOGGERS = new ConcurrentHashMap<>();
-        log = getLog(Core.class);
-    }
+    public static Logger log = LoggerFactory.getLogger("MinehutBot");
 
     public static void main(String[] args) throws InterruptedException, UnknownBindingException {
-        SimpleLog.LEVEL = SimpleLog.Level.OFF;
-        SimpleLog.addListener(new SimpleLog.LogListener() {
-            @Override
-            public void onLog(SimpleLog log, SimpleLog.Level logLevel, Object message) {
-                switch (logLevel) {
-                    case ALL:
-                    case INFO:
-                        getLog(log.name).info(String.valueOf(message));
-                        break;
-                    case FATAL:
-                        getLog(log.name).error(String.valueOf(message));
-                        break;
-                    case WARNING:
-                        getLog(log.name).warn(String.valueOf(message));
-                        break;
-                    case DEBUG:
-                        getLog(log.name).debug(String.valueOf(message));
-                        break;
-                    case TRACE:
-                        getLog(log.name).trace(String.valueOf(message));
-                        break;
-                    case OFF:
-                        break;
-                }
-            }
-
-            @Override
-            public void onError(SimpleLog log, Throwable err) {
-
-            }
-        });
-
-        Thread.setDefaultUncaughtExceptionHandler(((t, e) -> log.error("Uncaught exception in thread " + t, e)));
-        Thread.currentThread().setUncaughtExceptionHandler(((t, e) -> log.error("Uncaught exception in thread " + t, e)));
+        LoggerAdapter.set();
 
         try {
             config = new Config();
