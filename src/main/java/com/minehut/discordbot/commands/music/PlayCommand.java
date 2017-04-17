@@ -1,7 +1,11 @@
 package com.minehut.discordbot.commands.music;
 
+import com.arsenarsen.lavaplayerbridge.player.Player;
+import com.arsenarsen.lavaplayerbridge.player.Track;
+import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.music.VideoThread;
 import net.dv8tion.jda.core.entities.Guild;
@@ -23,6 +27,7 @@ public class PlayCommand implements Command {
     @Override
     public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         Chat.removeMessage(message, 5);
+        Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
 
         if (args.length == 0) {
             Chat.sendMessage(sender.getAsMention() + " Usage: `" + Command.getPrefix() + getCommand() + " <term>`", channel, 15);
@@ -37,6 +42,20 @@ public class PlayCommand implements Command {
             }
 
             if (args[0].startsWith("http") || args[0].startsWith("www.")) {
+                if (!Bot.isTrusted(sender.getUser())) {
+                    if (player.getPlayingTrack() != null && player.getPlayingTrack().getTrack().getInfo().uri.equals(args[0])) {
+                        Chat.sendMessage(sender.getAsMention() + " That song is already in the playing!", channel, 10);
+                        return;
+                    }
+                    if (!player.getPlaylist().isEmpty()) {
+                        for (Track track : player.getPlaylist()) {
+                            if (track.getTrack().getInfo().uri.equals(args[0])) {
+                                Chat.sendMessage(sender.getAsMention() + " That song is already in the playlist!", channel, 10);
+                                return;
+                            }
+                        }
+                    }
+                }
                 VideoThread.getThread(args[0], channel, sender.getUser()).start();
             } else {
                 StringBuilder term = new StringBuilder();

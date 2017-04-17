@@ -1,8 +1,10 @@
 package com.minehut.discordbot.util.music.extractors;
 
 import com.arsenarsen.lavaplayerbridge.player.Player;
+import com.arsenarsen.lavaplayerbridge.player.Track;
 import com.mashape.unirest.http.Unirest;
 import com.minehut.discordbot.Core;
+import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.User;
@@ -43,6 +45,19 @@ public class YouTubeSearchExtractor extends YouTubeExtractor {
                     .setDescription(String.format("No results for `%s` could be found! Please try again with a different search term", input))
                     .setColor(Chat.CUSTOM_RED).build(), message, 15);
             return;
+        }
+        if (!Bot.isTrusted(user)) {
+            if (player.getPlayingTrack() != null && player.getPlayingTrack().getTrack().getInfo().uri.equals(link)) {
+                return;
+            }
+            if (!player.getPlaylist().isEmpty()) {
+                for (Track track : player.getPlaylist()) {
+                    if (track.getTrack().getInfo().uri.equals(link)) {
+                        Chat.sendMessage(user.getAsMention() + " That song is already in the playlist!", message.getChannel(), 10);
+                        return;
+                    }
+                }
+            }
         }
         super.process(link, player, message, user);
     }
