@@ -52,15 +52,16 @@ public class VideoThread extends Thread {
                     break;
                 }
             if (extractor == null) {
-                Chat.editMessage("Could not find a way to process that..", message, 30);
+                message.editMessage("Could not find a way to process that..").queue(msg -> Chat.removeMessage(msg, 30));
                 return;
             }
             if (managers.add(extractor.getSourceManagerClass()))
                 manager.getManager().registerSourceManager(extractor.getSourceManagerClass().newInstance());
-                extractor.process(url, manager.getPlayer(channel.getGuild().getId()), message, user);
+            extractor.process(url, manager.getPlayer(channel.getGuild().getId()), message, user);
         } catch (Exception e) {
             Core.log.error("Could not init extractor for '{}'".replace("{}", url), e);
-            Chat.editMessage("Something went wrong! Issue logged", message, 30);
+            message.editMessage("Something went wrong! Issue logged").queue();
+            Chat.removeMessage(message, 30); //TODO Fix like above if you can
         }
     }
 
