@@ -92,7 +92,7 @@ public class YouTubeExtractor implements Extractor {
             EmbedBuilder builder = Chat.getEmbed();
             builder.setDescription(String.format("%s queued the %s [`%s`](%s)", user.getAsMention(), tracks.size() == 1 ? "song" : "playlist", name, input));
             if (audioTracks.size() > 1)
-                builder.addField("Song count:", String.valueOf(tracks.size()), true);
+                builder.addField("Song Count", String.valueOf(tracks.size()), true);
             Chat.editMessage(builder.build(), message, 20);
         }
     }
