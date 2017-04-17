@@ -4,6 +4,7 @@ import com.arsenarsen.lavaplayerbridge.player.Player;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.commands.management.ToggleMusicCommand;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.entities.*;
@@ -31,10 +32,16 @@ public class SkipCommand implements Command {
 
     @Override
     public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
-        Chat.removeMessage(message, 5);
+        Chat.removeMessage(message);
 
         Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
         VoiceChannel voiceChannel = guild.getSelfMember().getVoiceState().getChannel();
+
+        if (!ToggleMusicCommand.canQueue && !Bot.isTrusted(sender.getUser())) {
+            Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. " +
+                    "If you believe this is an error, please contact a staff member", channel, 10);
+            return;
+        }
 
         if (!guild.getAudioManager().isConnected() ||
                 Core.getMusicManager().getPlayer(guild.getId()).getPlayingTrack() == null) {

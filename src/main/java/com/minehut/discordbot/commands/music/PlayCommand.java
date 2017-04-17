@@ -5,6 +5,7 @@ import com.arsenarsen.lavaplayerbridge.player.Track;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.commands.management.ToggleMusicCommand;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.music.VideoThread;
@@ -26,8 +27,15 @@ public class PlayCommand implements Command {
 
     @Override
     public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
-        Chat.removeMessage(message, 5);
+        Chat.removeMessage(message);
+
         Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
+
+        if (!ToggleMusicCommand.canQueue && !Bot.isTrusted(sender.getUser())) {
+            Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. " +
+                    "If you believe this is an error, please contact a staff member", channel, 10);
+            return;
+        }
 
         if (args.length == 0) {
             Chat.sendMessage(sender.getAsMention() + " Usage: `" + Command.getPrefix() + getCommand() + " <term>`", channel, 15);

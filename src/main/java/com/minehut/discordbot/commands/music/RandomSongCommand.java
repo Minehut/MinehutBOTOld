@@ -2,6 +2,8 @@ package com.minehut.discordbot.commands.music;
 
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.commands.management.ToggleMusicCommand;
+import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.URLJson;
 import com.minehut.discordbot.util.music.VideoThread;
@@ -35,7 +37,13 @@ public class RandomSongCommand implements Command {
 
     @Override
     public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
-        Chat.removeMessage(message, 5);
+        Chat.removeMessage(message);
+
+        if (!ToggleMusicCommand.canQueue && !Bot.isTrusted(sender.getUser())) {
+            Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. " +
+                    "If you believe this is an error, please contact a staff member", channel, 10);
+            return;
+        }
 
         if (guild.getSelfMember().getVoiceState().getChannel() == null) {
             Chat.sendMessage(sender.getAsMention() + " The bot is not in a voice channel!", channel, 10);

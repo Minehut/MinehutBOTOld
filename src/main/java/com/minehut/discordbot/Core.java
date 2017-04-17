@@ -292,6 +292,7 @@ public class Core {
         registerCommand(new QueueCommand());
         registerCommand(new RandomSongCommand());
         registerCommand(new NowPlayingCommand());
+        registerCommand(new ToggleMusicCommand());
         registerCommand(new VolumeCommand());
     }
 
