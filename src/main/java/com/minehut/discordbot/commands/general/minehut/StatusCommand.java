@@ -71,7 +71,7 @@ public class StatusCommand implements Command {
                         return;
                     }
 
-                    Chat.editMessage(embed.setDescription("`" + motd + "`").setAuthor("Minehut Network Status", "https://minehut.com", Bot.getLogo())
+                    Chat.editMessage(embed.setDescription("`" + motd.toString().replaceAll("§(.)", "") + "`").setAuthor("Minehut Network Status", "https://minehut.com", Bot.getLogo())
                             .setFooter("System time | " + Bot.getBotTime(), null).setColor(Chat.CUSTOM_GREEN).build(), mainMsg, 20);
                     break;
                 case "bot":

@@ -44,7 +44,7 @@ public class ServerCommand implements Command {
                     JSONObject obj = (JSONObject) server;
 
                     if (obj.get("name").equals(args[0])) {
-                        embed.clearFields().setDescription("`" + String.valueOf(obj.getString("motd")) + "`");
+                        embed.clearFields().setDescription("`" + obj.getString("motd").replaceAll("&(.)", "") + "`");
 
                         try {
                             JSONArray json = URLJson.readJsonArrayFromUrl("https://api.mojang.com/user/profiles/" + obj.getString("owner").replaceAll("-", "") + "/names");
