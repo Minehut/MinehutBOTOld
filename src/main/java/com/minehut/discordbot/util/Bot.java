@@ -114,10 +114,9 @@ public class Bot {
             sb.append(hours);
             sb.append(format ? "h " : ":");
         }
-        if (minutes > 0) {
-            sb.append(minutes);
-            sb.append(format ? "m " : ":");
-        }
+        sb.append(format ? minutes : minutes < 10 && hours < 1 ? minutes : "0" + minutes);
+        sb.append(format ? "m " : ":");
+
         sb.append(format ? seconds : seconds < 10 ? "0" + seconds : seconds);
         sb.append(format ? "s" : "");
 
