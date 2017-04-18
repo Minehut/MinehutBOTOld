@@ -38,7 +38,8 @@ public class PlayCommand implements Command {
         }
 
         if (args.length == 0) {
-            Chat.sendMessage(sender.getAsMention() + " Usage: `" + Command.getPrefix() + getCommand() + " <term>`", channel, 15);
+            Chat.sendMessage(sender.getAsMention() + " Usage: `" + Command.getPrefix() + getCommand() + " <term>`\n" +
+                    "Term can be a search term, YouTube url, or a SoundCloud url.", channel, 15);
         } else if (args.length >= 1) {
             if (guild.getSelfMember().getVoiceState().getChannel() == null) {
                 Chat.sendMessage(sender.getAsMention() + " The bot is not in a voice channel!", channel, 10);
