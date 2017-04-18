@@ -29,7 +29,7 @@ public class PlayCommand implements Command {
     public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
-        Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
+        Player player = Core.getMusicManager().getPlayer(guild.getId());
 
         if (!ToggleMusicCommand.canQueue && !Bot.isTrusted(sender.getUser())) {
             Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. " +

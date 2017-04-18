@@ -40,7 +40,7 @@ public class QueueCommand implements Command {
     public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         Chat.removeMessage(message, 5);
 
-        Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
+        Player player = Core.getMusicManager().getPlayer(guild.getId());
 
         if (!player.getPlaylist().isEmpty()) {
             if (Bot.isTrusted(sender.getUser())) {
@@ -57,7 +57,7 @@ public class QueueCommand implements Command {
                         return;
                     }
 
-                    Queue<Track> queue = Core.getMusicManager().getPlayer(channel.getGuild().getId()).getPlaylist();
+                    Queue<Track> queue = Core.getMusicManager().getPlayer(guild.getId()).getPlaylist();
 
                     if (number < 1 || number > queue.size()) {
                         Chat.sendMessage(sender.getAsMention() + " There is no song with that index. Songs in queue: **" + queue.size() + "**", channel, 5);

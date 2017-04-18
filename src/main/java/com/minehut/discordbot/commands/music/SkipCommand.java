@@ -34,7 +34,7 @@ public class SkipCommand implements Command {
     public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
-        Player player = Core.getMusicManager().getPlayer(channel.getGuild().getId());
+        Player player = Core.getMusicManager().getPlayer(guild.getId());
         VoiceChannel voiceChannel = guild.getSelfMember().getVoiceState().getChannel();
 
         if (!ToggleMusicCommand.canQueue && !Bot.isTrusted(sender.getUser())) {
