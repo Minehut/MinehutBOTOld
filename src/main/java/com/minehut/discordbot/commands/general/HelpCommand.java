@@ -3,7 +3,6 @@ package com.minehut.discordbot.commands.general;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Chat;
-import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -39,7 +38,6 @@ public class HelpCommand implements Command {
                         "`" + Command.getPrefix() + "status <network|bot>` See Minehut's network or bot status\n" +
                         "`" + Command.getPrefix() + "user <username>` Shows username changes and Minehut stats\n" +
                         "`" + Command.getPrefix() + "server <name>` Shows about for the player server", false).build()).build(), channel, 20);
-        )
     }
 
     @Override
