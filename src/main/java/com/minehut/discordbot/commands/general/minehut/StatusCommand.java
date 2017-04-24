@@ -49,7 +49,7 @@ public class StatusCommand implements Command {
                     StringBuilder motd = new StringBuilder();
 
                     try {
-                        JSONObject status = URLJson.readJsonObjectFromUrl("https://minehut.com/api/status/");
+                        JSONObject status = new URLJson("https://minehut.com/api/status/").getJsonObject();
 
                         embed.clearFields()
                                 .addField("Users Online", status.getJSONObject("ping").getJSONObject("players").get("online") + "/" +
@@ -98,7 +98,7 @@ public class StatusCommand implements Command {
 
                     Integer playersOnline = 0, usedRam = 0, totalRam = 0;
                     try {
-                        JSONArray hosts = URLJson.readJsonArrayFromUrl("http://mctoolbox.me/minehut/hosts/?token=" + Core.getConfig().getSecretKey());
+                        JSONArray hosts = new URLJson("http://mctoolbox.me/minehut/hosts/?token=" + Core.getConfig().getSecretKey()).getJsonArray();
                         embed.clearFields();
 
                         for (Object host : hosts) {

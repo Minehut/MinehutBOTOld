@@ -48,7 +48,7 @@ public class UserCommand implements Command {
                     .setColor(Chat.CUSTOM_ORANGE).build()).build()).complete();
 
             try { //if user name is valid, continue.  If not, skip network check.  If offline, check network.
-                user = URLJson.readJsonObjectFromUrl("https://api.mojang.com/users/profiles/minecraft/" + args[0]);
+                user = new URLJson("https://api.mojang.com/users/profiles/minecraft/" + args[0]).getJsonObject();
             } catch (JSONException e) {
                 //Not valid
                 valid = false;
@@ -59,7 +59,7 @@ public class UserCommand implements Command {
 
             if (valid && user != null) {
                 try {
-                    profile = URLJson.readJsonArrayFromUrl("https://api.mojang.com/user/profiles/" + user.getString("id") + "/names");
+                    profile = new URLJson("https://api.mojang.com/user/profiles/" + user.getString("id") + "/names").getJsonArray();
                 } catch (JSONException e) {
                     //Not valid
                     valid = false;
@@ -72,9 +72,11 @@ public class UserCommand implements Command {
             if (valid) {
                 try {
                     if (user != null) {
-                        minehutProfile = URLJson.readJsonObjectFromUrl("http://mctoolbox.me/minehut/user/?user=" + user.get("name"));
+                        minehutProfile = new URLJson("http://mctoolbox.me/minehut/user/?user=" + user.get("name")).getJsonObject();
+                        valid = true;
                     } else {
-                        minehutProfile = URLJson.readJsonObjectFromUrl("http://mctoolbox.me/minehut/user/?user=" + args[0]);
+                        minehutProfile = new URLJson("http://mctoolbox.me/minehut/user/?user=" + args[0]).getJsonObject();
+                        valid = true;
                     }
                     if (minehutProfile.optBoolean("error")) {
                         minehutProfile = null;

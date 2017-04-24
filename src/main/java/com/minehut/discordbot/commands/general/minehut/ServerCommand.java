@@ -47,7 +47,7 @@ public class ServerCommand implements Command {
                         embed.clearFields().setDescription("`" + obj.getString("motd").replaceAll("&(.)", "") + "`");
 
                         try {
-                            JSONArray json = URLJson.readJsonArrayFromUrl("https://api.mojang.com/user/profiles/" + obj.getString("owner").replaceAll("-", "") + "/names");
+                            JSONArray json = new URLJson("https://api.mojang.com/user/profiles/" + obj.getString("owner").replaceAll("-", "") + "/names").getJsonArray();
                             String name = json.getJSONObject(json.length() - 1).getString("name");
 
                             embed.setAuthor(obj.getString("name") + " Info", "https://minehut.com/" + name, Bot.getLogo())
@@ -77,7 +77,7 @@ public class ServerCommand implements Command {
 
             // Offline?
             try {
-                JSONObject server = URLJson.readJsonObjectFromUrl("http://mctoolbox.me/minehut/serverowner/?server=" + args[0]);
+                JSONObject server = new URLJson("http://mctoolbox.me/minehut/serverowner/?server=" + args[0]).getJsonObject();
 
                 embed.clearFields().setAuthor(server.getJSONObject("server").optString("name") + " Info",
                         "https://minehut.com/" + server.getString("name"), Bot.getLogo())
