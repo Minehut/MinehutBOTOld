@@ -54,14 +54,16 @@ public class UserCommand implements Command {
                 valid = false;
             } catch (IOException e) {
                 //Down?
+                e.printStackTrace();
                 user = null;
             }
 
-            if (valid && user != null) {
+            if (user != null) {
                 try {
                     profile = new URLJson("https://api.mojang.com/user/profiles/" + user.getString("id") + "/names").getJsonArray();
                 } catch (JSONException e) {
                     //Not valid
+                    e.printStackTrace();
                     valid = false;
                 } catch (IOException e) {
                     //Down?
@@ -69,7 +71,7 @@ public class UserCommand implements Command {
                 }
             }
 
-            if (valid) {
+
                 try {
                     if (user != null) {
                         minehutProfile = new URLJson("http://mctoolbox.me/minehut/user/?user=" + user.get("name")).getJsonObject();
@@ -88,7 +90,7 @@ public class UserCommand implements Command {
                     //Down?
                     minehutProfile = null;
                 }
-            }
+                    e.printStackTrace();
 
             if (!valid) {
                 Core.log.info("Invalid"); //The username "" is invalid. Please try again with a different username
