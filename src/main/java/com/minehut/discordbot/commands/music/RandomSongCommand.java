@@ -84,7 +84,7 @@ public class RandomSongCommand implements Command {
             }
 
             try {
-                JSONArray array = URLJson.readJsonArrayFromUrl("http://temp.discord.fm/libraries/" + term.toString().toLowerCase().substring(0, term.length() - 1) + "/json");
+                JSONArray array = new URLJson("http://temp.discord.fm/libraries/" + term.toString().toLowerCase().substring(0, term.length() - 1) + "/json").getJsonArray();
                 JSONObject obj = array.getJSONObject(new Random().nextInt(array.length()) + 1); // .nextInt(max) + min
 
                 if (obj.getString("service").equals("YouTubeVideo")) {

@@ -38,7 +38,7 @@ public class ServerCommand implements Command {
                     .setColor(Chat.CUSTOM_ORANGE).build()).build()).complete();
 
             try {
-                JSONArray servers = URLJson.readJsonArrayFromUrl("https://minehut.com/api/servers/");
+                JSONArray servers = new URLJson("https://minehut.com/api/servers/").getJsonArray();
 
                 for (Object server : servers) {
                     JSONObject obj = (JSONObject) server;
