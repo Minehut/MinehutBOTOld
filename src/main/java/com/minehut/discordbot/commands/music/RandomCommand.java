@@ -3,8 +3,8 @@ package com.minehut.discordbot.commands.music;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.management.ToggleMusicCommand;
-import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.URLJson;
 import com.minehut.discordbot.util.music.VideoThread;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -23,28 +23,27 @@ import java.util.Random;
 /**
  * Created by MatrixTunnel on 2/21/2017.
  */
-public class RandomSongCommand implements Command {
+public class RandomCommand implements Command {
 
     @Override
     public String getCommand() {
-        return "randomsong";
+        return "random";
     }
 
     @Override
     public String[] getAliases() {
-        return new String[]{"rs", "random"};
+        return new String[]{"randomsong", "rs"};
     }
 
     @Override
     public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
-        if (!ToggleMusicCommand.canQueue && !Bot.isTrusted(sender.getUser())) {
+        if (!ToggleMusicCommand.canQueue.get(guild.getId()) && !GuildSettings.isTrusted(sender)) {
             Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. " +
                     "If you believe this is an error, please contact a staff member", channel, 10);
             return;
         }
-
         if (guild.getSelfMember().getVoiceState().getChannel() == null) {
             Chat.sendMessage(sender.getAsMention() + " The bot is not in a voice channel!", channel, 10);
             return;
@@ -88,9 +87,9 @@ public class RandomSongCommand implements Command {
                 JSONObject obj = array.getJSONObject(new Random().nextInt(array.length()) + 1); // .nextInt(max) + min
 
                 if (obj.getString("service").equals("YouTubeVideo")) {
-                    VideoThread.getThread("https://youtu.be/" + obj.getString("identifier"), channel, sender.getUser()).start();
+                    VideoThread.getThread("https://youtu.be/" + obj.getString("identifier"), channel, sender).start();
                 } else {
-                    VideoThread.getThread(obj.getString("url"), channel, sender.getUser()).start(); //Might break if new SoundCloud tracks don't have a url :(
+                    VideoThread.getThread(obj.getString("url"), channel, sender).start(); //Might break if new SoundCloud tracks don't have a url :(
                 }
 
 

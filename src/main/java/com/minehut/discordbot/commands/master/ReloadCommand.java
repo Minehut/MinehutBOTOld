@@ -1,4 +1,4 @@
-package com.minehut.discordbot.commands.management;
+package com.minehut.discordbot.commands.master;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
@@ -40,6 +40,6 @@ public class ReloadCommand implements Command {
 
     @Override
     public CommandType getType() {
-        return CommandType.TRUSTED;
+        return CommandType.MASTER;
     }
 }
