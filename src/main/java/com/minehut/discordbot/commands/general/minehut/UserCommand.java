@@ -51,6 +51,7 @@ public class UserCommand implements Command {
                 user = new URLJson("https://api.mojang.com/users/profiles/minecraft/" + args[0]).getJsonObject();
             } catch (JSONException e) {
                 //Not valid
+                e.printStackTrace();
                 valid = false;
             } catch (IOException e) {
                 //Down?
