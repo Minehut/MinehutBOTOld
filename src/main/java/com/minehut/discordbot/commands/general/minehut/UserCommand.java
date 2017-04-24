@@ -86,12 +86,12 @@ public class UserCommand implements Command {
                     }
                 } catch (JSONException e) {
                     //Not valid
+                    e.printStackTrace();
                     valid = false;
                 } catch (IOException e) {
                     //Down?
                     minehutProfile = null;
                 }
-                    e.printStackTrace();
 
             if (!valid) {
                 Core.log.info("Invalid"); //The username "" is invalid. Please try again with a different username
@@ -127,7 +127,7 @@ public class UserCommand implements Command {
                             .addField("Rank", minehutProfile.getString("rank").replace("\u00e2\u009d\u00a4", ":heart:"), true)
                             .setColor(isOnlineColor(minehutProfile));
 
-                    if (!isOnline(user)) {
+                    if (!isOnline(minehutProfile)) {
                         embed.addField("Last Online", minehutProfile.getString("last_seen").replace("Last seen ", ""), true);
                     }
 
