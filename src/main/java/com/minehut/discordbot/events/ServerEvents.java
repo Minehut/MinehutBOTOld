@@ -54,6 +54,34 @@ public class ServerEvents extends ListenerAdapter {
         }
 
         PunishmentChecker.checkPuns();
+        Core.log.info("Trackers Set");
+
+        VoiceChannel channel = Core.getClient().getVoiceChannelById(Core.getConfig().getMainMusicChannelID());
+        if (channel != null) {
+            channel.getGuild().getAudioManager().openAudioConnection(channel);
+        }
+
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
+
+                        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                        }
+
+                        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                        }
+                    }
+            };
+            sc.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (Exception e) {
+            Core.log.error("Error trusting cert", e);
+        }
+
 
         Core.enabled = true;
         Core.log.info("Bot ready.");
