@@ -1,6 +1,6 @@
 package com.minehut.discordbot.commands;
 
-import com.minehut.discordbot.Core;
+import com.minehut.discordbot.util.GuildSettings;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -18,15 +18,11 @@ public interface Command {
 
     CommandType getType();
 
-    default String getCommandUsage() {
-        return Command.getPrefix() + getCommand();
+    default String getCommandUsage(Guild guild) {
+        return GuildSettings.getPrefix(guild) + getCommand();
     }
 
     default String[] getAliases() {
         return new String[]{};
-    }
-
-    static String getPrefix() {
-        return Core.getConfig().getCommandPrefix();
     }
 }

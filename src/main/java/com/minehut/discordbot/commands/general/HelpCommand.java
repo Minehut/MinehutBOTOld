@@ -30,14 +30,14 @@ public class HelpCommand implements Command {
 
         Chat.sendMessage(new MessageBuilder().append(sender.getAsMention()).setEmbed(Chat.getEmbed().setColor(Chat.CUSTOM_DARK_GREEN)
                 .addField("Music",
-                        "`" + Command.getPrefix() + "play <term>` Replace \"term\" with a YouTube/SoundCloud url or a search query to play music\n" +
-                        "`" + Command.getPrefix() + "queue` Lists the current music playlist of queued messages\n" +
-                        "`" + Command.getPrefix() + "skip` Casts your vote to skip the song that is currently playing\n" +
-                        "`" + Command.getPrefix() + "random <playlist>` Plays a random song from the specified category", false)
+                        "`play <term>` Replace \"term\" with a YouTube/SoundCloud url or a search query to play music\n" +
+                        "`queue` Lists the current music playlist of queued messages\n" +
+                        "`skip` Casts your vote to skip the song that is currently playing\n" +
+                        "`random <playlist>` Plays a random song from the specified category", false)
                 .addField("Minehut",
-                        "`" + Command.getPrefix() + "status <network|bot>` See Minehut's network or bot status\n" +
-                        "`" + Command.getPrefix() + "user <username>` Shows username changes and Minehut stats\n" +
-                        "`" + Command.getPrefix() + "server <name>` Shows about for the player server", false).build()).build(), channel, 20);
+                        "`status <network|bot>` See Minehut's network or bot status\n" +
+                        "`user <username>` Shows username changes and Minehut stats\n" +
+                        "`server <name>` Shows about for the player server", false).build()).build(), channel, 20);
     }
 
     @Override

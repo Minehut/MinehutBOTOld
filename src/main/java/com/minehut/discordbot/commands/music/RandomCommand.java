@@ -71,7 +71,7 @@ public class RandomCommand implements Command {
                             "[`Purely Pop`](https://temp.discord.fm/libraries/purely-pop)\n" +
                             "[`Rock n Roll`](https://temp.discord.fm/libraries/rock-n-roll)\n" +
                             "[`Coffee house Jazz`](https://temp.discord.fm/libraries/coffee-house-jazz)");
-            Chat.sendMessage(embed.build(), channel, 25);
+            Chat.sendMessage(new MessageBuilder().append(sender.getAsMention()).setEmbed(embed.build()).build(), channel, 25);
         } else if (args.length >= 1) {
             Message mainMessage = channel.sendMessage(new MessageBuilder().setEmbed(embed.addField("Processing...", "This may take a few moments", true)
                     .setColor(Chat.CUSTOM_ORANGE).build()).build()).complete();
@@ -83,7 +83,7 @@ public class RandomCommand implements Command {
             }
 
             try {
-                JSONArray array = new URLJson("http://temp.discord.fm/libraries/" + term.toString().toLowerCase().substring(0, term.length() - 1) + "/json").getJsonArray();
+                JSONArray array = new URLJson("https://temp.discord.fm/libraries/" + term.toString().toLowerCase().substring(0, term.length() - 1) + "/json").getJsonArray();
                 JSONObject obj = array.getJSONObject(new Random().nextInt(array.length()) + 1); // .nextInt(max) + min
 
                 if (obj.getString("service").equals("YouTubeVideo")) {
@@ -91,8 +91,6 @@ public class RandomCommand implements Command {
                 } else {
                     VideoThread.getThread(obj.getString("url"), channel, sender).start(); //Might break if new SoundCloud tracks don't have a url :(
                 }
-
-
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
                 Chat.editMessage(embed.clearFields().addField("Whoops! :banana: :monkey:",

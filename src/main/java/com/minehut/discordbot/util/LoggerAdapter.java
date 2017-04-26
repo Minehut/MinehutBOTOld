@@ -12,7 +12,7 @@ import java.util.WeakHashMap;
  */
 public class LoggerAdapter implements SimpleLog.LogListener {
 
-    private static final Map<SimpleLog, Logger> logs = new WeakHashMap<>();
+    private final Map<SimpleLog, Logger> logs = new WeakHashMap<>();
 
     public static void set() {
         SimpleLog.addListener(new LoggerAdapter());

@@ -4,6 +4,7 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.URLJson;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -19,6 +20,8 @@ import java.io.IOException;
 
 /**
  * Created by MatrixTunnel on 4/14/2017.
+ * Matcher code/regex made by MeowingTwurtle.
+ * API by ReduxRedstone.
  */
 public class ServerCommand implements Command {
 
@@ -98,13 +101,13 @@ public class ServerCommand implements Command {
                         .setColor(Chat.CUSTOM_RED).build(), mainMsg, 10);
             }
         } else {
-            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage() + "```", channel, 10);
+            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```", channel, 10);
         }
     }
 
     @Override
-    public String getCommandUsage() {
-        return Command.getPrefix() + getCommand() + " <server_name>";
+    public String getCommandUsage(Guild guild) {
+        return GuildSettings.getPrefix(guild) + getCommand() + " <server_name>";
     }
 
     @Override

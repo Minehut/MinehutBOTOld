@@ -6,47 +6,32 @@ import com.google.gson.GsonBuilder;
 import java.io.*;
 
 /**
- * Originally created by the developer of SwagBot.
- * Changed by MatrixTunnel on 2/4/2017.
+ * Created by MatrixTunnel on 4/26/2017.
  */
 public class Config {
 
-    private int shardCount, maxMessageLength;
-    private String mainGuildID, logChannelID, mutedRoleID, commandPrefix, discordToken, googleAPIKey, secretKey;
-    private String[] trustedRoles, blockedUsers, musicVoiceChannels, musicCommandChannels;
-    private String BOT_JSON = "settings.json";
+    private int maxMessageLength;
+    private String mainGuildID, mainMusicChannelID, punishmentLogID, discordToken, googleAPIKey, secretKey;
+    private String[] blockedUsers;
 
-    /**
-     * Creates a reference to the preferences file, and generates one if it doesn't exist.
-     * @throws IOException
-     */
-    public Config() throws IOException {
-        shardCount = 1;
+    public static String FILE_NAME = "settings.json";
+
+    public Config()  {
         maxMessageLength = 275;
         mainGuildID = "";
-        logChannelID = "";
-        mutedRoleID = "";
-        commandPrefix = "!";
+        mainMusicChannelID = "";
+        punishmentLogID = "";
 
         discordToken = "";
         googleAPIKey = "";
         secretKey = "";
 
-        trustedRoles = new String[]{"", ""};
         blockedUsers = new String[]{"", ""};
-        musicVoiceChannels = new String[]{"", ""};
-        musicCommandChannels = new String[]{"", ""};
-
-        File prefs = new File(BOT_JSON);
-        if (!prefs.exists()) {
-            prefs.createNewFile();
-            save(this);
-        }
     }
 
-    public void save(Object obj) throws IOException {
+    public static void save(Object obj) throws IOException {
         BufferedWriter fout;
-        fout = new BufferedWriter(new FileWriter(BOT_JSON));
+        fout = new BufferedWriter(new FileWriter(FILE_NAME));
         fout.write(new GsonBuilder().setPrettyPrinting().create().toJson(obj));
         fout.close();
     }
@@ -55,31 +40,23 @@ public class Config {
         RandomAccessFile fin;
         byte[] buffer;
 
-        fin = new RandomAccessFile(BOT_JSON, "r");
+        fin = new RandomAccessFile(FILE_NAME, "r");
         buffer = new byte[(int) fin.length()];
         fin.readFully(buffer);
         fin.close();
 
         String json = new String(buffer);
         Config file = new Gson().fromJson(json, Config.class);
-        shardCount = file.shardCount;
         maxMessageLength = file.maxMessageLength;
         mainGuildID = file.mainGuildID;
-        logChannelID = file.logChannelID;
-        mutedRoleID = file.mutedRoleID;
-        commandPrefix = file.commandPrefix;
+        mainMusicChannelID = file.mainMusicChannelID;
+        punishmentLogID = file.punishmentLogID;
+
         discordToken = file.discordToken;
         googleAPIKey = file.googleAPIKey;
         secretKey = file.secretKey;
 
-        trustedRoles = file.trustedRoles;
         blockedUsers = file.blockedUsers;
-        musicVoiceChannels = file.musicVoiceChannels;
-        musicCommandChannels = file.musicCommandChannels;
-    }
-
-    public int getShardCount() {
-        return shardCount;
     }
 
     public int getMaxMessageLength() {
@@ -90,16 +67,12 @@ public class Config {
         return mainGuildID;
     }
 
-    public String getLogChannelID() {
-        return logChannelID;
+    public String getMainMusicChannelID() {
+        return mainMusicChannelID;
     }
 
-    public String getMutedRoleID() {
-        return mutedRoleID;
-    }
-
-    public String getCommandPrefix() {
-        return commandPrefix;
+    public String getPunishmentLogID() {
+        return punishmentLogID;
     }
 
     public String getDiscordToken() {
@@ -114,19 +87,7 @@ public class Config {
         return secretKey;
     }
 
-    public String[] getTrustedRoles() {
-        return trustedRoles;
-    }
-
     public String[] getBlockedUsers() {
         return blockedUsers;
-    }
-
-    public String[] getMusicVoiceChannels() {
-        return musicVoiceChannels;
-    }
-
-    public String[] getMusicCommandChannels() {
-        return musicCommandChannels;
     }
 }

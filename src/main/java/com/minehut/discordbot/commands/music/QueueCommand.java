@@ -7,6 +7,7 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.GuildSettings;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -33,7 +34,7 @@ public class QueueCommand implements Command {
 
     @Override
     public String[] getAliases() {
-        return new String[]{"songs", "playlist", "songlist"};
+        return new String[]{"songs", "playlist", "songlist", "list"};
     }
 
     @Override
@@ -43,7 +44,7 @@ public class QueueCommand implements Command {
         Player player = Core.getMusicManager().getPlayer(guild.getId());
 
         if (!player.getPlaylist().isEmpty()) {
-            if (Bot.isTrusted(sender.getUser())) {
+            if (GuildSettings.isTrusted(sender)) {
                 if (args.length == 1 && args[0].equals("clear")) {
                     Chat.sendMessage(sender.getAsMention() + " Cleared the current playlist.", channel, 15);
                     player.getPlaylist().clear();
@@ -81,7 +82,7 @@ public class QueueCommand implements Command {
             while (it.hasNext() && songs.size() < 25) {
                 Track next = it.next();
 
-                String toAppend; //TODO Add something to show soundcloud and youtube songs separate from each other
+                String toAppend;
                 if (next.getTrack() instanceof YoutubeAudioTrack) {
                     toAppend = String.format("**%s.** [%s](%s) `[%s]` | <@!%s>\n", i++, next.getTrack().getInfo().title,
                             next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration(), false), next.getMeta().get("requester"));
