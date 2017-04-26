@@ -4,6 +4,7 @@ import com.arsenarsen.lavaplayerbridge.PlayerManager;
 import com.arsenarsen.lavaplayerbridge.libraries.LibraryFactory;
 import com.arsenarsen.lavaplayerbridge.libraries.UnknownBindingException;
 import com.minehut.discordbot.commands.Command;
+import com.minehut.discordbot.commands.CommandHandler;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.general.HelpCommand;
 import com.minehut.discordbot.commands.general.InfoCommand;
@@ -58,6 +59,7 @@ public class Core {
     private static JDA client;
     private static List<Command> commands;
     private static PlayerManager musicManager;
+    private static CommandHandler commandHandler;
 
     public static JDA getClient() {
         return client;
@@ -237,7 +239,7 @@ public class Core {
         registerCommand(new MuteCommand());
         //registerCommand(new PurgeCommand());
         registerCommand(new ReconnectVoiceCommand());
-        registerCommand(new ReloadCommand());
+        //registerCommand(new ReloadCommand());
         registerCommand(new ToggleMusicCommand());
 
         registerCommand(new SayCommand());
@@ -279,11 +281,12 @@ public class Core {
 
         discord = new IDiscordClient();
         latch = new CountDownLatch(1);
+        commandHandler = new CommandHandler();
 
         try {
             try {
                 client = new JDABuilder(AccountType.BOT)
-                        .addEventListener(new ChatEvents(), new ServerEvents(), new VoiceEvents())
+                        .addEventListener(new ChatEvents(), new ServerEvents(), new VoiceEvents(), commandHandler)
                         .setToken(config.getDiscordToken())
                         .setAudioSendFactory(new NativeAudioSendFactory())
                         .setGame(Game.of("loading..."))
@@ -293,7 +296,6 @@ public class Core {
                 Thread.sleep(e.getRetryAfter());
             }
 
-            commands = new ArrayList<>();
             musicManager = PlayerManager.getPlayerManager(LibraryFactory.getLibrary(client));
             registerEvents();
         } catch (LoginException e) {
@@ -308,7 +310,7 @@ public class Core {
         })); // No operation STDERR. Will not do much of anything, except to filter out some Jsoup spam
 
         latch.await();
-        registerCommands();
+        commandHandler.registerCommands();
     }
 
     private static void registerCommand(Command command) {
