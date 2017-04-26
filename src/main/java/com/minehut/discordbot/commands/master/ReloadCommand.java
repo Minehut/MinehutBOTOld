@@ -17,13 +17,11 @@ import java.io.IOException;
 public class ReloadCommand extends Command {
 
     public ReloadCommand() {
-        super("reload", new String[]{"rl"}, CommandType.MASTER);
+        super("reload", new String[]{"rl"}, "", CommandType.MASTER);
     }
 
     @Override
     public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
-        this.guild = guild;
-
         Chat.removeMessage(message);
 
         try {

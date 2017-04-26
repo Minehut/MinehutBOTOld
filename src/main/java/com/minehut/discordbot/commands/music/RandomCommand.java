@@ -20,37 +20,29 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Random;
 
-/**
- * Created by MatrixTunnel on 2/21/2017.
- */
-public class RandomCommand implements Command {
 
-    @Override
-    public String getCommand() {
-        return "random";
+public class RandomCommand extends Command {
+
+    public RandomCommand() {
+        super("random", new String[]{"randomsong", "rs"}, "", CommandType.MUSIC);
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"randomsong", "rs"};
-    }
-
-    @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
         if (!ToggleMusicCommand.canQueue.get(guild.getId()) && !GuildSettings.isTrusted(sender)) {
             Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. " +
                     "If you believe this is an error, please contact a staff member", channel, 10);
-            return;
+            return true;
         }
         if (guild.getSelfMember().getVoiceState().getChannel() == null) {
             Chat.sendMessage(sender.getAsMention() + " The bot is not in a voice channel!", channel, 10);
-            return;
+            return true;
         }
         if (!guild.getSelfMember().getVoiceState().getChannel().equals(sender.getVoiceState().getChannel())) {
             Chat.sendMessage(sender.getAsMention() + " You must be in the music channel in order to play songs!", channel, 10);
-            return;
+            return true;
         }
 
         EmbedBuilder embed = Chat.getEmbed();
@@ -96,15 +88,13 @@ public class RandomCommand implements Command {
                 Chat.editMessage(embed.clearFields().addField("Whoops! :banana: :monkey:",
                         "The category `" + term.toString().replace("-", " ").substring(0, term.length() - 1) + "` was not found. Please try again with a different term!", true)
                         .setColor(Chat.CUSTOM_RED).build(), mainMessage, 15);
-                return;
+                return true;
             }
 
             Chat.removeMessage(mainMessage);
         }
+
+        return true;
     }
 
-    @Override
-    public CommandType getType() {
-        return CommandType.MUSIC;
-    }
 }

@@ -270,6 +270,12 @@ public class Core {
             config = new Config();
             Core.log.info("Loading config...");
             config.load();
+
+            File guildsSettings = new File(GuildSettings.FILE_NAME);
+            if (!guildsSettings.exists()) {
+                guildsSettings.createNewFile();
+                Core.log.info("New config generated! Please enter the settings and try again");
+            }
         } catch (IOException e) {
             log.error("Failed loading config!", e);
             shutdown(false);

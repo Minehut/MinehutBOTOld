@@ -3,6 +3,7 @@ package com.minehut.discordbot.commands.general.minehut;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
@@ -27,11 +28,10 @@ import java.util.Date;
  * Created by MatrixTunnel on 4/14/2017.
  * API by ReduxRedstone.
  */
-public class UserCommand implements Command {
+public class UserCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "user";
+    public UserCommand() {
+        super("user", new String[]{}, "<username>", CommandType.GENERAL);
     }
 
     private JSONObject user;
@@ -40,7 +40,7 @@ public class UserCommand implements Command {
     private boolean valid = true;
 
     @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
         EmbedBuilder embed = Chat.getEmbed();
@@ -101,7 +101,7 @@ public class UserCommand implements Command {
             } else if (user == null && minehutProfile == null) {
                 if (user == null && valid) {
                     Core.log.info("Mojang down and never joined minehut"); //That user has never joined Minehut and the Mojang servers are down so the user info could not be displayed. Please try again later
-                    return;
+                    return true;
                 }
                 Core.log.info("Both APIs down"); //Either something went wrong or both Mojang and Minehut are down. Please try again later
                 //Apis down
@@ -173,8 +173,10 @@ public class UserCommand implements Command {
                 Chat.editMessage(embed.setDescription(decription.toString()).build(), mainMsg, 20);
             }
         } else {
-            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```", channel, 10);
+            return false;
         }
+
+        return true;
     }
 
     private boolean isOnline(JSONObject json) {
@@ -200,13 +202,4 @@ public class UserCommand implements Command {
         return isOnline(json) ? Chat.CUSTOM_GREEN : Chat.CUSTOM_RED;
     }
 
-    @Override
-    public String getCommandUsage(Guild guild) {
-        return GuildSettings.getPrefix(guild) + getCommand() + " <username>";
-    }
-
-    @Override
-    public CommandType getType() {
-        return CommandType.GENERAL;
-    }
 }

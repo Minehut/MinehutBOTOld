@@ -2,6 +2,7 @@ package com.minehut.discordbot.commands.general;
 
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
 import net.dv8tion.jda.core.entities.Guild;
@@ -12,17 +13,16 @@ import net.dv8tion.jda.core.entities.TextChannel;
 /**
  * Created by MatrixTunnel on 1/29/2017.
  */
-public class InfoCommand implements Command {
+public class InfoCommand extends Command {
 
     private String minehutLogo = "https://cdn.discordapp.com/attachments/233737506955329538/292430804246855681/NEW_Minehut_logo.jpg";
 
-    @Override
-    public String getCommand() {
-        return "info";
+    public InfoCommand() {
+        super("info", new String[]{}, "", CommandType.GENERAL);
     }
 
     @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message, 5);
 
         if (args.length == 0) {
@@ -46,11 +46,8 @@ public class InfoCommand implements Command {
                     break;
             }
         }
-    }
 
-    @Override
-    public CommandType getType() {
-        return CommandType.GENERAL;
+        return true;
     }
 
 }

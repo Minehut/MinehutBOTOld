@@ -4,6 +4,7 @@ import com.arsenarsen.lavaplayerbridge.player.Player;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.entities.Guild;
@@ -11,23 +12,15 @@ import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 
-/**
- * Created by MatrixTunnel on 1/8/2017.
- */
-public class NowPlayingCommand implements Command {
 
-    @Override
-    public String getCommand() {
-        return "np";
+public class NowPlayingCommand extends Command {
+
+    public NowPlayingCommand() {
+        super("np", new String[]{"nowplaying", "current", "song", "playing"}, "", CommandType.MUSIC);
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"nowplaying", "current", "song", "playing"};
-    }
-
-    @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message, 5);
 
         Player player = Core.getMusicManager().getPlayer(guild.getId());
@@ -42,10 +35,8 @@ public class NowPlayingCommand implements Command {
         } else {
             Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs playing!").setColor(Chat.CUSTOM_RED).build(), channel, 20);
         }
+
+        return true;
     }
 
-    @Override
-    public CommandType getType() {
-        return CommandType.MUSIC;
-    }
 }

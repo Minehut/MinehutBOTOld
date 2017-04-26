@@ -11,12 +11,13 @@ public abstract class Command {
 
     private String name;
     private String[] aliases;
+    private String usage;
     private CommandType type;
-    protected Guild guild;
 
-    protected Command(String name, String[] aliases, CommandType type) {
+    protected Command(String name, String[] aliases, String usage, CommandType type) {
         this.name = name;
         this.aliases = aliases;
+        this.usage = usage;
         this.type = type;
     }
 
@@ -55,7 +56,7 @@ public abstract class Command {
      * @return the usage for the command
      */
     public String getUsage() {
-        return GuildSettings.getPrefix(guild) + getName();
+        return getName() + usage;
     }
 
 }

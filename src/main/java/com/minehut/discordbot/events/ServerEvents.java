@@ -6,7 +6,7 @@ import com.minehut.discordbot.commands.music.SkipCommand;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
-import com.minehut.discordbot.util.tasks.running.PunishmentChecker;
+//import com.minehut.discordbot.util.tasks.running.PunishmentChecker;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.OnlineStatus;
@@ -59,7 +59,7 @@ public class ServerEvents extends ListenerAdapter {
             }
         }
 
-        PunishmentChecker.checkPuns();
+        //PunishmentChecker.checkPuns();
         Core.log.info("Trackers Set");
 
         VoiceChannel channel = Core.getClient().getVoiceChannelById(Core.getConfig().getMainMusicChannelID());

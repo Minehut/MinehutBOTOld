@@ -24,7 +24,7 @@ import java.util.List;
 public class GuildSettings {
 
     private static String file;
-    private static String FILE_NAME = "guilds.json";
+    public static String FILE_NAME = "guilds.json";
 
     public static String getFile() {
         return file;
