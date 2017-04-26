@@ -33,7 +33,8 @@ public class HelpCommand implements Command {
                         "`play <term>` Replace \"term\" with a YouTube/SoundCloud url or a search query to play music\n" +
                         "`queue` Lists the current music playlist of queued messages\n" +
                         "`skip` Casts your vote to skip the song that is currently playing\n" +
-                        "`random <playlist>` Plays a random song from the specified category", false)
+                        "`random <playlist>` Plays a random song from the specified category\n" +
+                        "`nowplaying` Displays information about the playing song.", false)
                 .addField("Minehut",
                         "`status <network|bot>` See Minehut's network or bot status\n" +
                         "`user <username>` Shows username changes and Minehut stats\n" +
