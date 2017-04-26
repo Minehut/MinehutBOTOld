@@ -5,6 +5,7 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.URLJson;
 import com.minehut.discordbot.util.music.VideoThread;
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
@@ -26,6 +27,8 @@ import java.util.regex.Pattern;
 
 /**
  * Created by MatrixTunnel on 4/14/2017.
+ * Matcher code/regex made by MeowingTwurtle.
+ * API by ReduxRedstone.
  */
 public class StatusCommand implements Command {
 
@@ -92,7 +95,7 @@ public class StatusCommand implements Command {
                 case "hosts":
                     if (!sender.getUser().getId().equals("118088732753526784")) {
                         Chat.editMessage(new MessageBuilder().setEmbed(new EmbedBuilder().build()) //Remove embed
-                                .append(String.valueOf(sender.getAsMention() + " Usage: ```" + getCommandUsage() + "```")).build(), mainMsg, 10);
+                                .append(String.valueOf(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```")).build(), mainMsg, 10);
                         return;
                     }
 
@@ -129,17 +132,17 @@ public class StatusCommand implements Command {
                     break;
                 default:
                     Chat.editMessage(new MessageBuilder().setEmbed(new EmbedBuilder().build()) //Remove embed
-                            .append(String.valueOf(sender.getAsMention() + " Usage: ```" + getCommandUsage() + "```")).build(), mainMsg, 10);
+                            .append(String.valueOf(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```")).build(), mainMsg, 10);
                     break;
             }
         } else {
-            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage() + "```", channel, 10);
+            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```", channel, 10);
         }
     }
 
     @Override
-    public String getCommandUsage() {
-        return Command.getPrefix() + getCommand() + " <network|bot>";
+    public String getCommandUsage(Guild guild) {
+        return GuildSettings.getPrefix(guild) + getCommand() + " <network|bot>";
     }
 
     @Override

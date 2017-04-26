@@ -34,3 +34,5 @@ fabric.properties
 /src/main/resources/META-INF/
 /src/test/
 /settings.json
+/punishments.json
+/guilds.json

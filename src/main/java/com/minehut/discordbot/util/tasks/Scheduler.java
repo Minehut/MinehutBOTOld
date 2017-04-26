@@ -1,5 +1,7 @@
 package com.minehut.discordbot.util.tasks;
 
+import com.minehut.discordbot.Core;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -15,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * Changed by MatrixTunnel on 2/8/2017.
  */
 public class Scheduler {
-    private static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(10, r -> new Thread(r, "Bot Scheduled Task"));
+    private static final ScheduledExecutorService timer = Executors.newScheduledThreadPool(10, r -> new Thread(r, "BotTask"));
     private static final Map<String, ScheduledFuture<?>> tasks = new HashMap<>();
 
     static {
@@ -27,7 +29,13 @@ public class Scheduler {
             return false;
         }
         tasks.put(taskName,
-                timer.scheduleAtFixedRate(task, delay, interval, TimeUnit.MILLISECONDS));
+                timer.scheduleAtFixedRate(() -> {
+                    try {
+                        task.run();
+                    } catch (Exception e) {
+                        Core.log.error("Task \"" + taskName + "\" error!", e);
+                    }
+                }, delay, interval, TimeUnit.MILLISECONDS));
         return true;
     }
 

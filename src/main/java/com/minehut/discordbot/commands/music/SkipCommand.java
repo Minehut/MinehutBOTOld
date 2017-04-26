@@ -5,8 +5,8 @@ import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.management.ToggleMusicCommand;
-import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.GuildSettings;
 import net.dv8tion.jda.core.entities.*;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class SkipCommand implements Command {
         Player player = Core.getMusicManager().getPlayer(guild.getId());
         VoiceChannel voiceChannel = guild.getSelfMember().getVoiceState().getChannel();
 
-        if (!ToggleMusicCommand.canQueue && !Bot.isTrusted(sender.getUser())) {
+        if (!ToggleMusicCommand.canQueue.get(guild.getId()) && !GuildSettings.isTrusted(sender)) {
             Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. " +
                     "If you believe this is an error, please contact a staff member", channel, 10);
             return;
@@ -48,7 +48,7 @@ public class SkipCommand implements Command {
             Chat.sendMessage("The player is not playing!", channel, 15);
             return;
         }
-        if (args.length == 1 && args[0].equals("force") && Bot.isTrusted(sender.getUser())) {
+        if (args.length == 1 && args[0].equals("force") && GuildSettings.isTrusted(sender)) {
             votes.clear();
             Chat.sendMessage(sender.getAsMention() + " Force skipped **" + player.getPlayingTrack().getTrack().getInfo().title + "**", channel, 15);
             player.skip();

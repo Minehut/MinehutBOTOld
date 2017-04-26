@@ -39,9 +39,8 @@ public class IDiscordClient {
         return Core.getClient().getGuilds().stream().filter(g -> g.getRoles().equals(guild)).collect(Collectors.toList());
     }
 
-
-    public boolean userHasRoleId(Guild guild, User user, String id) {
-        return guild.getMember(user).getRoles().contains(Core.getClient().getRoleById(id));
+    public boolean userHasRoleId(Member member, String id) {
+        return member.getRoles().contains(Core.getClient().getRoleById(id));
     }
 
     public void streaming(String status, String url) {

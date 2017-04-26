@@ -1,10 +1,9 @@
 package com.minehut.discordbot.util;
 
 import com.minehut.discordbot.Core;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.TextChannel;
-import net.dv8tion.jda.core.entities.User;
 import org.json.JSONArray;
 
 import java.time.LocalDateTime;
@@ -43,17 +42,8 @@ public class Bot {
         return Core.getClient().getGuildById(Core.getConfig().getMainGuildID());
     }
 
-    public static TextChannel getLogChannel() {
-        return Core.getClient().getTextChannelById(Core.getConfig().getLogChannelID());
-    }
-
-    public static boolean isTrusted(User user) {
-        for (String role : Core.getConfig().getTrustedRoles()) {
-            if (Core.getDiscord().userHasRoleId(getMainGuild(), user, role)) {
-                return true;
-            }
-        }
-        return false;
+    public static void logGuildMessage(MessageBuilder message, Guild guild) {
+        if (GuildSettings.getLogChannel(guild) != null) GuildSettings.getLogChannel(guild).sendMessage(message.build()).queue();
     }
 
     public static String getBotTime() {

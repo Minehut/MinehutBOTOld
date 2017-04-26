@@ -5,6 +5,7 @@ import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.URLJson;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
@@ -24,6 +25,7 @@ import java.util.Date;
 
 /**
  * Created by MatrixTunnel on 4/14/2017.
+ * API by ReduxRedstone.
  */
 public class UserCommand implements Command {
 
@@ -73,25 +75,25 @@ public class UserCommand implements Command {
             }
 
 
-                try {
-                    if (user != null) {
-                        minehutProfile = new URLJson("http://mctoolbox.me/minehut/user/?user=" + user.get("name")).getJsonObject();
-                        valid = true;
-                    } else {
-                        minehutProfile = new URLJson("http://mctoolbox.me/minehut/user/?user=" + args[0]).getJsonObject();
-                        valid = true;
-                    }
-                    if (minehutProfile.optBoolean("error")) {
-                        minehutProfile = null;
-                    }
-                } catch (JSONException e) {
-                    //Not valid
-                    e.printStackTrace();
-                    valid = false;
-                } catch (IOException e) {
-                    //Down?
+            try {
+                if (user != null) {
+                    minehutProfile = new URLJson("http://mctoolbox.me/minehut/user/?user=" + user.get("name")).getJsonObject();
+                    valid = true;
+                } else {
+                    minehutProfile = new URLJson("http://mctoolbox.me/minehut/user/?user=" + args[0]).getJsonObject();
+                    valid = true;
+                }
+                if (minehutProfile.optBoolean("error")) {
                     minehutProfile = null;
                 }
+            } catch (JSONException e) {
+                //Not valid
+                e.printStackTrace();
+                valid = false;
+            } catch (IOException e) {
+                //Down?
+                minehutProfile = null;
+            }
 
             if (!valid) {
                 Core.log.info("Invalid"); //The username "" is invalid. Please try again with a different username
@@ -113,11 +115,10 @@ public class UserCommand implements Command {
                     embed.setColor(Chat.CUSTOM_RED);
                 } else {
                     if (minehutProfile.getString("about").length() == 0) {
-                        decription.append("```Nothing has been written here yet.```\n");
-                    } else if (minehutProfile.getString("about").length() > 50) {
-                        decription.append("```").append(minehutProfile.getString("about").substring(0, 50)).append("...```\n");
+                        decription.append("```Nothing has been written here yet. (probably just html)```\n");
                     } else {
-                        decription.append("```").append(minehutProfile.getString("about")).append("```\n");
+                        decription.append("```").append(minehutProfile.getString("about").length() > 50 ?
+                                minehutProfile.getString("about").substring(0, 50) : minehutProfile.getString("about")).append("...```\n");
                     }
 
                     embed.addField("Profile", "[`" + minehutProfile.getString("name") + "`](https://minehut.com/" + minehutProfile.getString("name") + ")", true)
@@ -172,7 +173,7 @@ public class UserCommand implements Command {
                 Chat.editMessage(embed.setDescription(decription.toString()).build(), mainMsg, 20);
             }
         } else {
-            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage() + "```", channel, 10);
+            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```", channel, 10);
         }
     }
 
@@ -200,8 +201,8 @@ public class UserCommand implements Command {
     }
 
     @Override
-    public String getCommandUsage() {
-        return Command.getPrefix() + getCommand() + " <username>";
+    public String getCommandUsage(Guild guild) {
+        return GuildSettings.getPrefix(guild) + getCommand() + " <username>";
     }
 
     @Override
