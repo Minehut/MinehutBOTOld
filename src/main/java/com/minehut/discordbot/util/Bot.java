@@ -84,7 +84,7 @@ public class Bot {
 
     public static String getMCOwnerName(String UUID) {
         try {
-            JSONArray json = URLJson.readJsonArrayFromUrl("https://api.mojang.com/user/profiles/" + UUID.replaceAll("-", "") + "/names");
+            JSONArray json = new URLJson("https://api.mojang.com/user/profiles/" + UUID.replaceAll("-", "") + "/names").getJsonArray();
             return json.getJSONObject(json.length() - 1).getString("name");
         } catch (Exception ex) {
             ex.printStackTrace();
