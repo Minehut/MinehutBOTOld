@@ -166,10 +166,12 @@ public class ServerEvents extends ListenerAdapter {
             }
         }
 
-        embed.setDescription(event.getMember().getAsMention() + " gained the role(s):\n" + roles.substring(0, roles.length() - 2));
+        if (roles.length() > 0) {
+            embed.setDescription(event.getMember().getAsMention() + " gained the role(s):\n" + roles.substring(0, roles.length() - 2));
 
-        Bot.logGuildMessage(new MessageBuilder().setEmbed(embed.setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_ORANGE).build()), event.getGuild());
+            Bot.logGuildMessage(new MessageBuilder().setEmbed(embed.setFooter("System time | " + Bot.getBotTime(), null)
+                    .setColor(Chat.CUSTOM_ORANGE).build()), event.getGuild());
+        }
     }
 
     @Override
@@ -190,10 +192,12 @@ public class ServerEvents extends ListenerAdapter {
             }
         }
 
-        embed.setDescription(event.getMember().getAsMention() + " lost the role(s):\n" + roles.substring(0, roles.length() - 2));
+        if (roles.length() > 0) {
+            embed.setDescription(event.getMember().getAsMention() + " lost the role(s):\n" + roles.substring(0, roles.length() - 2));
 
-        Bot.logGuildMessage(new MessageBuilder().setEmbed(embed.setFooter("System time | " + Bot.getBotTime(), null)
-                .setColor(Chat.CUSTOM_ORANGE).build()), event.getGuild());
+            Bot.logGuildMessage(new MessageBuilder().setEmbed(embed.setFooter("System time | " + Bot.getBotTime(), null)
+                    .setColor(Chat.CUSTOM_ORANGE).build()), event.getGuild());
+        }
     }
 
     @Override
