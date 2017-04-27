@@ -4,6 +4,7 @@ import com.minehut.discordbot.Core;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.User;
 import org.json.JSONArray;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,10 @@ import java.util.regex.Pattern;
 public class Bot {
 
     public static List<Message> nowPlaying;
+
+    public static User getCreator() {
+        return Core.getClient().getUserById("118088732753526784"); //MatrixTunnel#7348
+    }
 
     public static String getLogo() {
         return Core.getClient().getSelfUser().getAvatarUrl();

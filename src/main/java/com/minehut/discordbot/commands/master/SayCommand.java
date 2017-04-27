@@ -2,22 +2,20 @@ package com.minehut.discordbot.commands.master;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.entities.*;
 
 /**
  * Created by MatrixTunnel on 3/17/2017.
  */
-public class SayCommand implements Command {
+public class SayCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "say";
+    public SayCommand() {
+        super("say", CommandType.MASTER, null);
     }
 
     @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
         Chat.removeMessage(message);
 
         if (args.length >= 2) {
@@ -29,7 +27,7 @@ public class SayCommand implements Command {
             if (args[0].equals("here")) {
                 Core.log.info(msg.toString().replace(args[0], "[BOT]"));
                 channel.sendMessage(msg.toString().replace(args[0], "")).queue();
-                return;
+                return true;
             }
 
             MessageChannel textChannel = Core.getClient().getTextChannelById(args[0].replace("-r", ""));
@@ -43,11 +41,10 @@ public class SayCommand implements Command {
             }
         } else {
             //Command format
+            return false;
         }
+
+        return true;
     }
 
-    @Override
-    public CommandType getType() {
-        return CommandType.MASTER;
-    }
 }

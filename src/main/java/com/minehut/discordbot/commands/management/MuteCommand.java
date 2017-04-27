@@ -2,25 +2,24 @@ package com.minehut.discordbot.commands.management;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.*;
 
 /**
  * Created by MatrixTunnel on 1/27/2017.
  */
-public class MuteCommand implements Command {
+public class MuteCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "mute";
+    public MuteCommand() {
+        super("mute", CommandType.TRUSTED, "<user id|user mention>");
     }
 
     @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
         if (args.length == 1) {
@@ -29,12 +28,12 @@ public class MuteCommand implements Command {
 
             if (muteRole == null) {
                 Chat.sendMessage(sender.getAsMention() + " The mute command is not setup for this server!", channel, 10);
-                return;
+                return true;
             }
 
             if (muteUser == null) {
                 Chat.sendMessage(sender.getAsMention() + " Not a valid user!", channel, 5);
-                return;
+                return true;
             }
 
             if (guild.getMember(muteUser).getRoles().contains(muteRole)) {
@@ -61,12 +60,10 @@ public class MuteCommand implements Command {
                 Core.log.info(Chat.getFullName(muteUser) + " was muted by " + Chat.getFullName(sender.getUser()) + ".");
             }
         } else {
-            Chat.sendMessage(Chat.getEmbed().setDescription("Usage: `" + GuildSettings.getPrefix(guild) + getCommand() + " <user id|user mention>`").setColor(Chat.CUSTOM_BLUE).build(), channel, 5);
+            return false;
         }
+
+        return true;
     }
 
-    @Override
-    public CommandType getType() {
-        return CommandType.TRUSTED;
-    }
 }

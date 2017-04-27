@@ -2,11 +2,10 @@ package com.minehut.discordbot.commands.general.minehut;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.URLJson;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import com.minehut.discordbot.util.music.VideoThread;
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import com.sun.management.OperatingSystemMXBean;
@@ -30,15 +29,14 @@ import java.util.regex.Pattern;
  * Matcher code/regex made by MeowingTwurtle.
  * API by ReduxRedstone.
  */
-public class StatusCommand implements Command {
+public class StatusCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "status";
+    public StatusCommand() {
+        super("status", CommandType.GENERAL, "<network|bot>");
     }
 
     @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
         EmbedBuilder embed = Chat.getEmbed();
@@ -71,7 +69,7 @@ public class StatusCommand implements Command {
                         Chat.editMessage(embed.clearFields().setAuthor("Minehut Network Status", "https://minehut.com", Bot.getLogo())
                                 .setDescription("\nThe network is down at this time. Please try again later\n")
                                 .setColor(Chat.CUSTOM_RED).build(), mainMsg, 15);
-                        return;
+                        return true;
                     }
 
                     Chat.editMessage(embed.setDescription("`" + motd.toString().replaceAll("§(.)", "") + "`").setAuthor("Minehut Network Status", "https://minehut.com", Bot.getLogo())
@@ -85,7 +83,7 @@ public class StatusCommand implements Command {
                             .addField("Memory Free", Bot.getMb(runtime.freeMemory()), true)
                             .addField("Total Memory", Bot.getMb(runtime.totalMemory()), true)
                             .addField("Video Threads", String.valueOf(VideoThread.VIDEO_THREADS.activeCount()), true)
-                            .addField("Total Threads", String.valueOf(Thread.getAllStackTraces().size()), true) // .availableProcessors()
+                            .addField("Total Threads", String.valueOf(Thread.getAllStackTraces().size()), true)
                             .addField("Total Cores", String.valueOf(runtime.availableProcessors()), true)
                             .addField("CPU Usage", ((int) (ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getSystemCpuLoad() * 10000)) / 100f + "%", true)
                             .addField("Lavaplayer Version", PlayerLibrary.VERSION, true)
@@ -93,10 +91,8 @@ public class StatusCommand implements Command {
                             .setColor(Chat.CUSTOM_GREEN).setFooter("System time | " + Bot.getBotTime(), null).build(), mainMsg, 20);
                     break;
                 case "hosts":
-                    if (!sender.getUser().getId().equals("118088732753526784")) {
-                        Chat.editMessage(new MessageBuilder().setEmbed(new EmbedBuilder().build()) //Remove embed
-                                .append(String.valueOf(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```")).build(), mainMsg, 10);
-                        return;
+                    if (!sender.getUser().equals(Bot.getCreator())) {
+                        return false;
                     }
 
                     Integer playersOnline = 0, usedRam = 0, totalRam = 0;
@@ -124,29 +120,19 @@ public class StatusCommand implements Command {
                         e.printStackTrace();
                         Chat.editMessage(embed.clearFields().setAuthor("Minehut Network Status", "https://minehut.com", Bot.getLogo())
                                 .setDescription("\nThe network is down at this time. Please try again later\n").setColor(Chat.CUSTOM_RED).build(), mainMsg, 10);
-                        return;
+                        return true;
                     }
 
                     Chat.editMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
                             .setColor(Chat.CUSTOM_GREEN).build(), mainMsg, 20);
                     break;
                 default:
-                    Chat.editMessage(new MessageBuilder().setEmbed(new EmbedBuilder().build()) //Remove embed
-                            .append(String.valueOf(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```")).build(), mainMsg, 10);
-                    break;
+                    return false;
             }
         } else {
-            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```", channel, 10);
+            return false;
         }
-    }
 
-    @Override
-    public String getCommandUsage(Guild guild) {
-        return GuildSettings.getPrefix(guild) + getCommand() + " <network|bot>";
-    }
-
-    @Override
-    public CommandType getType() {
-        return CommandType.GENERAL;
+        return false;
     }
 }

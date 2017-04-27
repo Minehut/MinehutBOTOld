@@ -3,18 +3,8 @@ package com.minehut.discordbot;
 import com.arsenarsen.lavaplayerbridge.PlayerManager;
 import com.arsenarsen.lavaplayerbridge.libraries.LibraryFactory;
 import com.arsenarsen.lavaplayerbridge.libraries.UnknownBindingException;
-import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.commands.general.HelpCommand;
-import com.minehut.discordbot.commands.general.InfoCommand;
-import com.minehut.discordbot.commands.general.minehut.ServerCommand;
-import com.minehut.discordbot.commands.general.minehut.StatusCommand;
-import com.minehut.discordbot.commands.general.minehut.UserCommand;
-import com.minehut.discordbot.commands.management.*;
-import com.minehut.discordbot.commands.master.ReloadCommand;
-import com.minehut.discordbot.commands.master.SayCommand;
-import com.minehut.discordbot.commands.master.ShutdownCommand;
-import com.minehut.discordbot.commands.music.*;
+import com.minehut.discordbot.commands.CommandHandler;
+import com.minehut.discordbot.commands.music.SkipCommand;
 import com.minehut.discordbot.events.ChatEvents;
 import com.minehut.discordbot.events.ServerEvents;
 import com.minehut.discordbot.events.VoiceEvents;
@@ -38,12 +28,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
 
 /**
  * Created by MatrixTunnel on 11/28/2016.
@@ -56,8 +43,8 @@ public class Core {
     private static Config config;
     private static IDiscordClient discord;
     private static JDA client;
-    private static List<Command> commands;
     private static PlayerManager musicManager;
+    private static CommandHandler commandHandler;
 
     public static JDA getClient() {
         return client;
@@ -149,10 +136,6 @@ public class Core {
         return discord;
     }
 
-    public static List<Command> getCommands() {
-        return commands;
-    }
-
     public static PlayerManager getMusicManager() {
         return musicManager;
     }
@@ -202,7 +185,6 @@ public class Core {
 
             @Override
             public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-                //Chat.removeMessage(msg);
                 SkipCommand.votes.clear();
 
                 for (Message msg : Bot.nowPlaying) {
@@ -224,52 +206,28 @@ public class Core {
         }));
     }
 
-    private static void registerCommands() {
-        registerCommand(new ServerCommand());
-        registerCommand(new StatusCommand());
-        registerCommand(new UserCommand());
-
-        registerCommand(new HelpCommand());
-        registerCommand(new InfoCommand());
-
-        registerCommand(new JoinCommand());
-        registerCommand(new LeaveCommand());
-        registerCommand(new MuteCommand());
-        //registerCommand(new PurgeCommand());
-        registerCommand(new ReconnectVoiceCommand());
-        registerCommand(new ReloadCommand());
-        registerCommand(new ToggleMusicCommand());
-
-        registerCommand(new SayCommand());
-        registerCommand(new ShutdownCommand());
-
-        registerCommand(new NowPlayingCommand());
-        registerCommand(new PlayCommand());
-        registerCommand(new QueueCommand());
-        registerCommand(new RandomCommand());
-        registerCommand(new SkipCommand());
-        registerCommand(new VolumeCommand());
-    }
-
-    public static List<Command> getCommandsByType(CommandType type) {
-        return commands.stream().filter(command -> command.getType() == type).collect(Collectors.toList());
-    }
-
     private static void loadConfig() {
         try {
             File settings = new File(Config.FILE_NAME);
             if (!settings.exists()) {
                 settings.createNewFile();
                 Config.save(new Config());
-                Core.log.info("New config generated! Please enter the settings and try again");
+                Core.log.info("New settings.json generated! Please enter the settings and try again");
                 shutdown(false);
             }
 
             config = new Config();
             Core.log.info("Loading config...");
             config.load();
+
+            File guildsSettings = new File(GuildSettings.FILE_NAME);
+            if (!guildsSettings.exists()) {
+                guildsSettings.createNewFile();
+                Core.log.info("New quilds.json generated! Please enter the settings and try again");
+                shutdown(false);
+            }
         } catch (IOException e) {
-            log.error("Failed loading config!", e);
+            log.error("Failed loading config(s)!", e);
             shutdown(false);
         }
     }
@@ -277,13 +235,14 @@ public class Core {
     private void init() throws InterruptedException, UnknownBindingException {
         RestAction.DEFAULT_FAILURE = t -> {};
 
-        discord = new IDiscordClient();
+        discord = new IDiscordClient(); //TODO Move into Bot class
         latch = new CountDownLatch(1);
+        commandHandler = new CommandHandler();
 
         try {
             try {
                 client = new JDABuilder(AccountType.BOT)
-                        .addEventListener(new ChatEvents(), new ServerEvents(), new VoiceEvents())
+                        .addEventListener(new ChatEvents(), new ServerEvents(), new VoiceEvents(), commandHandler)
                         .setToken(config.getDiscordToken())
                         .setAudioSendFactory(new NativeAudioSendFactory())
                         .setGame(Game.of("loading..."))
@@ -293,7 +252,6 @@ public class Core {
                 Thread.sleep(e.getRetryAfter());
             }
 
-            commands = new ArrayList<>();
             musicManager = PlayerManager.getPlayerManager(LibraryFactory.getLibrary(client));
             registerEvents();
         } catch (LoginException e) {
@@ -308,11 +266,7 @@ public class Core {
         })); // No operation STDERR. Will not do much of anything, except to filter out some Jsoup spam
 
         latch.await();
-        registerCommands();
-    }
-
-    private static void registerCommand(Command command) {
-        commands.add(command);
+        commandHandler.registerCommands();
     }
 
 }

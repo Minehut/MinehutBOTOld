@@ -3,10 +3,10 @@ package com.minehut.discordbot.commands.music;
 import com.arsenarsen.lavaplayerbridge.player.Player;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.management.ToggleMusicCommand;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.*;
 
 import java.util.List;
@@ -15,23 +15,17 @@ import java.util.List;
  * Made by the developer of SwagBot.
  * Changed by MatrixTunnel on 1/9/2017.
  */
-public class SkipCommand implements Command {
+public class SkipCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "skip";
-    }
-
-    @Override
-    public String[] getAliases() {
-        return new String[]{"next", "stopplayingthissongplease"};
+    public SkipCommand() {
+        super("skip", CommandType.MUSIC, null, "next");
     }
 
     public static List<String> votes;
     private static int maxSkips = 0;
 
     @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
         Player player = Core.getMusicManager().getPlayer(guild.getId());
@@ -40,37 +34,37 @@ public class SkipCommand implements Command {
         if (!ToggleMusicCommand.canQueue.get(guild.getId()) && !GuildSettings.isTrusted(sender)) {
             Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. " +
                     "If you believe this is an error, please contact a staff member", channel, 10);
-            return;
+            return true;
         }
 
         if (!guild.getAudioManager().isConnected() ||
                 Core.getMusicManager().getPlayer(guild.getId()).getPlayingTrack() == null) {
             Chat.sendMessage("The player is not playing!", channel, 15);
-            return;
+            return true;
         }
         if (args.length == 1 && args[0].equals("force") && GuildSettings.isTrusted(sender)) {
             votes.clear();
             Chat.sendMessage(sender.getAsMention() + " Force skipped **" + player.getPlayingTrack().getTrack().getInfo().title + "**", channel, 15);
             player.skip();
-            return;
+            return true;
         }
         if (guild.getSelfMember().getVoiceState().getChannel() == null) {
             Chat.sendMessage(sender.getAsMention() + " The bot is not in a voice channel!", channel, 10);
-            return;
+            return true;
         }
         if (!guild.getSelfMember().getVoiceState().getChannel().equals(sender.getVoiceState().getChannel())) {
             Chat.sendMessage(sender.getAsMention() + " you must be in the channel in order to skip songs!", channel, 10);
-            return;
+            return true;
         }
         if (sender.getUser() == Core.getClient().getUserById(player.getPlayingTrack().getMeta().get("requester").toString())) {
             votes.clear();
             Chat.sendMessage("Skipped **" + player.getPlayingTrack().getTrack().getInfo().title + "**", channel, 20);
             player.skip();
-            return;
+            return true;
         }
         if (votes.contains(sender.getUser().getId())) {
             Chat.sendMessage(sender.getAsMention() + " you have already voted to skip this song!", channel, 10);
-            return;
+            return true;
         }
         votes.add(sender.getUser().getId());
 
@@ -90,10 +84,8 @@ public class SkipCommand implements Command {
                         (maxSkips - votes.size()) + "** more votes are required to skip the current song.", channel, 20);
             }
         }
+
+        return true;
     }
 
-    @Override
-    public CommandType getType() {
-        return CommandType.MUSIC;
-    }
 }

@@ -9,6 +9,7 @@ import net.dv8tion.jda.core.hooks.ListenerAdapter;
  * Created by MatrixTunnel on 4/16/2017.
  */
 public class VoiceEvents extends ListenerAdapter {
+
     @Override
     public void onGuildVoiceJoin(GuildVoiceJoinEvent event) {
         if (event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
