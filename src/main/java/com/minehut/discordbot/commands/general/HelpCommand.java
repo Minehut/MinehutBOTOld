@@ -1,9 +1,8 @@
 package com.minehut.discordbot.commands.general;
 
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -16,7 +15,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 public class HelpCommand extends Command {
 
     public HelpCommand() {
-        super("help", new String[]{"commands", "howdoido"}, "", CommandType.GENERAL);
+        super("help", CommandType.GENERAL, null, "commands", "howdoido");
     }
 
     @Override

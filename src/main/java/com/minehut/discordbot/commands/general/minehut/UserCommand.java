@@ -2,12 +2,10 @@ package com.minehut.discordbot.commands.general.minehut;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.URLJson;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -31,7 +29,7 @@ import java.util.Date;
 public class UserCommand extends Command {
 
     public UserCommand() {
-        super("user", new String[]{}, "<username>", CommandType.GENERAL);
+        super("user", CommandType.GENERAL, "<username>");
     }
 
     private JSONObject user;

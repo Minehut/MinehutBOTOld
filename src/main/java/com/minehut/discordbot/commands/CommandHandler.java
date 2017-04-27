@@ -11,9 +11,9 @@ import com.minehut.discordbot.commands.master.ReloadCommand;
 import com.minehut.discordbot.commands.master.SayCommand;
 import com.minehut.discordbot.commands.master.ShutdownCommand;
 import com.minehut.discordbot.commands.music.*;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.*;
 import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
@@ -27,7 +27,6 @@ public class CommandHandler extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-
         Message message = event.getMessage();
         Guild guild = event.getGuild();
         Member sender = event.getMember();
@@ -35,7 +34,6 @@ public class CommandHandler extends ListenerAdapter {
         TextChannel channel = event.getChannel();
 
         if (message.getRawContent() != null && message.getContent().startsWith(GuildSettings.getPrefix(guild))) {
-
             for (String id : Core.getConfig().getBlockedUsers()) {
                 if (user.getId().equals(id) && !GuildSettings.isTrusted(sender)) {
                     Chat.removeMessage(message);
@@ -52,23 +50,30 @@ public class CommandHandler extends ListenerAdapter {
                 args = msg.substring(msg.indexOf(" ") + 1).split(" ");
             }
 
-            Command botCmd = getCommand(command);
+            Command cmd = getCommand(command);
 
-            if (botCmd == null) { // this shouldn't happen, it only uses registered commands but incase.
+            if (cmd == null) { // this shouldn't happen, it only uses registered commands but incase.
                 Core.log.error("Invalid command provided: " + command);
+                return;
+            }
+            if (cmd.getType() == Command.CommandType.MASTER && !user.getId().equals("118088732753526784")) {
+                return;
+            }
+            if (cmd.getType() == Command.CommandType.TRUSTED && !GuildSettings.isTrusted(sender)) {
+                return;
+            }
+            if (cmd.getType() == Command.CommandType.MUSIC && !GuildSettings.getMusicCommandChannels().contains(channel.getId())) {
                 return;
             }
 
             try {
-                if (!botCmd.onCommand(guild, channel, sender, message, args)) {
-                    Chat.sendMessage(Chat.getEmbed().setDescription("Usage: " + GuildSettings.getPrefix(guild) + botCmd.getUsage()).setColor(Chat.CUSTOM_RED).build(), channel, 20);
+                if (!cmd.onCommand(guild, channel, sender, message, args)) {
+                    Chat.sendMessage(sender.getAsMention() + " Usage: ```" + GuildSettings.getPrefix(guild) + cmd.getUsage() + "```", channel, 20);
                 }
             } catch (CommandException e) {
-                Core.log.error(e.getMessage());
+                Core.log.error(e.getMessage(), e);
             }
-
         }
-
     }
 
     /**
@@ -79,8 +84,14 @@ public class CommandHandler extends ListenerAdapter {
      */
     protected Command getCommand(String name) {
         for (Command cmd : cmds) {
-            for (String alias : cmd.getAliases()) {
-                if (cmd.getName().equalsIgnoreCase(name) || alias.equalsIgnoreCase(name)) {
+            if (cmd.getAliases().length > 0) {
+                for (String alias : cmd.getAliases()) {
+                    if (cmd.getName().equalsIgnoreCase(name) || alias.equalsIgnoreCase(name)) {
+                        return cmd;
+                    }
+                }
+            } else {
+                if (cmd.getName().equalsIgnoreCase(name)) {
                     return cmd;
                 }
             }
@@ -89,7 +100,6 @@ public class CommandHandler extends ListenerAdapter {
     }
 
     public void registerCommands() {
-
         //general
         cmds.add(new ServerCommand());
         cmds.add(new StatusCommand());
@@ -98,18 +108,18 @@ public class CommandHandler extends ListenerAdapter {
         cmds.add(new HelpCommand());
         cmds.add(new InfoCommand());
 
-        //master
-        cmds.add(new ReloadCommand());
-        cmds.add(new SayCommand());
-        cmds.add(new ShutdownCommand());
-
         //management
         cmds.add(new JoinCommand());
         cmds.add(new LeaveCommand());
         cmds.add(new MuteCommand());
-        //registerCommand(new PurgeCommand());
+        //cmds.add(new PurgeCommand());
         cmds.add(new ReconnectVoiceCommand());
         cmds.add(new ToggleMusicCommand());
+
+        //master
+        cmds.add(new ReloadCommand());
+        cmds.add(new SayCommand());
+        cmds.add(new ShutdownCommand());
 
         //music
         cmds.add(new NowPlayingCommand());
@@ -118,8 +128,6 @@ public class CommandHandler extends ListenerAdapter {
         cmds.add(new RandomCommand());
         cmds.add(new SkipCommand());
         cmds.add(new VolumeCommand());
-
     }
-
 
 }

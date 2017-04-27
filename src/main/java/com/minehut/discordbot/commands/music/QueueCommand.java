@@ -4,11 +4,10 @@ import com.arsenarsen.lavaplayerbridge.player.Player;
 import com.arsenarsen.lavaplayerbridge.player.Track;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
 import net.dv8tion.jda.core.EmbedBuilder;
@@ -29,7 +28,7 @@ import java.util.Queue;
 public class QueueCommand extends Command {
 
     public QueueCommand() {
-        super("queue", new String[]{"songs", "playlist", "songlist", "list"}, "", CommandType.MUSIC);
+        super("queue", CommandType.MUSIC, null, "songs", "playlist", "songlist", "list");
     }
 
     @Override

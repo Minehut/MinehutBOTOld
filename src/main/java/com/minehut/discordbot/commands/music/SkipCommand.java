@@ -3,11 +3,10 @@ package com.minehut.discordbot.commands.music;
 import com.arsenarsen.lavaplayerbridge.player.Player;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.management.ToggleMusicCommand;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.*;
 
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.List;
 public class SkipCommand extends Command {
 
     public SkipCommand() {
-        super("skip", new String[]{"next", "stopplayingthissongplease"}, "", CommandType.MUSIC);
+        super("skip", CommandType.MUSIC, null, "next");
     }
 
     public static List<String> votes;

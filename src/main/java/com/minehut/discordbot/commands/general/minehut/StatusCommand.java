@@ -2,12 +2,10 @@ package com.minehut.discordbot.commands.general.minehut;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.URLJson;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import com.minehut.discordbot.util.music.VideoThread;
 import com.sedmelluq.discord.lavaplayer.tools.PlayerLibrary;
 import com.sun.management.OperatingSystemMXBean;
@@ -34,7 +32,7 @@ import java.util.regex.Pattern;
 public class StatusCommand extends Command {
 
     public StatusCommand() {
-        super("status", new String[]{}, "<network|bot>", CommandType.GENERAL);
+        super("status", CommandType.GENERAL, "<network|bot>");
     }
 
     @Override

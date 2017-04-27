@@ -3,10 +3,9 @@ package com.minehut.discordbot.commands.music;
 import com.arsenarsen.lavaplayerbridge.player.Player;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -16,7 +15,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 public class NowPlayingCommand extends Command {
 
     public NowPlayingCommand() {
-        super("np", new String[]{"nowplaying", "current", "song", "playing"}, "", CommandType.MUSIC);
+        super("np", CommandType.MUSIC, "", "nowplaying", "current", "song", "playing");
     }
 
     @Override

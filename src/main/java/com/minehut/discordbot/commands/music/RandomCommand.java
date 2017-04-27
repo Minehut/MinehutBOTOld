@@ -1,7 +1,6 @@
 package com.minehut.discordbot.commands.music;
 
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.management.ToggleMusicCommand;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
@@ -24,7 +23,7 @@ import java.util.Random;
 public class RandomCommand extends Command {
 
     public RandomCommand() {
-        super("random", new String[]{"randomsong", "rs"}, "", CommandType.MUSIC);
+        super("random", CommandType.MUSIC, "<playlist>", "randomsong", "rs");
     }
 
     @Override
@@ -49,7 +48,7 @@ public class RandomCommand extends Command {
 
         if (args.length == 0) {
             embed.setAuthor("Random Song Categories", "https://temp.discord.fm", null)
-                    .setDescription("Be sure to spell the name as shown! (not cap sensitive)\n\n" +
+                    .setDescription("Be sure to spell the name as shown! (not cap sensitive)\n\n" + //TODO Add playlist by number
                             //"[`all`](https://temp.discord.fm)\n" + //TODO Add "all" category
                             "[`Electro Hub`](https://temp.discord.fm/libraries/electro-hub)\n" +
                             "[`Chill Corner`](https://temp.discord.fm/libraries/chill-corner)\n" +

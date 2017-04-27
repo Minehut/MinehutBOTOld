@@ -1,9 +1,8 @@
 package com.minehut.discordbot.commands.management;
 
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -16,7 +15,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 public class JoinCommand extends Command {
 
     public JoinCommand() {
-        super("join", new String[]{"summon"}, "", CommandType.TRUSTED);
+        super("join", CommandType.TRUSTED, null, "summon");
     }
 
     @Override

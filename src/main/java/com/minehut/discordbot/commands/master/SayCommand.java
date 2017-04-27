@@ -2,7 +2,6 @@ package com.minehut.discordbot.commands.master;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.entities.*;
 
@@ -12,7 +11,7 @@ import net.dv8tion.jda.core.entities.*;
 public class SayCommand extends Command {
 
     public SayCommand() {
-        super("say", new String[]{}, "", CommandType.MASTER);
+        super("say", CommandType.MASTER, null);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package com.minehut.discordbot.commands;
 
-import com.minehut.discordbot.exceptions.CommandException;
-import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -14,7 +13,14 @@ public abstract class Command {
     private String usage;
     private CommandType type;
 
-    protected Command(String name, String[] aliases, String usage, CommandType type) {
+    public enum CommandType {
+        GENERAL,
+        TRUSTED,
+        MUSIC,
+        MASTER
+    }
+
+    protected Command(String name, CommandType type, String usage, String... aliases) {
         this.name = name;
         this.aliases = aliases;
         this.usage = usage;
@@ -56,7 +62,7 @@ public abstract class Command {
      * @return the usage for the command
      */
     public String getUsage() {
-        return getName() + usage;
+        return getName() + " " + usage;
     }
 
 }

@@ -1,10 +1,9 @@
 package com.minehut.discordbot.commands.general;
 
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -15,10 +14,8 @@ import net.dv8tion.jda.core.entities.TextChannel;
  */
 public class InfoCommand extends Command {
 
-    private String minehutLogo = "https://cdn.discordapp.com/attachments/233737506955329538/292430804246855681/NEW_Minehut_logo.jpg";
-
     public InfoCommand() {
-        super("info", new String[]{}, "", CommandType.GENERAL);
+        super("info", CommandType.GENERAL, null);
     }
 
     @Override

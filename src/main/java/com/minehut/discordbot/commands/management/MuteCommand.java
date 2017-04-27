@@ -2,11 +2,10 @@ package com.minehut.discordbot.commands.management;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.*;
 
@@ -16,7 +15,7 @@ import net.dv8tion.jda.core.entities.*;
 public class MuteCommand extends Command {
 
     public MuteCommand() {
-        super("mute", new String[]{}, " <user id|user mention>", CommandType.TRUSTED);
+        super("mute", CommandType.TRUSTED, "<user id|user mention>");
     }
 
     @Override

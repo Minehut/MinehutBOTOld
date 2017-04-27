@@ -1,9 +1,7 @@
 package com.minehut.discordbot.commands.management;
 
-import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
@@ -18,7 +16,7 @@ import java.util.HashMap;
 public class ToggleMusicCommand extends Command {
 
     public ToggleMusicCommand() {
-        super("togglemusic", new String[]{}, "", CommandType.TRUSTED);
+        super("togglemusic", CommandType.TRUSTED, "");
     }
 
     public static HashMap<String, Boolean> canQueue;
@@ -28,8 +26,7 @@ public class ToggleMusicCommand extends Command {
         Chat.removeMessage(message);
 
         if (canQueue.get(guild.getId()) == null) {
-            Core.log.info("wkdjlakjwdlkawjdkjwadlkjwhdljkhwd");
-            throw new CommandException("An unknown error has occurred, unable to toggle music");
+            throw new CommandException("An unknown error while toggling music has occurred");
         }
 
         channel.sendMessage("**Music queueing has been " + (!canQueue.get(guild.getId()) ? "enabled" : "disabled") + " by " + sender.getAsMention() + "!**").queue();

@@ -2,9 +2,8 @@ package com.minehut.discordbot.commands.master;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -16,7 +15,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 public class ShutdownCommand extends Command {
 
     public ShutdownCommand() {
-        super("shutdown", new String[]{"stop", "exit", "end"}, "", CommandType.MASTER);
+        super("shutdown", CommandType.MASTER, null, "stop", "exit", "end");
     }
 
     @Override

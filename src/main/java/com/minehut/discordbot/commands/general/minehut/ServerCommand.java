@@ -1,12 +1,10 @@
 package com.minehut.discordbot.commands.general.minehut;
 
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.URLJson;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -27,7 +25,7 @@ import java.io.IOException;
 public class ServerCommand extends Command {
 
     public ServerCommand() {
-        super("server", new String[]{}, "<server_name>", CommandType.GENERAL);
+        super("server", CommandType.GENERAL, "<server_name>");
     }
 
     @Override

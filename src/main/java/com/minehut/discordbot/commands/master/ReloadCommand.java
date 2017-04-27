@@ -2,10 +2,9 @@ package com.minehut.discordbot.commands.master;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
-import com.minehut.discordbot.commands.CommandType;
-import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -17,7 +16,7 @@ import java.io.IOException;
 public class ReloadCommand extends Command {
 
     public ReloadCommand() {
-        super("reload", new String[]{"rl"}, "", CommandType.MASTER);
+        super("reload", CommandType.MASTER, null, "rl");
     }
 
     @Override
