@@ -6,6 +6,7 @@ import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
 import com.minehut.discordbot.commands.management.ToggleMusicCommand;
+import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.music.VideoThread;
@@ -18,15 +19,14 @@ import net.dv8tion.jda.core.entities.TextChannel;
  * Made by the developers of FlareBot.
  * Changed by MatrixTunnel on 1/8/2017.
  */
-public class PlayCommand implements Command {
+public class PlayCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "play";
+    public PlayCommand() {
+        super("play", new String[]{}, " <term>", CommandType.MUSIC);
     }
 
     @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
         Player player = Core.getMusicManager().getPlayer(guild.getId());
@@ -34,20 +34,19 @@ public class PlayCommand implements Command {
         if (!ToggleMusicCommand.canQueue.get(guild.getId()) && !GuildSettings.isTrusted(sender)) {
             Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. " +
                     "If you believe this is an error, please contact a staff member", channel, 10);
-            return;
+            return true;
         }
 
         if (args.length == 0) {
-            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```\n" +
-                    "Term can be a search term, YouTube url, or SoundCloud url.", channel, 15);
+            return false;
         } else if (args.length >= 1) {
             if (guild.getSelfMember().getVoiceState().getChannel() == null) {
                 Chat.sendMessage(sender.getAsMention() + " The bot is not in a voice channel!", channel, 10);
-                return;
+                return true;
             }
             if (!guild.getSelfMember().getVoiceState().getChannel().equals(sender.getVoiceState().getChannel())) {
                 Chat.sendMessage(sender.getAsMention() + " You must be in the music channel in order to play songs!", channel, 10);
-                return;
+                return true;
             }
 
             if (args[0].startsWith("http") || args[0].startsWith("www.")) {
@@ -56,7 +55,7 @@ public class PlayCommand implements Command {
                         for (Track track : player.getPlaylist()) {
                             if (track.getTrack().getInfo().uri.equals(args[0])) {
                                 Chat.sendMessage(sender.getAsMention() + " That song is already in the playlist!", channel, 10);
-                                return;
+                                return true;
                             }
                         }
 
@@ -65,7 +64,7 @@ public class PlayCommand implements Command {
                             if (sender.getUser().getId().equals(track.getMeta().get("requester").toString())) {
                                 if (tracks >= 3) {
                                     Chat.sendMessage(sender.getAsMention() + " You have already queued the max of **4** songs in the playlist! Please try again later", channel, 10);
-                                    return;
+                                    return true;
                                 }
                                 tracks++;
                             }
@@ -74,7 +73,7 @@ public class PlayCommand implements Command {
                     }
                     if (player.getPlayingTrack() != null && player.getPlayingTrack().getTrack().getInfo().uri.equals(args[0])) {
                         Chat.sendMessage(sender.getAsMention() + " That song is already in the playing!", channel, 10);
-                        return;
+                        return true;
                     }
                 }
                 VideoThread.getThread(args[0], channel, sender).start();
@@ -86,16 +85,10 @@ public class PlayCommand implements Command {
                 term = new StringBuilder(term.toString().trim());
                 VideoThread.getSearchThread(term.toString(), channel, sender).start(); //YouTube only
             }
+
         }
+
+        return true;
     }
 
-    @Override
-    public String getCommandUsage(Guild guild) {
-        return GuildSettings.getPrefix(guild) + getCommand() + " <term>";
-    }
-
-    @Override
-    public CommandType getType() {
-        return CommandType.MUSIC;
-    }
 }

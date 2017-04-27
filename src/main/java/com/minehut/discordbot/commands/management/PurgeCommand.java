@@ -2,6 +2,7 @@ package com.minehut.discordbot.commands.management;
 
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.Guild;
 import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
@@ -11,20 +12,14 @@ import net.dv8tion.jda.core.entities.TextChannel;
  * Made by the developers of FlareBot.
  * Changed by MatrixTunnel on 12/18/2016.
  */
-public class PurgeCommand implements Command {
+public class PurgeCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "purge";
+    public PurgeCommand() {
+        super("purge", new String[]{"cut"}, "", CommandType.TRUSTED);
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"cut"};
-    }
-
-    @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         /*if (args.length == 1 && args[0].matches("\\d+")) {
             int count = Integer.parseInt(args[0]) + 1;
             if (count < 2 || count > 200) {
@@ -63,10 +58,8 @@ public class PurgeCommand implements Command {
             //Chat.sendMessage(Chat.getEmbed().withDesc("Bad arguments!\n" + getDescription()), channel, 5); //TODO Make reaction
         }
         */
+
+        return true;
     }
 
-    @Override
-    public CommandType getType() {
-        return CommandType.TRUSTED;
-    }
 }

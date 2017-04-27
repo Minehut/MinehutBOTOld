@@ -5,6 +5,7 @@ import com.arsenarsen.lavaplayerbridge.player.Track;
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
@@ -25,20 +26,14 @@ import java.util.Queue;
  * Made by the developers of FlareBot.
  * Changed by MatrixTunnel on 1/8/2017.
  */
-public class QueueCommand implements Command {
+public class QueueCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "queue";
+    public QueueCommand() {
+        super("queue", new String[]{"songs", "playlist", "songlist", "list"}, "", CommandType.MUSIC);
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"songs", "playlist", "songlist", "list"};
-    }
-
-    @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException{
         Chat.removeMessage(message, 5);
 
         Player player = Core.getMusicManager().getPlayer(guild.getId());
@@ -48,21 +43,21 @@ public class QueueCommand implements Command {
                 if (args.length == 1 && args[0].equals("clear")) {
                     Chat.sendMessage(sender.getAsMention() + " Cleared the current playlist.", channel, 15);
                     player.getPlaylist().clear();
-                    return;
+                    return true;
                 } else if (args.length == 2 && args[0].equalsIgnoreCase("remove")) {
                     int number;
                     try {
                         number = Integer.parseInt(args[1]);
                     } catch (NumberFormatException e) {
                         Chat.sendMessage("That is an invalid number!", channel, 5);
-                        return;
+                        return true;
                     }
 
                     Queue<Track> queue = Core.getMusicManager().getPlayer(guild.getId()).getPlaylist();
 
                     if (number < 1 || number > queue.size()) {
                         Chat.sendMessage(sender.getAsMention() + " There is no song with that index. Songs in queue: **" + queue.size() + "**", channel, 5);
-                        return;
+                        return true;
                     }
 
                     List<Track> playlist = new ArrayList<>(queue);
@@ -71,7 +66,7 @@ public class QueueCommand implements Command {
                     queue.addAll(playlist);
 
                     Chat.sendMessage(sender.getAsMention() + " Removed song **#" + number + "** from the queue!", channel, 15);
-                    return;
+                    return true;
                 }
             }
 
@@ -116,10 +111,8 @@ public class QueueCommand implements Command {
         } else {
             Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs in the queue!").setColor(Chat.CUSTOM_RED).build(), channel, 15);
         }
+
+        return true;
     }
 
-    @Override
-    public CommandType getType() {
-        return CommandType.MUSIC;
-    }
 }

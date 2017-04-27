@@ -2,6 +2,7 @@ package com.minehut.discordbot.commands.general.minehut;
 
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
@@ -23,15 +24,14 @@ import java.io.IOException;
  * Matcher code/regex made by MeowingTwurtle.
  * API by ReduxRedstone.
  */
-public class ServerCommand implements Command {
+public class ServerCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "server";
+    public ServerCommand() {
+        super("server", new String[]{}, "<server_name>", CommandType.GENERAL);
     }
 
     @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
         EmbedBuilder embed = Chat.getEmbed();
@@ -67,7 +67,7 @@ public class ServerCommand implements Command {
 
                         Chat.editMessage(embed.setFooter("System time | " + Bot.getBotTime(), null)
                                 .setColor(Chat.CUSTOM_GREEN).build(), mainMsg, 20);
-                        return;
+                        return true;
                     }
                 }
             } catch (IOException e) {
@@ -75,7 +75,7 @@ public class ServerCommand implements Command {
                 Chat.editMessage(embed.clearFields().setAuthor("Minehut Network Status", "https://minehut.com", Bot.getLogo())
                         .setDescription("\nThe network is down at this time. Please try again later\n")
                         .setColor(Chat.CUSTOM_RED).build(), mainMsg, 10);
-                return;
+                return true;
             }
 
             // Offline?
@@ -101,17 +101,10 @@ public class ServerCommand implements Command {
                         .setColor(Chat.CUSTOM_RED).build(), mainMsg, 10);
             }
         } else {
-            Chat.sendMessage(sender.getAsMention() + " Usage: ```" + getCommandUsage(guild) + "```", channel, 10);
+            return false;
         }
+
+        return true;
     }
 
-    @Override
-    public String getCommandUsage(Guild guild) {
-        return GuildSettings.getPrefix(guild) + getCommand() + " <server_name>";
-    }
-
-    @Override
-    public CommandType getType() {
-        return CommandType.GENERAL;
-    }
 }

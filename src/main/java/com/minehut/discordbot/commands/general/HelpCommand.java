@@ -2,6 +2,7 @@ package com.minehut.discordbot.commands.general;
 
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.commands.CommandType;
+import com.minehut.discordbot.exceptions.CommandException;
 import com.minehut.discordbot.util.Chat;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
@@ -12,20 +13,14 @@ import net.dv8tion.jda.core.entities.TextChannel;
 /**
  * Created by MatrixTunnel on 12/18/2016.
  */
-public class HelpCommand implements Command {
+public class HelpCommand extends Command {
 
-    @Override
-    public String getCommand() {
-        return "help";
+    public HelpCommand() {
+        super("help", new String[]{"commands", "howdoido"}, "", CommandType.GENERAL);
     }
 
     @Override
-    public String[] getAliases() {
-        return new String[]{"commands", "howdoido"};
-    }
-
-    @Override
-    public void onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) {
+    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
         Chat.sendMessage(new MessageBuilder().append(sender.getAsMention()).setEmbed(Chat.getEmbed().setColor(Chat.CUSTOM_DARK_GREEN)
@@ -38,10 +33,8 @@ public class HelpCommand implements Command {
                         "`status <network|bot>` See Minehut's network or bot status\n" +
                         "`user <username>` Shows username changes and Minehut stats\n" +
                         "`server <name>` Shows about for the player server", false).build()).build(), channel, 20);
+
+        return true;
     }
 
-    @Override
-    public CommandType getType() {
-        return CommandType.GENERAL;
-    }
 }
