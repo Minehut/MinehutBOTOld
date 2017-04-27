@@ -26,8 +26,4 @@ public enum CommandType {
     public List<Command> getCommands() {
         return Core.getCommandsByType(this);
     }
-
-    public String formattedName() {
-        return toString();
-    }
 }
