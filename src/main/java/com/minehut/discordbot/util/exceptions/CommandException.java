@@ -1,4 +1,4 @@
-package com.minehut.discordbot.exceptions;
+package com.minehut.discordbot.util.exceptions;
 
 public class CommandException extends Exception {
 

@@ -15,7 +15,7 @@ import net.dv8tion.jda.core.entities.TextChannel;
 public class HelpCommand extends Command {
 
     public HelpCommand() {
-        super("help", CommandType.GENERAL, null, "commands", "howdoido");
+        super("help", CommandType.GENERAL, null, "commands", "howdoido", "howdoidothis");
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.minehut.discordbot.commands;
 
 import com.minehut.discordbot.Core;
 import com.minehut.discordbot.commands.general.HelpCommand;
-import com.minehut.discordbot.commands.general.InfoCommand;
 import com.minehut.discordbot.commands.general.minehut.ServerCommand;
 import com.minehut.discordbot.commands.general.minehut.StatusCommand;
 import com.minehut.discordbot.commands.general.minehut.UserCommand;
@@ -11,6 +10,7 @@ import com.minehut.discordbot.commands.master.ReloadCommand;
 import com.minehut.discordbot.commands.master.SayCommand;
 import com.minehut.discordbot.commands.master.ShutdownCommand;
 import com.minehut.discordbot.commands.music.*;
+import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
 import com.minehut.discordbot.util.GuildSettings;
 import com.minehut.discordbot.util.exceptions.CommandException;
@@ -34,12 +34,12 @@ public class CommandHandler extends ListenerAdapter {
         TextChannel channel = event.getChannel();
 
         if (message.getRawContent() != null && message.getContent().startsWith(GuildSettings.getPrefix(guild))) {
-            for (String id : Core.getConfig().getBlockedUsers()) {
-                if (user.getId().equals(id) && !GuildSettings.isTrusted(sender)) {
-                    Chat.removeMessage(message);
-                    Chat.sendMessage(user.getAsMention() + " You are blacklisted from using bot commands. If you believe this is an error, please contact MatrixTunnel.", channel, 10);
-                    return;
-                }
+            if (Core.getConfig().getBlockedUsers().contains(sender.getUser().getId()) && !GuildSettings.isTrusted(sender)) {
+                Chat.removeMessage(message);
+                sender.getUser().openPrivateChannel().queue(c ->
+                    c.sendMessage("You are blacklisted from using bot commands. " +
+                            "If you believe this is an error, please contact MatrixTunnel.").queue(m -> m.getPrivateChannel().close()));
+                return;
             }
 
             String msg = event.getMessage().getRawContent();
@@ -52,11 +52,9 @@ public class CommandHandler extends ListenerAdapter {
 
             Command cmd = getCommand(command);
 
-            if (cmd == null) { // this shouldn't happen, it only uses registered commands but incase.
-                Core.log.error("Invalid command provided: " + command);
-                return;
-            }
-            if (cmd.getType() == Command.CommandType.MASTER && !user.getId().equals("118088732753526784")) {
+            if (cmd == null) return; //Invalid command
+
+            if (cmd.getType() == Command.CommandType.MASTER && !sender.getUser().equals(Bot.getCreator())) {
                 return;
             }
             if (cmd.getType() == Command.CommandType.TRUSTED && !GuildSettings.isTrusted(sender)) {
@@ -106,7 +104,6 @@ public class CommandHandler extends ListenerAdapter {
         cmds.add(new UserCommand());
 
         cmds.add(new HelpCommand());
-        cmds.add(new InfoCommand());
 
         //management
         cmds.add(new JoinCommand());

@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by MatrixTunnel on 4/26/2017.
@@ -12,7 +14,7 @@ public class Config {
 
     private int maxMessageLength;
     private String mainGuildID, mainMusicChannelID, punishmentLogID, discordToken, googleAPIKey, secretKey;
-    private String[] blockedUsers;
+    private List<String> blockedUsers;
 
     public static String FILE_NAME = "settings.json";
 
@@ -26,7 +28,7 @@ public class Config {
         googleAPIKey = "";
         secretKey = "";
 
-        blockedUsers = new String[]{"", ""};
+        blockedUsers = new ArrayList<>();
     }
 
     public static void save(Object obj) throws IOException {
@@ -87,7 +89,7 @@ public class Config {
         return secretKey;
     }
 
-    public String[] getBlockedUsers() {
+    public List<String> getBlockedUsers() {
         return blockedUsers;
     }
 }

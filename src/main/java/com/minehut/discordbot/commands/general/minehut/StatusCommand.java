@@ -83,7 +83,7 @@ public class StatusCommand extends Command {
                             .addField("Memory Free", Bot.getMb(runtime.freeMemory()), true)
                             .addField("Total Memory", Bot.getMb(runtime.totalMemory()), true)
                             .addField("Video Threads", String.valueOf(VideoThread.VIDEO_THREADS.activeCount()), true)
-                            .addField("Total Threads", String.valueOf(Thread.getAllStackTraces().size()), true) // .availableProcessors()
+                            .addField("Total Threads", String.valueOf(Thread.getAllStackTraces().size()), true)
                             .addField("Total Cores", String.valueOf(runtime.availableProcessors()), true)
                             .addField("CPU Usage", ((int) (ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class).getSystemCpuLoad() * 10000)) / 100f + "%", true)
                             .addField("Lavaplayer Version", PlayerLibrary.VERSION, true)
@@ -91,7 +91,7 @@ public class StatusCommand extends Command {
                             .setColor(Chat.CUSTOM_GREEN).setFooter("System time | " + Bot.getBotTime(), null).build(), mainMsg, 20);
                     break;
                 case "hosts":
-                    if (!sender.getUser().getId().equals("118088732753526784")) {
+                    if (!sender.getUser().equals(Bot.getCreator())) {
                         return false;
                     }
 
@@ -133,6 +133,6 @@ public class StatusCommand extends Command {
             return false;
         }
 
-        return true;
+        return false;
     }
 }
