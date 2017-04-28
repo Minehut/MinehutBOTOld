@@ -16,6 +16,7 @@ public class VolumeCommand extends Command {
 
     public VolumeCommand() {
         super("volume", CommandType.MUSIC, null, "vol", "sound");
+        setEnabled(false);
     }
 
     @Override
