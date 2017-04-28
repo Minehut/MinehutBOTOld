@@ -51,9 +51,18 @@ public class Core {
     }
     public static CountDownLatch latch;
     public static Logger log = LoggerFactory.getLogger("MinehutBot");
+    private static File configsDirectory = new File("configs");
 
     public static void main(String[] args) throws InterruptedException, UnknownBindingException {
         LoggerAdapter.set();
+
+        if (!configsDirectory.exists()){
+            try {
+                configsDirectory.mkdir();
+            } catch (Exception e) {
+                log.error("Could not create configs directory", e);
+            }
+        }
 
         try {
             new GuildSettings().load();

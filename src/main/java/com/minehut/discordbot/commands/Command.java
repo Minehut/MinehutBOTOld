@@ -12,6 +12,7 @@ public abstract class Command {
     private String[] aliases;
     private String usage;
     private CommandType type;
+    private boolean enabled = true;
 
     public enum CommandType {
         GENERAL,
@@ -63,6 +64,24 @@ public abstract class Command {
      */
     public String getUsage() {
         return getName() + " " + usage;
+    }
+
+    /**
+     * Gets the state of the command
+     *
+     * @return the state of the command
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * Sets the state of the command
+     *
+     * @param enabled the state of the command
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
 }

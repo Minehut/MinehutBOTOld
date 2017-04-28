@@ -6,9 +6,7 @@ import com.minehut.discordbot.commands.general.minehut.ServerCommand;
 import com.minehut.discordbot.commands.general.minehut.StatusCommand;
 import com.minehut.discordbot.commands.general.minehut.UserCommand;
 import com.minehut.discordbot.commands.management.*;
-import com.minehut.discordbot.commands.master.ReloadCommand;
-import com.minehut.discordbot.commands.master.SayCommand;
-import com.minehut.discordbot.commands.master.ShutdownCommand;
+import com.minehut.discordbot.commands.master.*;
 import com.minehut.discordbot.commands.music.*;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
@@ -64,6 +62,13 @@ public class CommandHandler extends ListenerAdapter {
                 return;
             }
 
+            if (!cmd.isEnabled()) {
+                //Command is not enabled, send user a message informing them
+                sender.getUser().openPrivateChannel().queue(c ->
+                        c.sendMessage("The command " + cmd.getName() + " is currently disabled.").queue(m -> m.getPrivateChannel().close()));
+                return;
+            }
+
             try {
                 if (!cmd.onCommand(guild, channel, sender, message, args)) {
                     Chat.sendMessage(sender.getAsMention() + " Usage: ```" + GuildSettings.getPrefix(guild) + cmd.getUsage() + "```", channel, 20);
@@ -80,7 +85,7 @@ public class CommandHandler extends ListenerAdapter {
      * @param name The name of the command
      * @return The Command if found, null otherwise.
      */
-    protected Command getCommand(String name) {
+    public Command getCommand(String name) {
         for (Command cmd : cmds) {
             if (cmd.getAliases().length > 0) {
                 for (String alias : cmd.getAliases()) {
@@ -117,6 +122,8 @@ public class CommandHandler extends ListenerAdapter {
         cmds.add(new ReloadCommand());
         cmds.add(new SayCommand());
         cmds.add(new ShutdownCommand());
+        cmds.add(new EnableCommand(this));
+        cmds.add(new DisableCommand(this));
 
         //music
         cmds.add(new NowPlayingCommand());
