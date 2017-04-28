@@ -1,7 +1,7 @@
 # Minehut Discord Bot
 Minehut's Discord bot was created for server info, management, music playback, and logging of the different Discord channels.
 
-It is also designed to work on one or more guilds but doesn't need to.
+It is also designed to work on one or more guilds but is usually ran on just one.
 
 ## Credits
 This bot contains some code from FlareBot. A very big thank you to the creators
