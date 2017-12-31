@@ -4,14 +4,14 @@ import com.arsenarsen.lavaplayerbridge.player.Player;
 import com.arsenarsen.lavaplayerbridge.player.Playlist;
 import com.arsenarsen.lavaplayerbridge.player.Track;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.UserClient;
 import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.track.AudioItem;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.core.EmbedBuilder;
-import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Message;
 
 import java.util.ArrayList;
@@ -33,8 +33,9 @@ public class SoundCloudExtractor implements Extractor {
     }
 
     @Override
-    public void process(String input, Player player, Message message, Member member) throws Exception {
+    public void process(String input, Player player, Message message, UserClient client) throws Exception {
         AudioItem item;
+
         try {
             item = player.resolve(input);
             if (item == null) {
@@ -46,13 +47,13 @@ public class SoundCloudExtractor implements Extractor {
         } catch (RuntimeException e) {
             Chat.editMessage(Chat.getEmbed()
                     .setDescription("Could not get that song!")
-                    .setColor(Chat.CUSTOM_RED).addField("SoundCloud said: ", e.getMessage(), true).build(), message, 15);
+                    .setColor(Chat.CUSTOM_RED).addField("SoundCloud said: ", e.getMessage(), true).build(), message, 15); //TODO
             return;
         }
         List<AudioTrack> audioTracks = new ArrayList<>();
         String name;
         if (item instanceof AudioPlaylist) {
-            if (GuildSettings.isTrusted(member)) {
+            if (client.isStaff()) {
                 AudioPlaylist audioPlaylist = (AudioPlaylist) item;
                 audioTracks.addAll(audioPlaylist.getTracks());
                 name = audioPlaylist.getName();
@@ -63,7 +64,7 @@ public class SoundCloudExtractor implements Extractor {
             }
         } else {
             AudioTrack track = (AudioTrack) item;
-            if (track.getInfo().length >= 900000 && !GuildSettings.isTrusted(member)) {
+            if (track.getInfo().length >= 900000 && !client.isStaff()) {
                 EmbedBuilder builder = Chat.getEmbed().setColor(Chat.CUSTOM_RED).setDescription("That track could not be queued! The song length is too long");
                 Chat.editMessage(builder.build(), message, 15);
                 return;
@@ -72,10 +73,9 @@ public class SoundCloudExtractor implements Extractor {
             name = track.getInfo().title;
         }
         if (name != null) {
-            List<Track> tracks = audioTracks.stream().map(Track::new).map(track -> {
-                track.getMeta().put("requester", member.getUser().getId());
+            List<Track> tracks = audioTracks.stream().map(Track::new).peek(track -> {
+                track.getMeta().put("requester", client.getId());
                 track.getMeta().put("guildId", player.getGuildId());
-                return track;
             }).collect(Collectors.toList());
             if (tracks.size() > 1) { // Double `if` https://giphy.com/gifs/ng1xAzwIkDgfm
                 Playlist p = new Playlist(tracks);
@@ -84,10 +84,11 @@ public class SoundCloudExtractor implements Extractor {
                 player.queue(tracks.get(0));
             }
             EmbedBuilder builder = Chat.getEmbed();
-            builder.setDescription(String.format("%s queued the %s [`%s`](%s)", member.getAsMention(), tracks.size() == 1 ? "song" : "playlist", name, input));
+            builder.setDescription(String.format("%s queued the %s [`%s`](%s)", client.getUser().getAsMention(), tracks.size() == 1 ? "song" : "playlist", name, input));
             if (audioTracks.size() > 1)
                 builder.addField("Song count:", String.valueOf(tracks.size()), true);
-            Chat.editMessage(builder.build(), message, 20);
+
+            message.editMessage(new MessageBuilder(EmbedBuilder.ZERO_WIDTH_SPACE).setEmbed(builder.build()).build()).queue(msg -> Chat.removeMessage(msg, 20));
         }
     }
 

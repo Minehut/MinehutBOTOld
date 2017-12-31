@@ -25,6 +25,10 @@ public abstract class BotTask implements Runnable {
         Scheduler.delayTask(this, delay);
     }
 
+    public void command() {
+        Scheduler.commandTask(this);
+    }
+
     public boolean cancel() {
         return Scheduler.cancelTask(taskName);
     }

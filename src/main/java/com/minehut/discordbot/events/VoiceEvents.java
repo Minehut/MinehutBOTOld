@@ -1,8 +1,10 @@
 package com.minehut.discordbot.events;
 
-import com.minehut.discordbot.Core;
+import com.minehut.discordbot.MinehutBot;
+import com.minehut.discordbot.util.tasks.BotTask;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMuteEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
 
 /**
@@ -19,18 +21,25 @@ public class VoiceEvents extends ListenerAdapter {
 
     @Override
     public void onGuildVoiceLeave(GuildVoiceLeaveEvent event) {
-        if (event.getGuild().equals(Core.getClient().getGuildById(Core.getConfig().getMainGuildID()))) return;
-
         if (event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
-            if (Core.getMusicManager().hasPlayer(event.getGuild().getId())) {
-                Core.getMusicManager().getPlayer(event.getGuild().getId()).getPlaylist().clear();
-                Core.getMusicManager().getPlayer(event.getGuild().getId()).skip();
+            if (MinehutBot.get().getMusicManager().hasPlayer(event.getGuild().getId())) {
+                MinehutBot.get().getMusicManager().getPlayer(event.getGuild().getId()).getPlaylist().clear();
+                MinehutBot.get().getMusicManager().getPlayer(event.getGuild().getId()).skip();
             }
-        } else {
-            if (event.getChannelLeft().getMembers().contains(event.getGuild().getMember(event.getJDA().getSelfUser()))
-                    && event.getChannelLeft().getMembers().size() < 2) {
-                event.getChannelLeft().getGuild().getAudioManager().closeAudioConnection();
+        }
+
+        new BotTask("RejoinVoice") {
+            @Override
+            public void run() {
+                if (event.getChannelLeft() != null) event.getChannelLeft().getGuild().getAudioManager().openAudioConnection(event.getChannelLeft());
             }
+        }.delay(5000);
+    }
+
+    @Override
+    public void onGuildVoiceMute(GuildVoiceMuteEvent event) {
+        if (event.getMember().getUser().equals(event.getJDA().getSelfUser())) {
+            //TODO Unmute lol event.getVoiceState().
         }
     }
 }

@@ -1,6 +1,6 @@
 **/dependency-reduced-pom.xml
 
-# Eclipse Core
+# Eclipse MinehutBot
 .project
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
@@ -37,3 +37,5 @@ fabric.properties
 /punishments.json
 /guilds.json
 discordbot.iml
+/latest.log
+/users.json
