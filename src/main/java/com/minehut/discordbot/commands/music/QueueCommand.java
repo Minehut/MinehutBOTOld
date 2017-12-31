@@ -2,11 +2,11 @@ package com.minehut.discordbot.commands.music;
 
 import com.arsenarsen.lavaplayerbridge.player.Player;
 import com.arsenarsen.lavaplayerbridge.player.Track;
-import com.minehut.discordbot.Core;
+import com.minehut.discordbot.MinehutBot;
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.UserClient;
 import com.minehut.discordbot.util.exceptions.CommandException;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioTrack;
 import com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioTrack;
@@ -28,19 +28,20 @@ import java.util.Queue;
 public class QueueCommand extends Command {
 
     public QueueCommand() {
-        super("queue", CommandType.MUSIC, null, "songs", "playlist", "songlist", "list");
+        super(CommandType.MUSIC, null, "queue", "songs", "playlist", "songlist", "list");
     }
 
     @Override
-    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException{
+    public boolean onCommand(UserClient sender, Guild guild, TextChannel channel, Message message, String[] args) throws CommandException{
         Chat.removeMessage(message, 5);
 
-        Player player = Core.getMusicManager().getPlayer(guild.getId());
+        Member member = guild.getMember(sender.getUser());
+        Player player = MinehutBot.get().getMusicManager().getPlayer(guild.getId());
 
         if (!player.getPlaylist().isEmpty()) {
-            if (GuildSettings.isTrusted(sender)) {
+            if (sender.isStaff()) {
                 if (args.length == 1 && args[0].equals("clear")) {
-                    Chat.sendMessage(sender.getAsMention() + " Cleared the current playlist.", channel, 15);
+                    Chat.sendMessage(member.getAsMention() + " Cleared the current playlist.", channel, 15);
                     player.getPlaylist().clear();
                     return true;
                 } else if (args.length == 2 && args[0].equalsIgnoreCase("remove")) {
@@ -48,14 +49,14 @@ public class QueueCommand extends Command {
                     try {
                         number = Integer.parseInt(args[1]);
                     } catch (NumberFormatException e) {
-                        Chat.sendMessage("That is an invalid number!", channel, 5);
+                        Chat.sendMessage(member.getAsMention() + " That is an invalid number!", channel, 5);
                         return true;
                     }
 
-                    Queue<Track> queue = Core.getMusicManager().getPlayer(guild.getId()).getPlaylist();
+                    Queue<Track> queue = MinehutBot.get().getMusicManager().getPlayer(guild.getId()).getPlaylist();
 
                     if (number < 1 || number > queue.size()) {
-                        Chat.sendMessage(sender.getAsMention() + " There is no song with that index. Songs in queue: **" + queue.size() + "**", channel, 5);
+                        Chat.sendMessage(member.getAsMention() + " There is no song with that index. Songs in queue: **" + queue.size() + "**", channel, 5);
                         return true;
                     }
 
@@ -64,7 +65,7 @@ public class QueueCommand extends Command {
                     queue.clear();
                     queue.addAll(playlist);
 
-                    Chat.sendMessage(sender.getAsMention() + " Removed song **#" + number + "** from the queue!", channel, 15);
+                    Chat.sendMessage(member.getAsMention() + " Removed song **#" + number + "** from the queue!", channel, 15);
                     return true;
                 }
             }
@@ -77,7 +78,7 @@ public class QueueCommand extends Command {
                 Track next = it.next();
 
                 String toAppend;
-                if (next.getTrack() instanceof YoutubeAudioTrack) {
+                if (next.getTrack() instanceof YoutubeAudioTrack) { //TODO Redo
                     toAppend = String.format("**%s.** [%s](%s) `[%s]` | <@!%s>\n", i++, next.getTrack().getInfo().title,
                             next.getTrack().getInfo().uri, Bot.millisToTime(next.getTrack().getDuration(), false), next.getMeta().get("requester"));
                 } else if (next.getTrack() instanceof SoundCloudAudioTrack) {
@@ -104,9 +105,9 @@ public class QueueCommand extends Command {
             for (Track track : player.getPlaylist()) {
                 totalTime = totalTime + track.getTrack().getDuration();
             }
-            Chat.sendMessage(builder.addField("Total songs", String.valueOf(player.getPlaylist().size()), true)
-                    .addField("Total Playlist Time", Bot.millisToTime(totalTime, true), true)
-                    .addField("Paused", player.getPaused() ? ":white_check_mark:" : ":x:", true).build(), channel, 25);
+            Chat.sendMessage(builder.addField("Total songs", String.valueOf(player.getPlaylist().size()), true) //TODO Redo this
+                    .addField("Total Playlist Time", Bot.millisToTime(totalTime, true), true).build(), channel, 25);
+                    //.addField("Paused", player.getPaused() ? ":white_check_mark:" : ":x:", true).build(), channel, 25);
         } else {
             Chat.sendMessage(Chat.getEmbed().setDescription("There are no songs in the queue!").setColor(Chat.CUSTOM_RED).build(), channel, 15);
         }

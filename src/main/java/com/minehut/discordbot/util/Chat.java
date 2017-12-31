@@ -6,6 +6,7 @@ import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.*;
 
 import java.awt.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by MatrixTunnel on 11/28/2016.
@@ -25,8 +26,24 @@ public class Chat {
         return user.getName() + '#' + user.getDiscriminator();
     }
 
+    public static boolean hasInvite(Message message) {
+        return Pattern.compile("(?:https?://)?discord(?:app\\.com/invite|\\.gg|\\.io)/(\\S+?)").matcher(message.getContentRaw()).find();
+    }
+
+    public static boolean hasRegex(Pattern regex, String imput) {
+        return regex.matcher(imput).find();
+    }
+
     public static EmbedBuilder getEmbed() {
         return new EmbedBuilder().setColor(CUSTOM_BLUE); //Default blue
+    }
+
+    public static void sendPM(User user, String content) {
+        user.openPrivateChannel().queue(c -> c.sendMessage(content).queue(m -> m.getPrivateChannel().close().queue()));
+    }
+
+    public static Message respondMessage(Member sender, MessageEmbed embed) {
+        return new MessageBuilder().append(sender.getAsMention()).setEmbed(new EmbedBuilder(embed).setFooter(null, null).build()).build();
     }
 
     public static void removeMessage(Message message) {
@@ -70,10 +87,6 @@ public class Chat {
 
     public static void sendMessage(Message message, MessageChannel channel, long time) {
         channel.sendMessage(message).queue(m -> removeMessage(m, time));
-    }
-
-    public static String getChannelName(Channel channel) {
-        return "[#" + channel.getName() + "] ";
     }
 
 }

@@ -1,77 +1,96 @@
 package com.minehut.discordbot.commands;
 
-import com.minehut.discordbot.Core;
+import com.minehut.discordbot.MinehutBot;
 import com.minehut.discordbot.commands.general.HelpCommand;
-import com.minehut.discordbot.commands.general.minehut.ServerCommand;
 import com.minehut.discordbot.commands.general.minehut.StatusCommand;
-import com.minehut.discordbot.commands.general.minehut.UserCommand;
 import com.minehut.discordbot.commands.management.*;
-import com.minehut.discordbot.commands.master.ReloadCommand;
-import com.minehut.discordbot.commands.master.SayCommand;
-import com.minehut.discordbot.commands.master.ShutdownCommand;
-import com.minehut.discordbot.commands.music.*;
+import com.minehut.discordbot.commands.master.*;
+import com.minehut.discordbot.commands.music.NowPlayingCommand;
+import com.minehut.discordbot.commands.music.PlayCommand;
+import com.minehut.discordbot.commands.music.QueueCommand;
+import com.minehut.discordbot.commands.music.SkipCommand;
 import com.minehut.discordbot.util.Bot;
 import com.minehut.discordbot.util.Chat;
-import com.minehut.discordbot.util.GuildSettings;
+import com.minehut.discordbot.util.UserClient;
 import com.minehut.discordbot.util.exceptions.CommandException;
-import net.dv8tion.jda.core.entities.*;
-import net.dv8tion.jda.core.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import com.minehut.discordbot.util.tasks.BotTask;
+import net.dv8tion.jda.core.entities.Guild;
+import net.dv8tion.jda.core.entities.Member;
+import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.entities.TextChannel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandHandler extends ListenerAdapter {
+public class CommandHandler {
 
-    private List<Command> cmds = new ArrayList<>();
+    private MinehutBot bot = MinehutBot.get();
 
-    @Override
-    public void onGuildMessageReceived(GuildMessageReceivedEvent event) {
-        Message message = event.getMessage();
-        Guild guild = event.getGuild();
-        Member sender = event.getMember();
-        User user = message.getAuthor();
-        TextChannel channel = event.getChannel();
+    private static List<Command> cmds = new ArrayList<>();
 
-        if (message.getRawContent() != null && message.getContent().startsWith(GuildSettings.getPrefix(guild))) {
-            if (Core.getConfig().getBlockedUsers().contains(sender.getUser().getId()) && !GuildSettings.isTrusted(sender)) {
-                Chat.removeMessage(message);
-                sender.getUser().openPrivateChannel().queue(c ->
-                    c.sendMessage("You are blacklisted from using bot commands. " +
-                            "If you believe this is an error, please contact MatrixTunnel.").queue(m -> m.getPrivateChannel().close()));
-                return;
-            }
+    public void execute(UserClient client, Guild guild, Message message, Member sender, TextChannel channel) {
+        new BotTask("CommandTask") {
+            @Override
+            public void run() {
+                String msg = message.getContentRaw();
+                String command = msg.substring(1);
+                String[] args = new String[0];
 
-            String msg = event.getMessage().getRawContent();
-            String command = msg.substring(1);
-            String[] args = new String[0];
-            if (msg.contains(" ")) {
-                command = command.substring(0, msg.indexOf(" ") - 1);
-                args = msg.substring(msg.indexOf(" ") + 1).split(" ");
-            }
-
-            Command cmd = getCommand(command);
-
-            if (cmd == null) return; //Invalid command
-
-            if (cmd.getType() == Command.CommandType.MASTER && !sender.getUser().equals(Bot.getCreator())) {
-                return;
-            }
-            if (cmd.getType() == Command.CommandType.TRUSTED && !GuildSettings.isTrusted(sender)) {
-                return;
-            }
-            if (cmd.getType() == Command.CommandType.MUSIC && !GuildSettings.getMusicCommandChannels().contains(channel.getId())) {
-                return;
-            }
-
-            try {
-                if (!cmd.onCommand(guild, channel, sender, message, args)) {
-                    Chat.sendMessage(sender.getAsMention() + " Usage: ```" + GuildSettings.getPrefix(guild) + cmd.getUsage() + "```", channel, 20);
+                if (msg.contains(" ")) {
+                    command = command.substring(0, msg.indexOf(" ") - 1);
+                    args = msg.substring(msg.indexOf(" ") + 1).split(" ");
                 }
-            } catch (CommandException e) {
-                Core.log.error(e.getMessage(), e);
+
+                Command cmd = getCommand(command);
+
+                if (cmd == null) return; //Invalid command
+                MinehutBot.log.info("[" + guild.getName() + "#" + channel.getName() + "|" + Chat.getFullName(sender.getUser()) + "]: " + msg);
+
+                switch (cmd.getType()) {
+                    case MASTER:
+                        if (!sender.getUser().getId().equals(Bot.getCreator().getId()))
+                            return;
+                        break;
+                    case TRUSTED:
+                        if (!client.isStaff()) return;
+                        break;
+                    case MUSIC:
+                        String musicId = bot.getConfig().getMusicCommandChannelId();
+
+                        if (musicId != null && !musicId.isEmpty()) {
+                            if (!channel.getId().equals(musicId)) {
+                                Chat.removeMessage(message);
+                                Chat.sendMessage(sender.getAsMention() + " Please use music commands in <#" + musicId + ">", channel, 5);
+                                return;
+                            }
+                        } else {
+                            Chat.removeMessage(message);
+                            Chat.sendMessage(sender.getAsMention() + " Music commands are currently disabled. Please contact a staff member if you believe this is an error", channel, 5);
+                            return;
+                        }
+                        break;
+                    case GENERAL:
+                        String cmdId = bot.getConfig().getCommandChannelId();
+
+                        if (cmdId != null && !cmdId.isEmpty()) {
+                            if (!channel.getId().equals(cmdId)) {
+                                Chat.removeMessage(message);
+                                Chat.sendMessage(sender.getAsMention() + " Please use bot commands in <#" + cmdId + ">", channel, 5);
+                                return;
+                            }
+                        }
+                        break;
+                }
+
+                try {
+                    if (!cmd.onCommand(client, guild, channel, message, args)) {
+                        Chat.sendMessage(sender.getAsMention() + " Usage: ```" + bot.getConfig().getCommandPrefix() + cmd.getUsage() + "```", channel, 20);
+                    }
+                } catch (CommandException e) {
+                    MinehutBot.log.error(e.getMessage(), e);
+                }
             }
-        }
+        }.command();
     }
 
     /**
@@ -82,26 +101,20 @@ public class CommandHandler extends ListenerAdapter {
      */
     protected Command getCommand(String name) {
         for (Command cmd : cmds) {
-            if (cmd.getAliases().length > 0) {
-                for (String alias : cmd.getAliases()) {
-                    if (cmd.getName().equalsIgnoreCase(name) || alias.equalsIgnoreCase(name)) {
+            if (cmd.getCommands().length > 0) {
+                for (String command : cmd.getCommands()) {
+                    if (command.equalsIgnoreCase(name)) {
                         return cmd;
                     }
-                }
-            } else {
-                if (cmd.getName().equalsIgnoreCase(name)) {
-                    return cmd;
                 }
             }
         }
         return null;
     }
 
-    public void registerCommands() {
+    public static void registerCommands() {
         //general
-        cmds.add(new ServerCommand());
         cmds.add(new StatusCommand());
-        cmds.add(new UserCommand());
 
         cmds.add(new HelpCommand());
 
@@ -114,6 +127,8 @@ public class CommandHandler extends ListenerAdapter {
         cmds.add(new ToggleMusicCommand());
 
         //master
+        cmds.add(new IconCommand());
+        cmds.add(new NameCommand());
         cmds.add(new ReloadCommand());
         cmds.add(new SayCommand());
         cmds.add(new ShutdownCommand());
@@ -122,9 +137,8 @@ public class CommandHandler extends ListenerAdapter {
         cmds.add(new NowPlayingCommand());
         cmds.add(new PlayCommand());
         cmds.add(new QueueCommand());
-        cmds.add(new RandomCommand());
+        //cmds.add(new RandomCommand());
         cmds.add(new SkipCommand());
-        cmds.add(new VolumeCommand());
     }
 
 }

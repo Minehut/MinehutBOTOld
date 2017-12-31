@@ -2,94 +2,51 @@ package com.minehut.discordbot.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by MatrixTunnel on 4/26/2017.
  */
+@Getter @NoArgsConstructor
 public class Config {
 
-    private int maxMessageLength;
-    private String mainGuildID, mainMusicChannelID, punishmentLogID, discordToken, googleAPIKey, secretKey;
-    private List<String> blockedUsers;
+    private String mainGuildId, musicCommandChannelId, audioChannelId, commandChannelId, logChannelId, discordToken, googleAPIKey, secretKey, commandPrefix = "!", muteRoleName = "Muted";
+    private int messageAlertLength = 275, maxPlaylistQueue = 4;
+    private boolean muteEnabled = false;
 
     public static String FILE_NAME = "settings.json";
 
-    public Config()  {
-        maxMessageLength = 275;
-        mainGuildID = "";
-        mainMusicChannelID = "";
-        punishmentLogID = "";
-
-        discordToken = "";
-        googleAPIKey = "";
-        secretKey = "";
-
-        blockedUsers = new ArrayList<>();
-    }
-
-    public static void save(Object obj) throws IOException {
-        BufferedWriter fout;
-        fout = new BufferedWriter(new FileWriter(FILE_NAME));
-        fout.write(new GsonBuilder().setPrettyPrinting().create().toJson(obj));
-        fout.close();
+    public void save(Object obj) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME));
+        writer.write(new GsonBuilder().setPrettyPrinting().create().toJson(obj));
+        writer.close();
     }
 
     public void load() throws IOException {
-        RandomAccessFile fin;
-        byte[] buffer;
+        BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME));
+        Config config = new Gson().fromJson(reader, Config.class);
+        reader.close();
 
-        fin = new RandomAccessFile(FILE_NAME, "r");
-        buffer = new byte[(int) fin.length()];
-        fin.readFully(buffer);
-        fin.close();
+        this.mainGuildId = config.getMainGuildId();
 
-        String json = new String(buffer);
-        Config file = new Gson().fromJson(json, Config.class);
-        maxMessageLength = file.maxMessageLength;
-        mainGuildID = file.mainGuildID;
-        mainMusicChannelID = file.mainMusicChannelID;
-        punishmentLogID = file.punishmentLogID;
+        this.musicCommandChannelId = config.getMusicCommandChannelId();
+        this.audioChannelId = config.getAudioChannelId();
+        this.commandChannelId = config.getCommandChannelId();
+        this.logChannelId = config.getLogChannelId();
 
-        discordToken = file.discordToken;
-        googleAPIKey = file.googleAPIKey;
-        secretKey = file.secretKey;
+        this.discordToken = config.getDiscordToken();
+        this.googleAPIKey = config.getGoogleAPIKey();
+        this.secretKey = config.getSecretKey();
 
-        blockedUsers = file.blockedUsers;
+        this.commandPrefix = config.getCommandPrefix();
+        this.messageAlertLength = config.getMessageAlertLength();
+        this.maxPlaylistQueue = config.getMaxPlaylistQueue();
+
+        this.muteEnabled = config.isMuteEnabled();
+        this.muteRoleName = config.getMuteRoleName();
     }
 
-    public int getMaxMessageLength() {
-        return maxMessageLength;
-    }
-
-    public String getMainGuildID() {
-        return mainGuildID;
-    }
-
-    public String getMainMusicChannelID() {
-        return mainMusicChannelID;
-    }
-
-    public String getPunishmentLogID() {
-        return punishmentLogID;
-    }
-
-    public String getDiscordToken() {
-        return discordToken;
-    }
-
-    public String getGoogleAPIKey() {
-        return googleAPIKey;
-    }
-
-    public String getSecretKey() {
-        return secretKey;
-    }
-
-    public List<String> getBlockedUsers() {
-        return blockedUsers;
-    }
 }

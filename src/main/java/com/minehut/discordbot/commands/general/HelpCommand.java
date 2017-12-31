@@ -2,10 +2,10 @@ package com.minehut.discordbot.commands.general;
 
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.UserClient;
 import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.MessageBuilder;
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 
@@ -15,23 +15,23 @@ import net.dv8tion.jda.core.entities.TextChannel;
 public class HelpCommand extends Command {
 
     public HelpCommand() {
-        super("help", CommandType.GENERAL, null, "commands", "howdoido", "howdoidothis");
+        super(CommandType.GENERAL, null, "help", "commands", "howdoido", "howdoidothis");
     }
 
     @Override
-    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
+    public boolean onCommand(UserClient sender, Guild guild, TextChannel channel, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
-        Chat.sendMessage(new MessageBuilder().append(sender.getAsMention()).setEmbed(Chat.getEmbed().setColor(Chat.CUSTOM_DARK_GREEN)
+        Chat.sendMessage(new MessageBuilder().append(guild.getMember(sender.getUser()).getAsMention()).setEmbed(Chat.getEmbed().setColor(Chat.CUSTOM_DARK_GREEN)
                 .addField("Music",
+                        "np Shows the currently playing song\n" +
                         "`play <term>` Replace \"term\" with a YouTube/SoundCloud url or a search query to play music\n" +
                         "`queue` Lists the current music playlist of queued messages\n" +
-                        "`skip` Casts your vote to skip the song that is currently playing\n" +
-                        "`random <playlist>` Plays a random song from the specified category", false)
+                        "`skip` Casts your vote to skip the song that is currently playing", false)
+                        //"`random <playlist>` Plays a random song from the specified category"
                 .addField("Minehut",
-                        "`status <network|bot>` See Minehut's network or bot status\n" +
-                        "`user <username>` Shows username changes and Minehut stats\n" +
-                        "`server <name>` Shows about for the player server", false).build()).build(), channel, 20);
+                        "`status <bot|servers>` See the current bot/network status\n" +
+                        "`help` Guess what this command does :thinking:", false).build()).build(), channel, 20);
 
         return true;
     }

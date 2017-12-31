@@ -1,17 +1,16 @@
 package com.minehut.discordbot.commands;
 
+import com.minehut.discordbot.util.UserClient;
 import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Member;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 public abstract class Command {
 
-    private String name;
-    private String[] aliases;
-    private String usage;
     private CommandType type;
+    private String usage;
+    private String[] commands;
 
     public enum CommandType {
         GENERAL,
@@ -20,32 +19,13 @@ public abstract class Command {
         MASTER
     }
 
-    protected Command(String name, CommandType type, String usage, String... aliases) {
-        this.name = name;
-        this.aliases = aliases;
-        this.usage = usage;
+    protected Command(CommandType type, String usage, String... commands) {
         this.type = type;
+        this.usage = usage;
+        this.commands = commands;
     }
 
-    public abstract boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException;
-
-    /**
-     * Get the name of the command used after the prefix
-     *
-     * @return The command name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Gets the aliases of the command
-     *
-     * @return The command aliases
-     */
-    public String[] getAliases() {
-        return aliases;
-    }
+    public abstract boolean onCommand(UserClient sender, Guild guild, TextChannel channel, Message message, String[] args) throws CommandException;
 
     /**
      * Gets the type of the command
@@ -62,7 +42,16 @@ public abstract class Command {
      * @return the usage for the command
      */
     public String getUsage() {
-        return getName() + " " + usage;
+        return commands[0] + " " + usage;
+    }
+
+    /**
+     * Gets the commands
+     *
+     * @return the commands
+     */
+    public String[] getCommands() {
+        return commands;
     }
 
 }

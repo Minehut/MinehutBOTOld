@@ -2,6 +2,7 @@ package com.minehut.discordbot.commands.management;
 
 import com.minehut.discordbot.commands.Command;
 import com.minehut.discordbot.util.Chat;
+import com.minehut.discordbot.util.UserClient;
 import com.minehut.discordbot.util.exceptions.CommandException;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.entities.Guild;
@@ -15,21 +16,24 @@ import net.dv8tion.jda.core.entities.TextChannel;
 public class JoinCommand extends Command {
 
     public JoinCommand() {
-        super("join", CommandType.TRUSTED, null, "summon");
+        super(CommandType.TRUSTED, null, "join", "summon");
     }
 
     @Override
-    public boolean onCommand(Guild guild, TextChannel channel, Member sender, Message message, String[] args) throws CommandException {
+    public boolean onCommand(UserClient sender, Guild guild, TextChannel channel, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
-        if (guild.getSelfMember().hasPermission(sender.getVoiceState().getChannel(), Permission.VOICE_CONNECT)) {
-            try {
-                guild.getAudioManager().openAudioConnection(sender.getVoiceState().getChannel());
-            } catch (Exception e) {
-                Chat.sendMessage("Could not connect! Reason:\n```" + e.getMessage() + "```", channel, 10);
+        Member member = guild.getMember(sender.getUser());
+
+        if (member.getVoiceState().inVoiceChannel()) {
+            if (guild.getSelfMember().hasPermission(member.getVoiceState().getChannel(), Permission.VOICE_CONNECT)) {
+
+                guild.getAudioManager().openAudioConnection(member.getVoiceState().getChannel());
+            } else {
+                Chat.sendMessage(member.getAsMention() + " I don't have permission to connect to that channel!", channel, 10);
             }
         } else {
-            Chat.sendMessage("I don't have permission to connect to that channel!", channel, 10);
+            Chat.sendMessage(member.getAsMention() + " You are not in a voice channel!", channel, 10);
         }
 
         return true;

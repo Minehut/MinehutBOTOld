@@ -1,34 +1,46 @@
 package com.minehut.discordbot.util;
 
-import com.minehut.discordbot.Core;
+import com.minehut.discordbot.MinehutBot;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.MessageBuilder;
-import net.dv8tion.jda.core.entities.Guild;
-import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.User;
+import net.dv8tion.jda.core.entities.*;
+import okhttp3.Request;
+import okhttp3.ResponseBody;
 import org.json.JSONArray;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 
 /**
  * Created by MatrixTunnel on 12/8/2016.
  */
 public class Bot {
 
-    public static List<Message> nowPlaying;
+    private static MinehutBot bot = MinehutBot.get();
+    private static Config config = bot.getConfig();
 
-    public static User getCreator() {
-        return Core.getClient().getUserById("118088732753526784"); //MatrixTunnel#7348
+    public static List<Message> nowPlaying = new ArrayList<>();
+
+    public static Message getLoadingMessage() {
+        return new MessageBuilder().setEmbed(Chat.getEmbed().addField("Gathering Information...", "This may take a few moments", true)
+                .setColor(Chat.CUSTOM_ORANGE).build()).build();
     }
 
-    public static String getLogo() {
-        return Core.getClient().getSelfUser().getAvatarUrl();
+    public static void logGuildMessage(MessageBuilder message) {
+        if (config.getLogChannelId() != null)
+            bot.getDiscordClient().getTextChannelById(config.getLogChannelId()).sendMessage(message.build()).queue();
+    }
+
+    public static User getCreator() {
+        return bot.getDiscordClient().getUserById(118088732753526784L); //MatrixTunnel#7348
+    }
+
+    public static String getLogoUrl() {
+        return bot.getDiscordClient().getSelfUser().getAvatarUrl();
     }
 
     public static String getMb(long bytes) {
@@ -36,23 +48,23 @@ public class Bot {
     }
 
     public static void updateUsers() {
-        if (Core.getClient().getGuilds().contains(Core.getClient().getGuildById("239599059415859200"))) { //Minehut
-            Core.getDiscord().streaming(getMainGuild().getMembers().size() + " Discord users!", "https://minehut.com");
+        if (bot.getDiscordClient().getGuilds().contains(getMainGuild())) {
+            setGame(Game.of(Game.GameType.WATCHING, getMainGuild().getMembers().size() + " discord users!", "https://minehut.com"));
         } else {
-            Core.getDiscord().streaming("with my code", "https://minehut.com");
+            setGame(Game.of(Game.GameType.STREAMING, "my code", "https://www.twitch.tv/p/security"));
         }
     }
 
+    public static Role getMutedRole() {
+        return config.isMuteEnabled() ? getMainGuild().getRolesByName(config.getMuteRoleName(), true).isEmpty() ? null : getMainGuild().getRolesByName(config.getMuteRoleName(), true).get(0) : null;
+    }
+
     public static Guild getMainGuild() {
-        return Core.getClient().getGuildById(Core.getConfig().getMainGuildID());
+        return bot.getDiscordClient().getGuildById(config.getMainGuildId());
     }
 
-    public static void logGuildMessage(MessageBuilder message, Guild guild) {
-        if (GuildSettings.getLogChannel(guild) != null) GuildSettings.getLogChannel(guild).sendMessage(message.build()).queue();
-    }
-
-    public static String getBotTime() {
-        return Bot.formatTime(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+    public static String getBotTime() { //TODO getFormattedBotTime
+        return formatTime(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
     }
 
     public static String formatTime(LocalDateTime time) {
@@ -77,18 +89,21 @@ public class Bot {
         }
     }
 
-    public static String getMCOwnerName(String UUID) {
+    public static String getMinecraftUsername(UUID minecraftUuid) {
         try {
-            JSONArray json = new URLJson("https://api.mojang.com/user/profiles/" + UUID.replaceAll("-", "") + "/names").getJsonArray();
-            return json.getJSONObject(json.length() - 1).getString("name");
-        } catch (Exception ex) {
+            ResponseBody body = bot.getHttpClient().newCall(new Request.Builder()
+                    .url("https://api.mojang.com/user/profiles/" + minecraftUuid.toString().replaceAll("-", "") + "/names")
+                    .header("Accept", "application/json").build()).execute().body();
+
+            if (body != null) {
+                JSONArray json = new JSONArray(body.string());
+                return json.getJSONObject(json.length() - 1).getString("name");
+            }
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
-        return "null";
-    }
 
-    public static boolean hasInvite(Message message) {
-        return Pattern.compile("(?:https?://)?discord(?:app\\.com/invite|\\.gg|\\.io)/(\\S+?)").matcher(message.getRawContent()).find();
+        return "null";
     }
 
     public static String millisToTime(long millis, boolean format) {
@@ -101,27 +116,42 @@ public class Bot {
         long seconds = TimeUnit.MILLISECONDS.toSeconds(millis);
 
         StringBuilder sb = new StringBuilder(64);
-        if (days > 0) {
-            sb.append(days);
-            sb.append(format ? "d " : ":");
-        }
-        if (hours > 0) {
-            sb.append(hours);
-            sb.append(format ? "h " : ":");
-        }
-        sb.append(format ? minutes : minutes < 10 && hours < 1 ? minutes : "0" + minutes);
-        sb.append(format ? "m " : ":");
+        if (days > 0)
+            sb.append(days).append(format ? "d " : ":");
 
-        sb.append(format ? seconds : seconds < 10 ? "0" + seconds : seconds);
-        sb.append(format ? "s" : "");
+        if (hours > 0)
+            sb.append(hours).append(format ? "h " : ":");
+
+        sb.append(format ? minutes : minutes < 10 ? "0" + minutes : minutes)
+                .append(format ? "m " : ":");
+
+        sb.append(format ? seconds : seconds < 10 ? "0" + seconds : seconds)
+                .append(format ? "s" : "");
 
         return (sb.toString());
     }
 
+    public static VoiceChannel getConnectedVoiceChannel() {
+        return getMainGuild().getAudioManager().isConnected() ? getMainGuild().getAudioManager().getConnectedChannel() : null;
+    }
+
+    public static boolean isReady() {
+        return bot.getDiscordClient().getStatus().equals(JDA.Status.CONNECTED);
+    }
+
+    public static boolean userHasRoleId(Member member, String id) {
+        Role role = bot.getDiscordClient().getRoleById(id);
+        return role != null && member.getRoles().contains(role);
+    }
+
+    public static void setGame(Game game) {
+        bot.getDiscordClient().getPresence().setGame(game);
+    }
+
     public static JSONArray reverseJsonArray(JSONArray array) {
-        List<Object> reverse = array.toList();
-        Collections.reverse(reverse);
-        return new JSONArray(reverse);
+        List<Object> reverseArray = array.toList();
+        Collections.reverse(reverseArray);
+        return new JSONArray(reverseArray);
     }
 
 }

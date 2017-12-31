@@ -10,26 +10,30 @@ import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.TextChannel;
 
 /**
- * Created by MatrixTunnel on 1/30/2017.
+ * Created by MatrixTunnel on 8/10/2017.
  */
-public class ShutdownCommand extends Command {
+public class NameCommand extends Command {
 
-    public ShutdownCommand() {
-        super(CommandType.MASTER, null, "shutdown", "stop", "exit", "end");
+    public NameCommand() {
+        super(CommandType.MASTER, "<name>", "name");
     }
 
     @Override
     public boolean onCommand(UserClient sender, Guild guild, TextChannel channel, Message message, String[] args) throws CommandException {
         Chat.removeMessage(message);
 
-        if (args.length == 1 && args[0].equals("-r")) {
-            MinehutBot.get().shutdown(true);
+        if (args.length >= 1) {
+            StringBuilder b = new StringBuilder();
+            for (String s : args) {
+                b.append(s).append(" ");
+            }
+            MinehutBot.get().getDiscordClient().getSelfUser().getManager()
+                    .setName(b.toString().length() > 32 ? b.toString().substring(0, 32) : b.toString()).complete();
         } else {
-            MinehutBot.get().shutdown(false);
+            return false;
         }
 
         return true;
     }
-
 
 }
