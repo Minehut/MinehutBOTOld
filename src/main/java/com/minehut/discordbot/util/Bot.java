@@ -31,7 +31,7 @@ public class Bot {
     }
 
     public static void logGuildMessage(MessageBuilder message) {
-        if (config.getLogChannelId() != null)
+        if (config.getLogChannelId() != null && !config.getLogChannelId().isEmpty())
             bot.getDiscordClient().getTextChannelById(config.getLogChannelId()).sendMessage(message.build()).queue();
     }
 
