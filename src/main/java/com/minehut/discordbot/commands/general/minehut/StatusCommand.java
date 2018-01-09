@@ -56,47 +56,10 @@ public class StatusCommand extends Command {
 
 
             switch (args[0]) {
-                //case "network":
-                //    try {
-                //        ResponseBody body = MinehutBot.get().getHttpClient().newCall(new Request.Builder()
-                //                .url("https://minehut.com/api/status/")
-                //                .header("accept", "application/json").build())
-                //                .execute().body();
-
-                //       if (body != null) {
-                //            JSONObject status = new JSONObject(body.string());
-
-                //            embed.clearFields()
-                //                    .addField("Users Online", status.getJSONObject("ping").getJSONObject("players").get("online") + "/" +
-                //                            status.getJSONObject("ping").getJSONObject("players").get("max"), true)
-                //                    .addField("Servers Online", status.getInt("totalPlayerServerCount") + "/" + status.getInt("totalPlayerMaxServerCount"), true)
-                //                    .addField("Ram Usage", (status.getInt("totalPlayerServerRamUsage") / 1024) + "/" + status.getInt("totalPlayerServerMaxRam") + " GB", true)
-                //                    .addField("Players on Player Servers", String.valueOf(status.getInt("totalPlayerServerPlayerCount")), true);
-
-                //            Matcher matcher = Pattern.compile("(?<=\"text\":\").*?(?=\")").matcher(String.valueOf(status.getJSONObject("ping").getJSONObject("description")));
-
-                //            StringBuilder motd = new StringBuilder();
-
-                //            while (matcher.find()) {
-                //               motd.append(matcher.group());
-                //            }
-
-                //            Chat.editMessage(Chat.respondMessage(member, embed.setDescription("`" + motd.toString().replaceAll("§(.)", "") + "`").setAuthor("Minehut Network Status", "https://minehut.com", Bot.getLogo())
-                //                    .setColor(Chat.CUSTOM_GREEN).build()), mainMsg, 20);
-                //            return true;
-                //        }
-                //    } catch (IOException e) {
-                //        e.printStackTrace();
-                //    }
-
-                //    Chat.editMessage(Chat.respondMessage(member, embed.clearFields().setAuthor("Network Status", "https://minehut.com", Bot.getLogoUrl())
-                //            .setDescription("\nUnable to load network status. Please try again later\n")
-                //            .setColor(Chat.CUSTOM_RED).build()), mainMsg, 10);
-                //    return true;
                 case "bot":
                     Runtime runtime = Runtime.getRuntime();
                     Chat.editMessage(Chat.respondMessage(member, embed.clearFields()
-                            .setAuthor(bot.getDiscordClient().getSelfUser().getName() + " Bot Info", "https://minehut.com", bot.getDiscordClient().getSelfUser().getAvatarUrl())
+                            .setAuthor(bot.getDiscordClient().getSelfUser().getName() + " Bot Info", "https://minehut.com", bot.getDiscordClient().getSelfUser().getEffectiveAvatarUrl())
                             .addField("Memory Usage", Bot.getMb(runtime.totalMemory() - runtime.freeMemory()), true)
                             .addField("Memory Free", Bot.getMb(runtime.freeMemory()), true)
                             .addField("Total Memory", Bot.getMb(runtime.totalMemory()), true)

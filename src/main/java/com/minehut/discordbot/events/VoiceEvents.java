@@ -1,7 +1,6 @@
 package com.minehut.discordbot.events;
 
 import com.minehut.discordbot.MinehutBot;
-import com.minehut.discordbot.util.tasks.BotTask;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.core.events.guild.voice.GuildVoiceMuteEvent;
@@ -27,13 +26,6 @@ public class VoiceEvents extends ListenerAdapter {
                 MinehutBot.get().getMusicManager().getPlayer(event.getGuild().getId()).skip();
             }
         }
-
-        new BotTask("RejoinVoice") {
-            @Override
-            public void run() {
-                if (event.getChannelLeft() != null) event.getChannelLeft().getGuild().getAudioManager().openAudioConnection(event.getChannelLeft());
-            }
-        }.delay(5000);
     }
 
     @Override
