@@ -2,8 +2,11 @@ package com.minehut.discordbot.util;
 
 import com.minehut.discordbot.MinehutBot;
 import lombok.Getter;
+import net.dv8tion.jda.core.entities.Role;
 import net.dv8tion.jda.core.entities.User;
 import org.json.JSONObject;
+
+import java.util.Arrays;
 
 /**
  * Created by MatrixTunnel on 12/31/2017.
@@ -69,7 +72,19 @@ public class UserClient {
     }
 
     private JSONObject createUserObject() {
-        JSONObject object = new JSONObject().put("id", id).put("rank", Rank.DEFAULT).put("discord_muted", false);
+        Rank rank = null;
+
+        for (Role role : Bot.getMainGuild().getMemberById(id).getRoles()) {
+            if (rank == null) {
+                rank = getRankByRole(role);
+            } else {
+                if (getRankByRole(role).ordinal() > rank.ordinal()) {
+                    rank = getRankByRole(role);
+                }
+            }
+        }
+
+        JSONObject object = new JSONObject().put("id", id).put("rank", rank).put("discord_muted", false);
         userManager.getUserJson().put(object);
         return object;
     }
@@ -92,6 +107,10 @@ public class UserClient {
 
     public String toString() {
         return "{id=\"" + id + "\",rank=\"" + rank.name() + "\",discord_muted=\"" + String.valueOf(muted) + "\"}";
+    }
+
+    private Rank getRankByRole(Role role) {
+        return Arrays.stream(Rank.values()).filter(r -> r.getDisplayName().equals(role.getName())).findFirst().orElse(Rank.DEFAULT);
     }
 
 }
