@@ -36,6 +36,6 @@ fabric.properties
 /settings.json
 /punishments.json
 /guilds.json
-discordbot.iml
 /latest.log
 /users.json
+/*.iml
