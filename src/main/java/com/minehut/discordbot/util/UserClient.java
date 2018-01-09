@@ -101,6 +101,8 @@ public class UserClient {
     }
 
     private Rank getCurrentRank(List<Role> roles) {
+        if (roles.isEmpty()) return Rank.DEFAULT;
+
         Rank rank = null;
 
         for (Role role : roles) {
