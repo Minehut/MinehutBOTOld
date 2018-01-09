@@ -19,8 +19,7 @@ public class UserClient {
     @Getter private boolean muted;
 
     public enum Rank {
-        DEVELOPER("Developers"),
-        JR_DEVELOPER("Junior Developers"),
+        ADMIN("Admins"),
         SR_MOD("Senior Moderators"),
         MOD("Moderators"),
         JR_MOD("Junior Moderators"),
@@ -80,7 +79,7 @@ public class UserClient {
     }
 
     public boolean isStaff() {
-        return rank.ordinal() <= 4; // staff ranks (5) - 1 = 4
+        return rank.ordinal() <= 3; // staff ranks (4) - 1 = 3
     }
 
     public void toggleMute() {
