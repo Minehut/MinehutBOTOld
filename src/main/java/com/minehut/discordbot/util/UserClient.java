@@ -7,6 +7,7 @@ import net.dv8tion.jda.core.entities.User;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by MatrixTunnel on 12/31/2017.
@@ -65,6 +66,8 @@ public class UserClient {
         for (Object obj : userManager.getUserJson()) {
             JSONObject object = (JSONObject) obj;
             if (object.optString("id", "").equals(id)) {
+                String rankName = getCurrentRank(Bot.getMainGuild().getMemberById(id).getRoles()).name();
+                if (!object.optString("rank", "DEFAULT").equals(rankName)) object.put("rank", rankName);
                 return object;
             }
         }
@@ -72,19 +75,7 @@ public class UserClient {
     }
 
     private JSONObject createUserObject() {
-        Rank rank = null;
-
-        for (Role role : Bot.getMainGuild().getMemberById(id).getRoles()) {
-            if (rank == null) {
-                rank = getRankByRole(role);
-            } else {
-                if (getRankByRole(role).ordinal() > rank.ordinal()) {
-                    rank = getRankByRole(role);
-                }
-            }
-        }
-
-        JSONObject object = new JSONObject().put("id", id).put("rank", rank).put("discord_muted", false);
+        JSONObject object = new JSONObject().put("id", id).put("rank", getCurrentRank(Bot.getMainGuild().getMemberById(id).getRoles()).name()).put("discord_muted", false);
         userManager.getUserJson().put(object);
         return object;
     }
@@ -107,6 +98,22 @@ public class UserClient {
 
     public String toString() {
         return "{id=\"" + id + "\",rank=\"" + rank.name() + "\",discord_muted=\"" + String.valueOf(muted) + "\"}";
+    }
+
+    private Rank getCurrentRank(List<Role> roles) {
+        Rank rank = null;
+
+        for (Role role : roles) {
+            if (rank == null) {
+                rank = getRankByRole(role);
+            } else {
+                if (getRankByRole(role).ordinal() > rank.ordinal()) {
+                    rank = getRankByRole(role);
+                }
+            }
+        }
+
+        return rank;
     }
 
     private Rank getRankByRole(Role role) {
