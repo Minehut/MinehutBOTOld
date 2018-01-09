@@ -13,7 +13,7 @@ import java.io.*;
 @Getter @NoArgsConstructor
 public class Config {
 
-    private String mainGuildId, musicCommandChannelId, audioChannelId, commandChannelId, logChannelId, discordToken, googleAPIKey, secretKey, commandPrefix = "!", muteRoleName = "Muted";
+    private String mainGuildId= "", musicCommandChannelId = "", audioChannelId = "", commandChannelId = "", logChannelId = "", discordToken = "", googleAPIKey = "", secretKey = "", commandPrefix = "!", muteRoleName = "Muted";
     private int messageAlertLength = 275, maxPlaylistQueue = 4;
     private boolean muteEnabled = false;
 
