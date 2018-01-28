@@ -77,16 +77,17 @@ public class StatusCommand extends Command {
                 case "servers":
                     try {
                         ResponseBody body = MinehutBot.get().getHttpClient().newCall(new Request.Builder()
-                                .url("https://pocket.minehut.com/servers")
+                                .url("https://pocket.minehut.com/network/simple_stats")
                                 .header("accept", "application/json").build())
                                 .execute().body();
 
                         if (body != null) {
-                            JSONArray servers = new JSONObject(body.string()).getJSONArray("servers");
+                            JSONObject networkValues = new JSONObject(body.string());
 
                             Chat.editMessage(Chat.respondMessage(member, embed.clearFields()
-                                    .setAuthor("Active Network Servers", "https://minehut.com")
-                                    .addField("Online", servers.toList().stream().filter(o -> new JSONObject(o).optBoolean("online", false)).count() + "/" + servers.length(), true)
+                                    .setAuthor("Network Statistics", "https://minehut.com")
+                                    .addField("Player Count", "" + networkValues.getInt("player_count"), true)
+                                    .addField("Online Servers", "" + networkValues.getInt("server_count"), true)
                                     .setColor(Chat.CUSTOM_GREEN).build()), mainMsg, 20);
                             return true;
                         }
