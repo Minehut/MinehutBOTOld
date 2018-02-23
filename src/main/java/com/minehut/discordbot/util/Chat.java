@@ -27,7 +27,7 @@ public class Chat {
     }
 
     public static boolean hasInvite(Message message) {
-        return Pattern.compile("(?:https?://)?discord(?:app\\.com/invite|\\.gg|\\.io)/(\\S+?)").matcher(message.getContentRaw()).find();
+        return Pattern.compile("(?:https?://)?discord(?:app\\.com/invite|\\.gg|\\.io)/(\\S+?)").matcher(message.getContentRaw().toLowerCase()).find();
     }
 
     public static boolean hasRegex(Pattern regex, String imput) {
