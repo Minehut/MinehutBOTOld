@@ -24,7 +24,7 @@ public class HelpCommand extends Command {
 
         Chat.sendMessage(new MessageBuilder().append(guild.getMember(sender.getUser()).getAsMention()).setEmbed(Chat.getEmbed().setColor(Chat.CUSTOM_DARK_GREEN)
                 .addField("Music",
-                        "np Shows the currently playing song\n" +
+                        "Shows the currently playing song\n" +
                         "`play <term>` Replace \"term\" with a YouTube/SoundCloud url or a search query to play music\n" +
                         "`queue` Lists the current music playlist of queued messages\n" +
                         "`skip` Casts your vote to skip the song that is currently playing", false)
